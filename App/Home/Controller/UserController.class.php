@@ -36,7 +36,7 @@ class UserController extends Controller
 
     public function checkLogin()
     {
-        if (empty(I("session.uaername"))) {
+        if (empty(I("session.username"))) {
             return false;
         } else {
             return true;
@@ -72,7 +72,7 @@ class UserController extends Controller
             $_SESSION['userId'] = $this->id;
             $_SESSION['username'] = $this->username;
             $_SESSION['admin'] = $this->admin;
-            $this->success("登录成功!");
+            $this->success("登录成功!","Index/index");
         } else {
             $this->error("用户名或者密码不正确");
         }
@@ -101,6 +101,52 @@ class UserController extends Controller
         $info['realname'] = $this->realname;
         $info['admin'] = $this->admin;
         return $this->db->data($info)->save();
+    }
+
+    public function addUser(){
+        if($this->checkAdmin()===true){
+            if(I("post.do")=="addUser"){
+                $info['username'] = I("post.username");
+                $info['password'] = I("post.password");
+                $info['realname'] = I("post.realname");
+                $info['admin'] = I("post.admin",0);
+                $res = $this->db->data($info)->add();
+                if($res){
+                    $this->ajaxReturn(array('code'=>200,'msg'=>"ok",'result'=>$res));
+                }else{
+                    $this->ajaxReturn(array('code'=>400,'msg'=>"add error",'result'=>$this->db->error()));
+                }
+            }
+            else{
+                $this->display();
+            }
+        }else{
+            $this->error("权限错误!");
+        }
+    }
+
+    public function delUser(){
+        if($this->checkAdmin()===true){
+            if(I("post.do")=="delUser"){
+                $info['id'] = I("post.id");
+                $user = $this->db->where($info)->find();
+                if($user){
+                    if($user['admin']==0){
+                        $res = $this->db->where($user)->delete();
+                        $this->ajaxReturn(array('code'=>200,'msg'=>"ok",'result'=>$res));
+                    }else{
+                        $this->ajaxReturn(array('code'=>400,'msg'=>"不能删除管理员",'result'=>""));
+                    }
+                }else{
+                    $this->ajaxReturn(array('code'=>400,'msg'=>"no this user",'result'=>$this->db->error()));
+                }
+            }
+            else{
+                $this->display();
+            }
+        }else{
+            $this->error("权限错误!");
+        }
     }
 
 
