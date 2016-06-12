@@ -92,7 +92,7 @@ class UserController extends Controller
 
     public function saveInfo()
     {
-        if($this->id !== I("session.userId") && $this->checkAdmin()===false){
+        if($this->id !== I("session.userId") || $this->checkAdmin()===false){
             return false;
         }
         $info['id'] = $this->id;
