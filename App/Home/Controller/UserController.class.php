@@ -65,6 +65,7 @@ class UserController extends Controller
         $user['password'] = md5(I("post.password"));
         $result = $this->db->where($user)->find();
         if ($result) {
+            $this->id = $result['id'];
             $this->username = $result['username'];
             $this->password = $result['password'];
             $this->realname = $result['realname'];
@@ -72,7 +73,8 @@ class UserController extends Controller
             $_SESSION['userId'] = $this->id;
             $_SESSION['username'] = $this->username;
             $_SESSION['admin'] = $this->admin;
-            $this->success("登录成功!","Index/index");
+//            $this->success("登录成功!","/Store/Index");
+            $this->redirect("/Home/Store/Index");
         } else {
             $this->error("用户名或者密码不正确");
         }

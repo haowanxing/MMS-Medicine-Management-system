@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./Public/Tpl/head.html" title="基本信息管理" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<include file="./Public/Tpl/nav.html"/>
+<div class="container">
+  <div class="col-md-2">
+    <div class="panel panel-default">
+      <div class="panel-heading">功能</div>
+      <div class="list-group list-menu">
+        <button type="button" class="list-group-item list-menu active" data-to="0">药店信息</button>
+        <button type="button" class="list-group-item list-menu" data-to="1">药品</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-10">
+    <div class="panel panel-info func">
+      <div class="panel-heading" style="text-align: center">{$store.storename}</div>
+      <div class="panel-body">
+        <p>{$store.storename}的简介在这里</p>
+      </div>
+      <table class="table table-hover">
+        <tr><td>店铺联系方式:</td><td>{$store.telephone}</td></tr>
+        <tr><td>店长手机号码:</td><td>{$store.mobile}</td></tr>
+        <tr><td>店铺地址:</td><td>{$store.address}</td></tr>
+      </table>
+    </div>
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">药品信息库</div>
+      <table class="table table-hover">
+        <thead>
+        <tr><th>药品编号</th><th>药品名称</th><th>拼音码</th><th>规格</th><th>单位</th><th>最低限数量</th></tr>
+        </thead>
+        <tbody id="drugList">
+        {$drugList}
+        </tbody>
+      </table>
+      <div id="drugPage" class="center">
+        <nav>
+          <ul class="pagination">
+            <li>
+              <a href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+
+            <for start="1" end="$drugListCount+1">
+              <li><a href="#" data-to="{$i}">{$i}</a></li>
+            </for>
+            <li>
+              <a href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+<include file="./Public/Tpl/footer.html"/>
+<script>
+  var drugPage = $("#drugPage");
+  var storagePage = $("#storagePage");
+  drugPage.bind("click",function(ev){
+    ev.stopPropagation();
+    var page = ev.target.getAttribute("data-to");
+    $.ajax({
+      type: 'POST',
+      url: '__MODULE__/Index/getDrugList',
+      data:{"do":"loadmore","page":page},
+      success: function (data) {
+        if(data){
+          console.log(data);
+          $('#drugList').html(data.table);
+        }
+      },
+      error: function (xhr, type) {
+        alert('Ajax error!');
+      }
+    });
+    $("#drugPage li").removeClass("active");
+    $("[data-to='"+page+"']").parent().addClass("active");  });
+</script>
+</body>
+</html>

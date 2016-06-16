@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./Public/Tpl/head.html" title="利润统计" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<include file="./Public/Tpl/nav.html"/>
+<div class="container">
+  <div class="col-md-2">
+    <div class="panel panel-default">
+      <div class="panel-heading">功能</div>
+      <div class="list-group list-menu">
+        <button type="button" class="list-group-item list-menu active" data-to="0">总数据</button>
+        <button type="button" class="list-group-item list-menu" data-to="1">无</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-10">
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">数据概览</div>
+      <table class="table table-bordered table-hover">
+        <thead>
+        <tr><th></th><th>数据</th></tr>
+        </thead>
+        <tbody id="profitData">
+        <tr><td>进货支出</td><td class="info">-{$profitData.storage}</td></tr>
+        <tr><td>销售收入</td><td class="success">+{$profitData.sell}</td></tr>
+        <tr><td>退货支出</td><td class="info">-{$profitData.return}</td></tr>
+        <tr><td>报损支出</td><td class="info">-{$profitData.breakage}</td></tr>
+        <tr><td>合计</td><td class="warning">{$profitData.heji}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">功能名称2</div>
+      ...
+    </div>
+  </div>
+</div>
+<include file="./Public/Tpl/footer.html"/>
+</body>
+</html>

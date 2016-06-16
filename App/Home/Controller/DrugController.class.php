@@ -18,7 +18,27 @@ class DrugController extends Controller
     }
 
     public function drugList(){
-
+        $list = $this->db->select();
+        return $list;
+    }
+    public function getDrugList(){
+        isset($_POST['page'])?$page=I("post.page"):$page=1;
+        isset($_POST['limit'])?$limit=I("post.limit"):$limit=10;
+        $data = $this->db->page($page,$limit)->select();
+        $count = $this->db->count()/$limit;
+        $string = "";
+        foreach($data as $key=>$value){
+            $string .= "<tr>";
+            $string .= "<td>".$value['drug_id']."</td>";
+            $string .= "<td>".$value['name']."</td>";
+            $string .= "<td>".$value['pinyinma']."</td>";
+            $string .= "<td>".$value['spec']."</td>";
+            $string .= "<td>".$value['unit']."</td>";
+            $string .= "<td>".$value['lowwarning']."</td>";
+            $string .= "</tr>";
+        }
+        $retMsg = array('code'=>200,"pageCount"=>ceil($count),"table"=>$string);
+        return $retMsg;
     }
 
     public function saveInfo(){
@@ -65,7 +85,7 @@ class DrugController extends Controller
      */
     public function setId($id)
     {
-        $this->data['id'] = $id;
+        $this->data['drug_id'] = $id;
         return $this;
     }
 

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./Public/Tpl/head.html" title="退货管理" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<include file="./Public/Tpl/nav.html"/>
+<div class="container">
+  <div class="col-md-2">
+    <div class="panel panel-default">
+      <div class="panel-heading">功能</div>
+      <div class="list-group list-menu">
+        <button type="button" class="list-group-item list-menu active" data-to="0">药品退货</button>
+        <button type="button" class="list-group-item list-menu" data-to="1">退货记录</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-10">
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">功能名称1</div>
+      ...
+    </div>
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">退货记录</div>
+      <table class="table table-hover">
+        <thead>
+        <tr><th>退货编号</th><th>库存编号</th><th>药品名称</th><th>规格</th><th>单位</th><th>单价</th><th>退货数量</th><th>退货总额</th><th>退货日期</th><th>操作员</th><th>原因</th></tr>
+        </thead>
+        <tbody id="returnList">
+        {$returnList}
+        </tbody>
+      </table>
+      <div id="returnPage">
+        <for start="1" end="$returnListCount">
+          <a href="#" data-to="{$i}">{$i}</a>
+        </for>
+      </div>
+    </div>
+  </div>
+</div>
+<include file="./Public/Tpl/footer.html"/>
+</body>
+</html>

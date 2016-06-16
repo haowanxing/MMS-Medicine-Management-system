@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./Public/Tpl/head.html" title="入库管理" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<include file="./Public/Tpl/nav.html"/>
+<div class="container">
+  <div class="col-md-2">
+    <div class="panel panel-default">
+      <div class="panel-heading">功能</div>
+      <div class="list-group list-menu">
+        <button type="button" class="list-group-item list-menu active" data-to="0">新增药品</button>
+        <button type="button" class="list-group-item list-menu" data-to="1">药品入库</button>
+        <button type="button" class="list-group-item list-menu" data-to="2">入库记录</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-10">
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">新增药品</div>
+
+    </div>
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">药品入库</div>
+      <form class="form-horizontal" action="{$url_storage}">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="inputPinyin" class="col-sm-3 control-label">拼音码</label>
+            <div class="col-sm-9">
+              <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPihao" class="col-sm-3 control-label">批号</label>
+            <div class="col-sm-9">
+              <input name="pihao" type="text" class="form-control" id="inputPihao" placeholder="药品批号">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPizhunwenhao" class="col-sm-3 control-label">批准文号</label>
+            <div class="col-sm-9">
+              <input name="pizhunwenhao" type="text" class="form-control" id="inputPizhunwenhao" placeholder="药品批准文号">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputAmount" class="col-sm-3 control-label">进货数量</label>
+            <div class="col-sm-9">
+              <input name="amount" type="text" width="10" class="form-control" id="inputAmount" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPrice" class="col-sm-3 control-label">进货单价</label>
+            <div class="col-sm-9">
+              <input name="inprice" type="text" class="form-control" id="inputPrice" placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputAllprice" class="col-sm-3 control-label">进货总额</label>
+            <div class="col-sm-9">
+              <input name="allprice" type="text" class="form-control" id="inputAllprice" placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputTime" class="col-sm-3 control-label">进货时间</label>
+            <div class="col-sm-9">
+              <input name="in_time" type="text" class="form-control" id="inputTime" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputFrom" class="col-sm-3 control-label">进货单位</label>
+            <div class="col-sm-9">
+              <input name="in_from" type="text" class="form-control" id="inputFrom" placeholder="0">
+            </div>
+          </div>
+
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="inputName" class="col-sm-3 control-label">名称</label>
+            <div class="col-sm-9">
+              <input name="name" type="text" class="form-control" disabled id="inputName" placeholder="药品名称">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputSpec" class="col-sm-3 control-label">规格大小</label>
+            <div class="col-sm-9">
+              <input name="spec" type="text" class="form-control" disabled id="inputSpec" placeholder="规格">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputUnit" class="col-sm-3 control-label">计量单位</label>
+            <div class="col-sm-9">
+              <input name="unit" type="text" class="form-control" disabled id="inputUnit" placeholder="单位">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputLowwarning" class="col-sm-3 control-label">库存低限</label>
+            <div class="col-sm-9">
+              <input name="lowwarning" type="text" class="form-control" disabled id="inputLowwarning" placeholder="最低库存保存">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputFactory" class="col-sm-3 control-label">生产厂家</label>
+            <div class="col-sm-9">
+              <input name="factory" type="text" class="form-control" id="inputFactory" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputProduceDate" class="col-sm-3 control-label">生产日期</label>
+            <div class="col-sm-9 input-append date form_datetime">
+              <input name="producedate" type="text" class="form-control" id="inputProduceDate" readonly placeholder="">
+              <span class="add-on"><i class="icon-th"></i></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputUsefulDate" class="col-sm-3 control-label">失效日期</label>
+            <div class="col-sm-9 input-append date form_datetime">
+              <input name="usefuldate" type="text" class="form-control" id="inputUsefulDate" readonly placeholder="">
+              <span class="add-on"><i class="icon-th"></i></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputRemark" class="col-sm-3 control-label">备注</label>
+            <div class="col-sm-9">
+              <input name="remark" type="text" class="form-control" id="inputRemark" placeholder="无">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-9">
+            <button type="button" class="btn btn-default submit">新增</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">入库记录</div>
+      <table class="table table-hover">
+        <thead>
+        <tr><th>编号</th><th>药品名称</th><th>批号</th><th>批准文号</th><th>数量</th><th>进货单价</th><th>总额</th><th>进货时间</th><th>进货单位</th><th>生产厂家</th><th>生产日期</th><th>到期</th><th>操作员</th><th>备注</th></tr>
+        </thead>
+        <tbody id="storageList">
+        {$storageList}
+        </tbody>
+      </table>
+      <div id="storagePage" class="center">
+        <nav>
+          <ul class="pagination">
+            <for start="1" end="$storageListCount+1">
+              <li><a href="#" data-to="{$i}">{$i}</a></li>
+            </for>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+<include file="./Public/Tpl/footer.html"/>
+<script>
+  storagePage.click(function(ev){
+    var page = ev.target.getAttribute("data-to");
+    $.ajax({
+      type: 'POST',
+      url: '__MODULE__/Index/getStorageList',
+      data:{"do":"loadmore","page":page},
+      success: function (data) {
+        if(data){
+          console.log(data);
+          $('#storageList').html(data.table);
+        }
+      },
+      error: function (xhr, type) {
+        alert('Ajax error!');
+      }
+    });
+  });
+</script>
+</body>
+</html>
