@@ -10,28 +10,12 @@
     <div class="panel panel-default">
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
-        <button type="button" class="list-group-item list-menu active" data-to="0">药品调价</button>
-        <button type="button" class="list-group-item list-menu" data-to="1">调价记录</button>
+        <button type="button" class="list-group-item list-menu active" data-to="0">调价记录</button>
+        <button type="button" class="list-group-item list-menu" data-to="1">药品调价</button>
       </div>
     </div>
   </div>
   <div class="col-md-10">
-    <div class="panel panel-default func">
-      <div class="panel-heading" style="text-align: center">药品调价</div>
-      <table class="table table-hover">
-        <thead>
-        <tr><th>库存编号</th><th>药品名称</th><th>生产厂家</th><th>库存数量</th><th>批号</th><th>批准文号</th><th>销售单价</th><th>入库时间</th><th>生产日期</th><th>失效期</th></tr>
-        </thead>
-        <tbody id="stockList">
-        {$stockList}
-        </tbody>
-      </table>
-      <div id="stockPage">
-        <for start="1" end="$stockListCount">
-          <a href="#" data-to="{$i}">{$i}</a>
-        </for>
-      </div>
-    </div>
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">调价记录</div>
       <table class="table table-hover">
@@ -47,6 +31,10 @@
           <a href="#" data-to="{$i}">{$i}</a>
         </for>
       </div>
+    </div>
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">药品调价</div>
+      <div class="penel-body text-danger">调价请到库存页面:<a href="{:U('Store/Stock')}">点击跳转</a> </div>
     </div>
   </div>
 </div>
