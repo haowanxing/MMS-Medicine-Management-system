@@ -10,25 +10,21 @@
     <div class="panel panel-default">
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
-        <button type="button" class="list-group-item list-menu active" data-to="0">新增药品</button>
-        <button type="button" class="list-group-item list-menu" data-to="1">药品入库</button>
-        <button type="button" class="list-group-item list-menu" data-to="2">入库记录</button>
+        <button type="button" class="list-group-item list-menu active" data-to="0">药品入库</button>
+        <button type="button" class="list-group-item list-menu" onclick="loadStorage()" data-to="1">入库记录</button>
       </div>
     </div>
   </div>
   <div class="col-md-10">
     <div class="panel panel-default func">
-      <div class="panel-heading" style="text-align: center">新增药品</div>
-
-    </div>
-    <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">药品入库</div>
-      <form class="form-horizontal" action="{$url_storage}">
+      <div class="panel-body text-info">首先输入拼音码,确认药品存在后才能执行入库操作</div>
+      <form id="storageForm" class="form-horizontal" target="_blank" action="{:U('Storage/doAdd')}">
         <div class="col-md-6">
           <div class="form-group">
             <label for="inputPinyin" class="col-sm-3 control-label">拼音码</label>
             <div class="col-sm-9">
-              <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码">
+              <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码" autocomplete="off">
             </div>
           </div>
           <div class="form-group">
@@ -63,8 +59,9 @@
           </div>
           <div class="form-group">
             <label for="inputTime" class="col-sm-3 control-label">进货时间</label>
-            <div class="col-sm-9">
-              <input name="in_time" type="text" class="form-control" id="inputTime" placeholder="0">
+            <div class="col-sm-9 input-append date form_datetime">
+              <input name="in_time" type="text" class="form-control" id="inputTime" value="{:date('Y/m/d',time())}" readonly placeholder="点击选择">
+              <span class="add-on"><i class="icon-th"></i></span>
             </div>
           </div>
           <div class="form-group">
@@ -79,7 +76,7 @@
           <div class="form-group">
             <label for="inputName" class="col-sm-3 control-label">名称</label>
             <div class="col-sm-9">
-              <input name="name" type="text" class="form-control" disabled id="inputName" placeholder="药品名称">
+              <input name="name" type="text" class="form-control" readonly id="inputName" placeholder="药品名称">
             </div>
           </div>
           <div class="form-group">
@@ -103,20 +100,20 @@
           <div class="form-group">
             <label for="inputFactory" class="col-sm-3 control-label">生产厂家</label>
             <div class="col-sm-9">
-              <input name="factory" type="text" class="form-control" id="inputFactory" placeholder="0">
+              <input name="factory" type="text" class="form-control" id="inputFactory" placeholder="请输入">
             </div>
           </div>
           <div class="form-group">
             <label for="inputProduceDate" class="col-sm-3 control-label">生产日期</label>
             <div class="col-sm-9 input-append date form_datetime">
-              <input name="producedate" type="text" class="form-control" id="inputProduceDate" readonly placeholder="">
+              <input name="producedate" type="text" class="form-control" id="inputProduceDate" readonly placeholder="点击选择">
               <span class="add-on"><i class="icon-th"></i></span>
             </div>
           </div>
           <div class="form-group">
             <label for="inputUsefulDate" class="col-sm-3 control-label">失效日期</label>
             <div class="col-sm-9 input-append date form_datetime">
-              <input name="usefuldate" type="text" class="form-control" id="inputUsefulDate" readonly placeholder="">
+              <input name="usefuldate" type="text" class="form-control" id="inputUsefulDate" readonly placeholder="点击选择">
               <span class="add-on"><i class="icon-th"></i></span>
             </div>
           </div>
@@ -129,7 +126,8 @@
         </div>
         <div class="form-group">
           <div class="col-sm-offset-2 col-sm-9">
-            <button type="button" class="btn btn-default submit">新增</button>
+            <button id="doStorage" type="button" class="btn btn-success submit">入库</button>
+            <button type="reset" class="btn btn-warning">清空</button>
           </div>
         </div>
       </form>
@@ -157,24 +155,85 @@
   </div>
 </div>
 <include file="./Public/Tpl/footer.html"/>
+<js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
 <script>
+  var storagePage = $("#storagePage");
   storagePage.click(function(ev){
     var page = ev.target.getAttribute("data-to");
+    loadStorage(page);
+  });
+  function loadStorage(page){
     $.ajax({
       type: 'POST',
-      url: '__MODULE__/Index/getStorageList',
+      url: "{:U('Index/getStorageList')}",
       data:{"do":"loadmore","page":page},
       success: function (data) {
         if(data){
           console.log(data);
           $('#storageList').html(data.table);
         }
-      },
-      error: function (xhr, type) {
-        alert('Ajax error!');
       }
     });
+  }
+  $(document).ready(function(){
+    $("#doStorage").click(function(){
+      $.ajax({
+        url:"{:U('Storage/doAdd')}",
+        data:$("#storageForm").serialize(),
+        datatype:"json",
+        type:"POST",
+        beforeSend:function(){
+
+        },
+        success:function(data){
+          if(data['code'] == 200){
+            alert("入库成功!");
+          }else{
+            alert("入库失败了!原因:"+data['msg']);
+          }
+        },
+        error:function(){
+          alert("提交过程中发生问题! ");
+        }
+      })
+    });
+    //拼音码事件
+    $("#inputPinyin").on("blur",function(){
+      $.ajax({
+        url:"{:U('Drug/getInfo')}",
+        data:"pinyinma="+$("#inputPinyin").val(),
+        datatype:"json",
+        type:"get",
+        success:function(data){
+          console.log(data['code']+" "+data.msg);
+          if(data['code']==200){
+            var tempName = data.result.name;
+            var tempSpec = data.result.spec;
+            var tempUnit = data.result.unit;
+            var tempLowwarning = data.result.lowwarning;
+          }else{
+            var tempName = data.msg;
+            var tempSpec = data.msg;
+            var tempUnit = data.msg;
+            var tempLowwarning = data.msg;
+          }
+          $("#inputName").attr("value",tempName);
+          $("#inputSpec").attr("value",tempSpec);
+          $("#inputUnit").attr("value",tempUnit);
+          $("#inputLowwarning").attr("value",tempLowwarning);
+        },
+        error:function(){},
+      })
+    });
+    //拼音码自动提示
+    $("#inputPinyin").Kcomplete({
+      location       : "{:U('Drug/nameTips')}",
+      dataType       : 'json'
+    });
+
+
   });
+
 </script>
 </body>
 </html>

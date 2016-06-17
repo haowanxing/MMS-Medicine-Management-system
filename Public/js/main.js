@@ -14,9 +14,11 @@ $(document).ready(function(){
         func.fadeOut(0);
         func.eq(to).fadeIn(0);
     });
-});
-
-$(".form_datetime").datepicker({
-    //format: "dd MM yyyy - hh:ii"
-    format: "dd MM yyyy"
+    //时间选择
+    $(".form_datetime").datepicker({
+        //format: "dd MM yyyy - hh:ii"
+        format: "yyyy/MM/dd",
+        language: 'zh-CN',
+        autoclose:true,
+    });
 });

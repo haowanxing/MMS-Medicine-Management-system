@@ -74,8 +74,6 @@ class StoreController extends Controller
         return $this;
     }
     public function storage(){
-        $this->assign("url_add",U("Drug/doAdd"));
-        $this->assign("url_storage",U("Storage/doAdd"));
         $Drug = A("Drug");
         $Storage = A("Storage");
         $drugList = $Drug->getDrugList();

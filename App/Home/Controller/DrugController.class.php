@@ -76,7 +76,33 @@ class DrugController extends Controller
         }
     }
     public function getInfo(){
-
+        if(!empty(I("get.pinyinma"))){
+            $this->data['pinyinma'] = I("get.pinyinma");
+            $this->data = $this->db->where($this->data)->find();
+            if($this->data){
+                $retMsg = array("code"=>200,"msg"=>"ok","result"=>$this->data);
+            }else{
+                $retMsg = array("code"=>400,"msg"=>"没有该药品:".I("get.pinyinma"),"result"=>$this->data);
+            }
+        }else{
+            $retMsg = array("code"=>400,"msg"=>"缺少参数:pinyinma","result"=>0);
+        }
+        $this->ajaxReturn($retMsg,'json');
+    }
+    public function nameTips(){
+        if(!empty(I("get.input"))){
+            $data['pinyinma'] = array("like","%".I("get.input")."%");
+            $result = $this->db->where($data)->select();
+            $ret = array();
+            if($result){
+                foreach($result as $k=>$v){
+                    $ret[] = array("id"=>$k,"value"=>$v["pinyinma"]);
+                }
+            }
+            $this->ajaxReturn($ret,'json');
+        }else{
+//            $this->ajaxReturn(array('value'=>"1","data"=>"one"));
+        }
     }
 
     /**
