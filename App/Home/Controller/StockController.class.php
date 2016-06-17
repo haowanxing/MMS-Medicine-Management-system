@@ -42,7 +42,7 @@ class StockController extends Controller
             $string .= "<td>".$value['stock_id']."</td>";
             $string .= "<td>".$value['name']."</td>";
             $string .= "<td>".$value['factory']."</td>";
-            $string .= "<td>".$value['amount']."</td>";
+            $string .= "<td>".$value['stock_amount']."</td>";
             $string .= "<td>".$value['pihao']."</td>";
             $string .= "<td>".$value['pizhunwenhao']."</td>";
             $string .= "<td>".$value['sellprice']."</td>";
@@ -63,6 +63,22 @@ class StockController extends Controller
     public function getStockByDrugId($drug_id)
     {
         return $this->db->where(array("drug_id"=>$drug_id))->find();
+    }
+    public function getInfo(){
+        if(!empty(I("get.pinyinma"))){
+            $Drug = A("Drug");
+            $drugRes = $Drug->getInfoByPinYinMa(I("get.pinyinma"));
+            $this->data['drug_id'] = $drugRes['drug_id'];
+            $this->data = $this->db->where($this->data)->find();
+            if($this->data){
+                $retMsg = array("code"=>200,"msg"=>"ok","result"=>array_merge($drugRes,$this->data));
+            }else{
+                $retMsg = array("code"=>400,"msg"=>"没有该药品:".I("get.pinyinma"),"result"=>$this->data);
+            }
+        }else{
+            $retMsg = array("code"=>400,"msg"=>"缺少参数:pinyinma","result"=>0);
+        }
+        $this->ajaxReturn($retMsg,'json');
     }
 
     /**
@@ -167,7 +183,7 @@ class StockController extends Controller
      */
     public function setAmount($amount)
     {
-        $this->data['amount'] = $amount;
+        $this->data['stock_amount'] = $amount;
         $this->amount = $amount;
         return $this;
     }

@@ -47,7 +47,7 @@ class StorageController extends Controller
             $string .= "<td>".$value['name']."</td>";
             $string .= "<td>".$value['pihao']."</td>";
             $string .= "<td>".$value['pizhunwenhao']."</td>";
-            $string .= "<td>".$value['amount']."</td>";
+            $string .= "<td>".$value['storage_amount']."</td>";
             $string .= "<td>".$value['inprice']."</td>";
             $string .= "<td>".$value['allprice']."</td>";
             $string .= "<td>".date("Y/m/d",$value['in_time'])."</td>";
@@ -155,7 +155,7 @@ class StorageController extends Controller
      */
     public function setAmount($amount)
     {
-        $this->data['amount'] = $amount;
+        $this->data['storage_amount'] = $amount;
         $this->amount = $amount;
         return $this;
     }
