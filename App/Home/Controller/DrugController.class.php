@@ -104,6 +104,9 @@ class DrugController extends Controller
 //            $this->ajaxReturn(array('value'=>"1","data"=>"one"));
         }
     }
+    public function getInfoByPinYinMa($pin){
+        return $this->db->where(array("pinyinma"=>$pin))->find();
+    }
 
     /**
      * @param mixed $id

@@ -11,53 +11,62 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">销售药品</button>
-        <button type="button" class="list-group-item list-menu" data-to="1">销售记录</button>
+        <button type="button" class="list-group-item list-menu" onclick="loadSell()" data-to="1">销售记录</button>
       </div>
     </div>
   </div>
   <div class="col-md-10">
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">销售</div>
-      <form class="form-horizontal" action="{$url_add}">
+      <div class="panel-body text-info">输入拼音码来进行销售</div>
+      <form id="sellForm" class="form-horizontal" action="{:U('Sell/doAdd')}">
         <div class="form-group">
           <label for="inputPinyin" class="col-sm-2 control-label">拼音码</label>
           <div class="col-sm-10">
-            <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码">
+            <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码" autocomplete="off">
+            <input name="stock_id" type="hidden" class="form-control" id="inputStockId">
           </div>
         </div>
         <div class="form-group">
           <label for="inputName" class="col-sm-2 control-label">名称</label>
           <div class="col-sm-10">
-            <input name="name" type="text" class="form-control" id="inputName" placeholder="药品名称">
+            <input name="name" type="text" class="form-control" id="inputName" readonly placeholder="药品名称">
           </div>
         </div>
         <div class="form-group">
           <label for="inputSpec" class="col-sm-2 control-label">规格大小</label>
           <div class="col-sm-10">
-            <input name="spec" type="text" class="form-control" id="inputSpec" placeholder="规格">
+            <input name="spec" type="text" class="form-control" id="inputSpec" readonly placeholder="规格">
           </div>
         </div>
         <div class="form-group">
           <label for="inputUnit" class="col-sm-2 control-label">计量单位</label>
           <div class="col-sm-10">
-            <input name="unit" type="text" class="form-control" id="inputUnit" placeholder="单位">
+            <input name="unit" type="text" class="form-control" id="inputUnit" readonly placeholder="单位">
           </div>
         </div>
         <div class="form-group">
           <label for="inputprice" class="col-sm-2 control-label">单价</label>
           <div class="col-sm-10">
-            <input name="price" type="text" class="form-control" id="inputprice" placeholder="0.00">
+            <input name="price" type="text" class="form-control" id="inputprice" readonly placeholder="0.00">
           </div>
         </div>
         <div class="form-group">
           <label for="inputCount" class="col-sm-2 control-label">数量</label>
           <div class="col-sm-10">
-            <input name="count" type="text" class="form-control" id="inputCount" placeholder="0">
+            <input name="amount" type="text" class="form-control" id="inputCount" placeholder="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputAllprice" class="col-sm-2 control-label">总价</label>
+          <div class="col-sm-10">
+            <input name="allprice" type="text" class="form-control" id="inputAllprice" readonly placeholder="自动计算...">
           </div>
         </div>
         <div class="form-group">
           <div class="col-sm-offset-2 col-sm-10">
-            <button type="button" class="btn btn-default submit">新增</button>
+            <button id="doSell" type="button" class="btn btn-success submit">确认销售</button>
+            <button type="reset" class="btn btn-warning">清空输入</button>
           </div>
         </div>
       </form>
@@ -72,14 +81,110 @@
         {$sellList}
         </tbody>
       </table>
-      <div id="sellPage">
-        <for start="1" end="$sellListCount">
-          <a href="#" data-to="{$i}">{$i}</a>
-        </for>
+      <div id="sellPage" class="center">
+        <nav>
+          <ul class="pagination">
+            <for start="1" end="$sellListCount+1">
+              <li><a href="#" data-to="{$i}">{$i}</a></li>
+            </for>
+          </ul>
+        </nav>
       </div>
     </div>
   </div>
 </div>
 <include file="./Public/Tpl/footer.html"/>
+<js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
+<script>
+  function loadSell(page){
+    $.ajax({
+      type: 'POST',
+      url: "{:U('Index/getSellList')}",
+      data:{"do":"loadmore","page":page},
+      success: function (data) {
+        if(data){
+          console.log(data);
+          $('#sellList').html(data.table);
+        }
+      }
+    });
+  }
+  $("#sellPage").on("click", function () {
+    var page = ev.target.getAttribute("data-to");
+    loadSell(page);
+  });
+
+  $(document).ready(function(){
+    //提交事件
+    $("#doSell").on("click", function () {
+      $.ajax({
+        url:"{:U('Sell/doAdd')}",
+        data:$("#sellForm").serialize(),
+        datatype:"json",
+        type:"POST",
+        beforeSend:function(){
+
+        },
+        success:function(data){
+          console.log(data);
+          if(data['code'] == 200){
+            alert("销售成功!");
+          }else{
+            alert("处理失败了!原因:"+data['msg']);
+          }
+        },
+        error:function(){
+          alert("提交过程中发生问题! 请联系管理员");
+        }
+      })
+    });
+    //自动算价
+    $("#inputCount").on("blur", function () {
+      if(this.value!=="" && $("#inputprice").val()!=""){
+        $("#inputAllprice").attr("value",this.value*$("#inputprice").val());
+      }
+    });
+    //拼音码事件
+    $("#inputPinyin").on("blur",function(){
+      if(this.value==""){
+        return;
+      }
+      $("#inputAllprice").attr("value","");
+      $.ajax({
+        url:"{:U('Stock/getInfo')}",
+        data:"pinyinma="+$("#inputPinyin").val(),
+        datatype:"json",
+        type:"get",
+        success:function(data){
+          console.log(data);
+          if(data['code']==200){
+            var tempStockId = data.result.stock_id;
+            var tempName = data.result.name;
+            var tempSpec = data.result.spec;
+            var tempUnit = data.result.unit;
+            var tempSellprice = data.result.sellprice;
+          }else{
+            var tempName = data.msg;
+            var tempSpec = data.msg;
+            var tempUnit = data.msg;
+            var tempSellprice = data.msg;
+          }
+          $("#inputStockId").attr("value",tempStockId);
+          $("#inputName").attr("value",tempName);
+          $("#inputSpec").attr("value",tempSpec);
+          $("#inputUnit").attr("value",tempUnit);
+          $("#inputprice").attr("value",tempSellprice);
+        },
+        error:function(){},
+      })
+    });
+    //拼音码自动提示
+    $("#inputPinyin").Kcomplete({
+      location       : "{:U('Drug/nameTips')}",
+      dataType       : 'json'
+    });
+
+  });
+</script>
 </body>
 </html>

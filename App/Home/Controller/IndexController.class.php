@@ -19,7 +19,11 @@ class IndexController extends Controller
         $this->ajaxReturn($Drug->getDrugList(),'json');
     }
     public function getStorageList(){
-        $Drug = A("Storage");
-        $this->ajaxReturn($Drug->getStorageRecord(),'json');
+        $Storage = A("Storage");
+        $this->ajaxReturn($Storage->getStorageRecord(),'json');
+    }
+    public function getSellList(){
+        $Sell = A("Sell");
+        $this->ajaxReturn($Sell->getSellList(),'json');
     }
 }
