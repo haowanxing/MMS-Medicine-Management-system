@@ -33,9 +33,13 @@ class UserController extends Controller
 
         $this->show("<h2>用户类</h2>");
     }
+
+    /**
+     *其他模块调用,检测用户登陆状态,未登录则提示登录
+     */
     public function loginCheck(){
         if(!$this->checkLogin()){
-            $this->redirect("User/login");
+            $this->error("请登录后再试!",U("Home/User/login"),2);
         }
     }
     public function checkLogin()

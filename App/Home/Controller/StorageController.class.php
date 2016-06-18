@@ -39,7 +39,7 @@ class StorageController extends Controller
     public function getStorageRecord(){
         isset($_POST['page'])?$page=I("post.page"):$page=1;
         isset($_POST['limit'])?$limit=I("post.limit"):$limit=20;
-        $result = $this->db->join("__DRUGS__ ON __DRUGS__.drug_id = __STORAGE__.drug_id")->join("__USERS__ ON __USERS__.id = __STORAGE__.in_by")->page($page,$limit)->select();
+        $result = $this->db->join("__DRUGS__ ON __DRUGS__.drug_id = __STORAGE__.drug_id")->join("__USERS__ ON __USERS__.id = __STORAGE__.in_by")->page($page,$limit)->order("storage_id desc")->select();
         $count = $this->db->count()/$limit;
         $string = "";
         foreach($result as $key=>$value){
