@@ -33,7 +33,11 @@ class UserController extends Controller
 
         $this->show("<h2>用户类</h2>");
     }
-
+    public function loginCheck(){
+        if(!$this->checkLogin()){
+            $this->redirect("User/login");
+        }
+    }
     public function checkLogin()
     {
         if (empty(I("session.username"))) {

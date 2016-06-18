@@ -9,6 +9,7 @@ class AdjustController extends Controller
     private $db;
     public function _initialize()
     {
+        A("User")->loginCheck();
         $this->db = M("Adjust");
     }
     public function index()

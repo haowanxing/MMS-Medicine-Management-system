@@ -10,6 +10,7 @@ class DrugController extends Controller
 
     public function _initialize()
     {
+        A("User")->loginCheck();
         $this->db = M("drugs");
     }
     public function index()

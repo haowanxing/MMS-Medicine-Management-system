@@ -9,6 +9,7 @@ class ReturnController extends Controller
     private $db;
     public function _initialize()
     {
+        A("User")->loginCheck();
         $this->db = M("Return");
     }
     public function index()

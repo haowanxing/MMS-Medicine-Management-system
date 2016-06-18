@@ -10,6 +10,7 @@ class StoreController extends Controller
 
     public function _initialize()
     {
+        A("User")->loginCheck();
         $this->db = M("store");
         $info = $this->db->find();
         if ($info) {

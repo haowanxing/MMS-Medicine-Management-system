@@ -16,6 +16,7 @@ class SellController extends Controller
     private $db;
     public function _initialize()
     {
+        A("User")->loginCheck();
         $this->db = M("Sell");
     }
     public function index()

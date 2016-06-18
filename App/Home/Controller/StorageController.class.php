@@ -24,6 +24,7 @@ class StorageController extends Controller
 
     public function _initialize()
     {
+        A("User")->loginCheck();
         $this->db = M("storage");
     }
     public function index()

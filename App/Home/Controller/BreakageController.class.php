@@ -9,6 +9,7 @@ class BreakageController extends Controller
     private $db;
     public function _initialize()
     {
+        A("User")->loginCheck();
         $this->db = M("Breakage");
     }
     public function index()

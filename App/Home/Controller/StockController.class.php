@@ -19,6 +19,7 @@ class StockController extends Controller
     private $db;
     public function _initialize()
     {
+        A("User")->loginCheck();
         $this->db = M("Stock");
     }
     public function index()
