@@ -22,3 +22,16 @@ $(document).ready(function(){
         autoclose:true,
     });
 });
+function loadMore(target,url,page){
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data:{"do":"loadmore","page":page},
+        success: function (data) {
+            if(data){
+                console.log(data);
+                $(target).html(data.table);
+            }
+        }
+    });
+}
