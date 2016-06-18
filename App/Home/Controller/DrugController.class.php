@@ -6,6 +6,12 @@ use Think\Controller;
 class DrugController extends Controller
 {
     private $data = array();
+    private $drug_id;
+    private $name;
+    private $pinyinma;
+    private $spec;
+    private $unit;
+    private $lowwarning;
     private $db;
 
     public function _initialize()
@@ -42,8 +48,24 @@ class DrugController extends Controller
         return $retMsg;
     }
 
-    public function saveInfo(){
+    public function setDataFromPost(){
+        $this->setId(I("post.drug_id"))->setName(I("post.name"))->setPinYinMa(I("post.pinyinma"))->setSpec(I("post.spec"))->setUnit(I("post.unit"))->setLowwarning(I("post.lowwarning"));
+        return $this;
+    }
 
+    public function doChangeInfo(){
+        $drugId = I("post.drug_id");
+        if(!empty($drugId) && $drugId != 0){
+            $saveRes = $this->setDataFromPost()->db->data($this->data)->save();
+            if($saveRes){
+                $retMsg = array("code"=>200,"msg"=>"ok".$this->drug_id,"result"=>$saveRes);
+            }else{
+                $retMsg = array("code"=>400,"msg"=>"没有任何改变发生","result"=>0);
+            }
+        }else{
+            $retMsg = array("code"=>400,"msg"=>"药品编号必须为非零数字","result"=>0);
+        }
+        $this->ajaxReturn($retMsg,'json');
     }
 
     public function add(){
@@ -116,6 +138,7 @@ class DrugController extends Controller
     public function setId($id)
     {
         $this->data['drug_id'] = $id;
+        $this->drug_id = $id;
         return $this;
     }
 
@@ -126,6 +149,7 @@ class DrugController extends Controller
     public function setName($name)
     {
         $this->data['name'] = $name;
+        $this->name = $name;
         return $this;
     }
 
@@ -133,9 +157,10 @@ class DrugController extends Controller
      * @param mixed $pinyinma
      * @return DrugController
      */
-    public function setPinyinma($pinyinma)
+    public function setPinYinMa($pinyinma)
     {
         $this->data['pinyinma'] = $pinyinma;
+        $this->pinyinma = $pinyinma;
         return $this;
     }
 
@@ -146,6 +171,7 @@ class DrugController extends Controller
     public function setSpec($spec)
     {
         $this->data['spec'] = $spec;
+        $this->spec = $spec;
         return $this;
     }
 
@@ -156,6 +182,7 @@ class DrugController extends Controller
     public function setUnit($unit)
     {
         $this->data['unit'] = $unit;
+        $this->unit = $unit;
         return $this;
     }
 
@@ -166,6 +193,7 @@ class DrugController extends Controller
     public function setLowwarning($lowwarning)
     {
         $this->data['lowwarning'] = $lowwarning;
+        $this->lowwarning = $lowwarning;
         return $this;
     }
 

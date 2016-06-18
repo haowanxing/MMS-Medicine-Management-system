@@ -13,6 +13,7 @@ class SellController extends Controller
     private $allprice;
     private $time;
     private $sell_by;
+    private $sell_status;
     private $db;
     public function _initialize()
     {
@@ -46,6 +47,7 @@ class SellController extends Controller
             $string .= "<td>".$value['allprice']."</td>";
             $string .= "<td>".date("Y-m-d H:i:s",$value['time'])."</td>";
             $string .= "<td>".$value['realname']."</td>";
+            $string .= "<td>".($value['sell_status']==0?"正常":"退货")."</td>";
             $string .= "</tr>";
         }
         $retMsg = array('code'=>200,"pageCount"=>ceil($count),"table"=>$string);
@@ -90,7 +92,33 @@ class SellController extends Controller
         unset($tempData['sell_id']);
         return $this->db->data($tempData)->add();
     }
+    public function getInfo(){
+        if(!empty(I("post.sell_id"))){
 
+            $this->data = $this->setSellId(I("post.sell_id"))->formatData()->db->where($this->data)->join("__STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id")->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id")->join("__USERS__ ON __USERS__.id = __SELL__.sell_by")->find();
+            if($this->data){
+                $retMsg = array("code"=>200,"msg"=>"ok","result"=>$this->data);
+            }else{
+                $retMsg = array("code"=>400,"msg"=>"编号".I("post.sell_id")."不存在","result"=>$this->data);
+            }
+        }else{
+            $retMsg = array("code"=>400,"msg"=>"缺少必要参数","result"=>0);
+        }
+        $this->ajaxReturn($retMsg,'json');
+    }
+
+    /**
+     * 格式化data,删除无用的字段
+     * @return $this
+     */
+    public function formatData(){
+        foreach($this->data as $key=>$item){
+            if(empty($item)){
+                unset($this->data[$key]);
+            }
+        }
+        return $this;
+    }
     /**
      * @param mixed $sell_by
      * @return SellController
@@ -165,6 +193,17 @@ class SellController extends Controller
     {
         $this->data['time'] = $time;
         $this->time = $time;
+        return $this;
+    }
+
+    /**
+     * @param mixed $sell_status
+     * @return SellController
+     */
+    public function setSellStatus($sell_status)
+    {
+        $this->data['sell_status'] = $sell_status;
+        $this->sell_status = $sell_status;
         return $this;
     }
 

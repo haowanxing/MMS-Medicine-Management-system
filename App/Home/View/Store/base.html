@@ -40,48 +40,122 @@
       <div id="drugPage" class="center">
         <nav>
           <ul class="pagination">
-            <li>
-              <a href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-
             <for start="1" end="$drugListCount+1">
               <li><a href="#" data-to="{$i}">{$i}</a></li>
             </for>
-            <li>
-              <a href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
           </ul>
         </nav>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <!-- Modal -->
+    <div class="modal fade" id="drugModal" tabindex="-1" role="dialog" aria-labelledby="drugModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="drugModalLabel">药品名</h4>
+          </div>
+          <div class="modal-body">
+            <form id="drugForm" class="form-horizontal">
+              <div class="form-group">
+                <label for="inputName" class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-10">
+                  <input name="name" type="text" class="form-control" id="inputName" placeholder="读取错误" autocomplete="off">
+                  <input name="drug_id" type="hidden" class="form-control" id="inputDrugId">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputPinYinMa" class="col-sm-2 control-label">拼音码</label>
+                <div class="col-sm-10">
+                  <input name="pinyinma" type="text" class="form-control" id="inputPinYinMa" placeholder="读取错误" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputSpec" class="col-sm-2 control-label">规格</label>
+                <div class="col-sm-10">
+                  <input name="spec" type="text" class="form-control" id="inputSpec" placeholder="读取错误" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputUnit" class="col-sm-2 control-label">单位</label>
+                <div class="col-sm-10">
+                  <input name="unit" type="text" class="form-control" id="inputUnit" placeholder="读取错误" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputLowWarning" class="col-sm-2 control-label">低限警告</label>
+                <div class="col-sm-10">
+                  <input name="lowwarning" type="text" class="form-control" id="inputLowWarning" placeholder="读取错误" autocomplete="off">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button id="saveChange" type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 <include file="./Public/Tpl/footer.html"/>
 <script>
-  var drugPage = $("#drugPage");
-  drugPage.bind("click",function(ev){
-    ev.stopPropagation();
-    var page = ev.target.getAttribute("data-to");
-    $.ajax({
-      type: 'POST',
-      url: '__MODULE__/Index/getDrugList',
-      data:{"do":"loadmore","page":page},
-      success: function (data) {
-        if(data){
-          console.log(data);
-          $('#drugList').html(data.table);
-        }
-      },
-      error: function (xhr, type) {
-        alert('Ajax error!');
-      }
+  $(document).ready(function () {
+    //加载更多
+    $("#drugPage").on("click","li", function (ev) {
+      NOW_PAGE = ev.target.getAttribute("data-to");
+      loadMore("#drugList", "{:U('Index/getDrugList')}", NOW_PAGE);
+      $(this).addClass("active");
+      $(this).siblings().removeClass("active");
     });
-    $("#drugPage li").removeClass("active");
-    $("[data-to='"+page+"']").parent().addClass("active");  });
+    //点击库存列表填充模态框
+    $("#drugList").on("click","tr", function (ev) {
+      $("#drugModalLabel").html("药品编号: "+$(this).find("td")[0].innerHTML);
+      $("#inputDrugId").attr("value",$(this).find("td")[0].innerHTML);
+      $("#inputName").attr("value",$(this).find("td")[1].innerHTML);
+      $("#inputPinYinMa").attr("value",$(this).find("td")[2].innerHTML);
+      $("#inputSpec").attr("value",$(this).find("td")[3].innerHTML);
+      $("#inputUnit").attr("value",$(this).find("td")[4].innerHTML);
+      $("#inputLowWarning").attr("value",$(this).find("td")[5].innerHTML);
+    });
+    //响应保存提交事件
+    $("#saveChange").on("click", function (ev) {
+      var lowWarning = $("#inputLowWarning").val();
+      if(lowWarning == "" || isNaN(lowWarning)){
+        alert("低限必须填写且只能为整数!");
+      }else{
+        //提交事件
+        var Form = $("#drugForm");
+        $.ajax({
+          url:"{:U('Drug/doChangeInfo')}",
+          data:Form.serialize(),
+          datatype:"json",
+          type:"POST",
+          beforeSend:function(){
+
+          },
+          success:function(data){
+            console.log(data);
+            if(data['code'] == 200){
+              $("#drugModal").modal('toggle');
+              loadMore("#drugList","{:U('Index/getDrugList')}",NOW_PAGE);
+              Form[0].reset();
+              alert("修改成功!");
+            }else{
+              alert("处理失败了!原因:"+data['msg']);
+            }
+          },
+          error:function(){
+            alert("提交过程中发生问题! 请联系管理员");
+          }
+        })
+      }
+    })
+
+  });
 </script>
 </body>
 </html>

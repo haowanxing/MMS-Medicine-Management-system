@@ -26,10 +26,14 @@
         {$adjustList}
         </tbody>
       </table>
-      <div id="adjustPage">
-        <for start="1" end="$adjustListCount">
-          <a href="#" data-to="{$i}">{$i}</a>
-        </for>
+      <div id="adjustPage" class="center">
+        <nav>
+          <ul class="pagination">
+            <for start="1" end="$adjustListCount+1">
+              <li><a href="#" data-to="{$i}">{$i}</a></li>
+            </for>
+          </ul>
+        </nav>
       </div>
     </div>
     <div class="panel panel-default func">
@@ -39,5 +43,15 @@
   </div>
 </div>
 <include file="./Public/Tpl/footer.html"/>
+<script>
+  $(document).ready(function () {
+    //加载更多
+    $("#adjustPage li").on("click", function (ev) {
+      NOW_PAGE = ev.target.getAttribute("data-to");
+      loadMore("#adjustList", "{:U('Index/getAdjustList')}", NOW_PAGE);
+    });
+
+  });
+</script>
 </body>
 </html>

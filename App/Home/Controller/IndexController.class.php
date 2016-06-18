@@ -26,4 +26,18 @@ class IndexController extends Controller
         $Sell = A("Sell");
         $this->ajaxReturn($Sell->getSellList(),'json');
     }
+    public function getStockList(){
+        $Stock = A("Stock");
+        $this->ajaxReturn($Stock->getStockList(),'json');
+    }
+    public function getAdjustList(){
+        $Adjust = A("Adjust");
+        $this->ajaxReturn($Adjust->getAdjustList(),'json');
+    }
+    public function getRetList(){
+        $this->ajaxReturn(A("Return")->getRetList(),'json');
+    }
+    public function getBreakageList(){
+        $this->ajaxReturn(A("Return")->getBreakageList(),'json');
+    }
 }

@@ -66,9 +66,9 @@ class StockController extends Controller
         return $this->db->where(array("drug_id"=>$drug_id))->find();
     }
     public function getInfo(){
-        if(!empty(I("get.pinyinma"))){
+        if(!empty(I("post.pinyinma"))){
             $Drug = A("Drug");
-            $drugRes = $Drug->getInfoByPinYinMa(I("get.pinyinma"));
+            $drugRes = $Drug->getInfoByPinYinMa(I("post.pinyinma"));
             $this->data['drug_id'] = $drugRes['drug_id'];
             $this->data = $this->db->where($this->data)->find();
             if($this->data){

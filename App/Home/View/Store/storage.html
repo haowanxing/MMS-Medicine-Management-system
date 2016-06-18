@@ -157,23 +157,14 @@
 <include file="./Public/Tpl/footer.html"/>
 <js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
 <script>
-  var storagePage = $("#storagePage");
-  storagePage.click(function(ev){
-    var page = ev.target.getAttribute("data-to");
-    loadStorage(page);
+  $("#storagePage").on("click","li", function (ev) {
+      NOW_PAGE = ev.target.getAttribute("data-to");
+    loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE);
+    $(this).addClass("active");
+    $(this).siblings().removeClass("active");
   });
-  function loadStorage(page){
-    $.ajax({
-      type: 'POST',
-      url: "{:U('Index/getStorageList')}",
-      data:{"do":"loadmore","page":page},
-      success: function (data) {
-        if(data){
-          console.log(data);
-          $('#storageList').html(data.table);
-        }
-      }
-    });
+  function loadStorage(){
+    loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE)
   }
   $(document).ready(function(){
     $("#doStorage").click(function(){

@@ -75,7 +75,7 @@
       <div class="panel-heading" style="text-align: center">销售记录</div>
       <table class="table table-hover">
         <thead>
-        <tr><th>销售编号</th><th>库存编号</th><th>药品名称</th><th>规格</th><th>单位</th><th>单价</th><th>数量</th><th>总额</th><th>销售日期</th><th>操作员</th></tr>
+        <tr><th>销售码</th><th>库存号</th><th>药品名称</th><th>规格</th><th>单位</th><th>单价</th><th>数量</th><th>总额</th><th>销售日期</th><th>操作员</th><th>状态</th></tr>
         </thead>
         <tbody id="sellList">
         {$sellList}
@@ -109,7 +109,7 @@
       }
     });
   }
-  $("#sellPage").on("click", function () {
+  $("#sellPage").on("click", function (ev) {
     var page = ev.target.getAttribute("data-to");
     loadSell(page);
   });
@@ -154,7 +154,7 @@
         url:"{:U('Stock/getInfo')}",
         data:"pinyinma="+$("#inputPinyin").val(),
         datatype:"json",
-        type:"get",
+        type:"POST",
         success:function(data){
           console.log(data);
           if(data['code']==200){

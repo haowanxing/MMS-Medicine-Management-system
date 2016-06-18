@@ -17,8 +17,105 @@
   </div>
   <div class="col-md-10">
     <div class="panel panel-default func">
-      <div class="panel-heading" style="text-align: center">功能名称1</div>
-      ...
+      <div class="panel-heading" style="text-align: center">报损表</div>
+      <form id="breakageForm" class="form-horizontal">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="inputPinYinMa" class="col-sm-3 control-label">拼音码</label>
+            <div class="col-sm-9">
+              <input name="pinyinma" type="text" class="form-control" id="inputPinYinMa" placeholder="请输入" autocomplete="off">
+              <input name="stock_id" type="hidden" class="form-control" id="inputStockId" placeholder="" autocomplete="off">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputAmount" class="col-sm-3 control-label">库存数量</label>
+            <div class="col-sm-9">
+              <input name="price" type="number" class="form-control" id="inputAmount" disabled placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPiHao" class="col-sm-3 control-label">批号</label>
+            <div class="col-sm-9">
+              <input name="pihao" type="text" class="form-control" disabled id="inputPiHao" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPiZhunWenHao" class="col-sm-3 control-label">批准文号</label>
+            <div class="col-sm-9">
+              <input name="pizhunwenhao" type="text" class="form-control" disabled id="inputPiZhunWenHao" placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputSellPrice" class="col-sm-3 control-label">销售价</label>
+            <div class="col-sm-9">
+              <input name="sell_price" type="text" class="form-control" disabled id="inputSellPrice" placeholder="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputBreakAmount" class="col-sm-3 control-label">报损数量</label>
+            <div class="col-sm-9">
+              <input name="break_amount" type="text" class="form-control" id="inputBreakAmount" placeholder="未填写">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputBreakPrice" class="col-sm-3 control-label">报损总额</label>
+            <div class="col-sm-9">
+              <input name="allprice" type="text" class="form-control" id="inputBreakPrice" placeholder="未填写">
+            </div>
+          </div>
+
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="inputName" class="col-sm-3 control-label">名称</label>
+            <div class="col-sm-9">
+              <input name="name" type="text" class="form-control" readonly id="inputName" placeholder="药品名称">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputSpec" class="col-sm-3 control-label">规格大小</label>
+            <div class="col-sm-9">
+              <input name="spec" type="text" class="form-control" disabled id="inputSpec" placeholder="规格">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputUnit" class="col-sm-3 control-label">计量单位</label>
+            <div class="col-sm-9">
+              <input name="unit" type="text" class="form-control" disabled id="inputUnit" placeholder="单位">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputFactory" class="col-sm-3 control-label">生产厂家</label>
+            <div class="col-sm-9">
+              <input name="factory" type="text" class="form-control" disabled id="inputFactory" placeholder="厂家">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputProduceDate" class="col-sm-3 control-label">生产日期</label>
+            <div class="col-sm-9">
+              <input name="producedate" type="text" class="form-control" id="inputProduceDate" disabled placeholder="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputUsefulDate" class="col-sm-3 control-label">失效日期</label>
+            <div class="col-sm-9">
+              <input name="usefuldate" type="text" class="form-control" id="inputUsefulDate" disabled placeholder="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputReason" class="col-sm-3 control-label">原因</label>
+            <div class="col-sm-9">
+              <input name="reason" type="text" class="form-control" id="inputReason" placeholder="未填写">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-9">
+            <button id="doBreak" type="button" class="btn btn-danger submit">报损</button>
+            <button type="reset" class="btn btn-success">清空</button>
+          </div>
+        </div>
+      </form>
     </div>
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">报损列表</div>
@@ -30,14 +127,117 @@
         {$breakageList}
         </tbody>
       </table>
-      <div id="breakagePage">
-        <for start="1" end="$breakageListCount">
-          <a href="#" data-to="{$i}">{$i}</a>
-        </for>
+      <div id="breakagePage" class="center">
+        <nav>
+          <ul class="pagination">
+            <for start="1" end="$breakageListCount+1">
+              <li><a href="#" data-to="{$i}">{$i}</a></li>
+            </for>
+          </ul>
+        </nav>
       </div>
     </div>
   </div>
 </div>
 <include file="./Public/Tpl/footer.html"/>
+<js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
+<script>
+  $(document).ready(function () {
+    //加载更多
+    $("#breakagePage").on("click", "li", function (ev) {
+      NOW_PAGE = ev.target.getAttribute("data-to");
+      loadMore("#breakageList", "{:U('Index/getBreakageList')}", NOW_PAGE);
+      $(this).addClass("active");
+      $(this).siblings().removeClass("active");
+    });
+    //退货按钮
+    $("#doBreak").on("click", function () {
+      var amount = $("#inputBreakAmount").val();
+      var price = $("#inputBreakPrice").val();
+      if(amount==0 || price==0){
+        alert("数量和价格不能为空或为零!");
+        return;
+      }
+      var Form = $("#breakageForm");
+      $.ajax({
+        url:"{:U('Breakage/doAdd')}",
+        data:Form.serialize(),
+        datatype:"json",
+        type:"POST",
+        beforeSend:function(){
+
+        },
+        success:function(data){
+          if(data['code'] == 200){
+            alert("成功确认报损!");
+            Form[0].reset();
+          }else{
+            alert("操作失败了!原因:"+data['msg']);
+          }
+        },
+        error:function(){
+          alert("提交过程中发生问题! ");
+        }
+      })
+    });
+    //填写完数量
+    $("#inputBreakAmount").on("blur", function () {
+      $("#inputBreakPrice").attr("value",this.value*$("#inputSellPrice").val());
+    });
+    //拼音码自动提示
+    $("#inputPinYinMa").Kcomplete({
+      location       : "{:U('Drug/nameTips')}",
+      dataType       : 'json'
+    });
+    //销售单事件
+    $("#inputPinYinMa").on("blur",function(){
+      $.ajax({
+        url:"{:U('Stock/getInfo')}",
+        data:"pinyinma="+$("#inputPinYinMa").val(),
+        datatype:"json",
+        type:"POST",
+        success:function(data){
+          console.log(data);
+          if(data['code']==200){
+            var tempName = data.result.name;
+            var tempSpec = data.result.spec;
+            var tempUnit = data.result.unit;
+            var tempFactory = data.result.factory;
+            var tempProduceDate = formatDate(data.result.producedate);
+            var tempUsefulDate = formatDate(data.result.usefuldate);
+            var tempPrice = data.result.sellprice;
+            var tempAmount = data.result.stock_amount;
+            var tempPiHao = data.result.pihao;
+            var tempPiZhunWenHao = data.result.pizhunwenhao;
+            var tempStockID = data.result.stock_id;
+          }else{
+            var tempName = data.msg;
+            var tempSpec = data.msg;
+            var tempUnit = data.msg;
+            var tempFactory = data.msg;
+            var tempProduceDate = data.msg;
+            var tempUsefulDate = data.msg;
+            var tempPrice = data.msg;
+            var tempAmount = data.msg;
+            var tempPiHao = data.msg;
+            var tempPiZhunWenHao = data.msg;
+          }
+          $("#inputName").attr("value",tempName);
+          $("#inputSpec").attr("value",tempSpec);
+          $("#inputUnit").attr("value",tempUnit);
+          $("#inputFactory").attr("value",tempFactory);
+          $("#inputProduceDate").attr("value",tempProduceDate);
+          $("#inputUsefulDate").attr("value",tempUsefulDate);
+          $("#inputSellPrice").attr("value",tempPrice);
+          $("#inputAmount").attr("value",tempAmount);
+          $("#inputPiHao").attr("value",tempPiHao);
+          $("#inputPiZhunWenHao").attr("value",tempPiZhunWenHao);
+          $("#inputStockId").attr("value",tempStockID);
+        },
+        error:function(){},
+      })
+    });
+  });
+</script>
 </body>
 </html>

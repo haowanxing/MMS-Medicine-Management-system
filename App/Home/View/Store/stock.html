@@ -27,10 +27,14 @@
           {$stockList}
           </tbody>
         </table>
-        <div id="stockPage">
-          <for start="1" end="$stockListCount">
-            <a href="#" data-to="{$i}">{$i}</a>
-          </for>
+        <div id="stockPage" class="center">
+          <nav>
+            <ul class="pagination">
+              <for start="1" end="$stockListCount+1">
+                <li><a href="#" data-to="{$i}">{$i}</a></li>
+              </for>
+            </ul>
+          </nav>
         </div>
       </div>
       <div class="panel panel-default func">
@@ -113,8 +117,14 @@
 <include file="./Public/Tpl/footer.html"/>
 <script>
   $(document).ready(function () {
+    //加载更多
+    $("#stockPage li").on("click", function (ev) {
+      NOW_PAGE = ev.target.getAttribute("data-to");
+      loadMore("#stockList","{:U('Index/getStockList')}",NOW_PAGE);
+    });
     //点击库存列表填充模态框
-    $("#stockList tr").on("click", function (ev) {
+    $("#stockList").on("click","tr", function (ev) {
+      console.log(ev);
       $("#stockModalLabel").html("药品名称: "+$(this).find("td")[1].innerHTML);
       $("#inputStockId").attr("value",$(this).find("td")[0].innerHTML);
       $("#inputFactory").attr("value",$(this).find("td")[2].innerHTML);
@@ -130,20 +140,24 @@
       var newPrice = $("#inputNewPrice").val();
       if(newPrice == ""){
         alert("新价格为空,如果您不需要修改请点击'Close'或者按下ESC建来关闭对话框.");
+      }else if(isNaN(newPrice)){
+        alert("价格只能数字!");
       }else{
         //提交事件
+        var Form = $("#stockForm");
         $.ajax({
           url:"{:U('Stock/doChangePrice')}",
-          data:$("#stockForm").serialize(),
+          data:Form.serialize(),
           datatype:"json",
           type:"POST",
           beforeSend:function(){
 
           },
           success:function(data){
-            console.log(data);
             if(data['code'] == 200){
               $("#stockModal").modal('toggle');
+              loadMore("#stockList","{:U('Index/getStockList')}",NOW_PAGE);
+              Form[0].reset();
               alert("改价成功!");
             }else{
               alert("处理失败了!原因:"+data['msg']);
