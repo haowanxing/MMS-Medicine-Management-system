@@ -6,38 +6,156 @@
 <body>
 <include file="./Public/Tpl/nav.html"/>
 <div class="container">
-  <div class="col-md-2">
-    <div class="panel panel-default">
-      <div class="panel-heading">功能</div>
-      <div class="list-group list-menu">
-        <button type="button" class="list-group-item list-menu active" data-to="0">库存列表</button>
-        <button type="button" class="list-group-item list-menu" data-to="1">库存功能</button>
+  <div class="row">
+    <div class="col-md-2">
+      <div class="panel panel-default">
+        <div class="panel-heading">功能</div>
+        <div class="list-group list-menu">
+          <button type="button" class="list-group-item list-menu active" data-to="0">库存列表</button>
+          <button type="button" class="list-group-item list-menu" data-to="1">库存功能</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="panel panel-default func">
+        <div class="panel-heading" style="text-align: center">库存列表</div>
+        <table class="table table-hover">
+          <thead>
+          <tr><th>库存编号</th><th>药品名称</th><th>生产厂家</th><th>库存数量</th><th>批号</th><th>批准文号</th><th>销售单价</th><th>入库时间</th><th>生产日期</th><th>失效期</th></tr>
+          </thead>
+          <tbody id="stockList">
+          {$stockList}
+          </tbody>
+        </table>
+        <div id="stockPage">
+          <for start="1" end="$stockListCount">
+            <a href="#" data-to="{$i}">{$i}</a>
+          </for>
+        </div>
+      </div>
+      <div class="panel panel-default func">
+        <div class="panel-heading" style="text-align: center">功能名称2</div>
+        ...
       </div>
     </div>
   </div>
-  <div class="col-md-10">
-    <div class="panel panel-default func">
-      <div class="panel-heading" style="text-align: center">库存列表</div>
-      <table class="table table-hover">
-        <thead>
-        <tr><th>库存编号</th><th>药品名称</th><th>生产厂家</th><th>库存数量</th><th>批号</th><th>批准文号</th><th>销售单价</th><th>入库时间</th><th>生产日期</th><th>失效期</th></tr>
-        </thead>
-        <tbody id="stockList">
-        {$stockList}
-        </tbody>
-      </table>
-      <div id="stockPage">
-        <for start="1" end="$stockListCount">
-          <a href="#" data-to="{$i}">{$i}</a>
-        </for>
+  <div class="row">
+    <!-- Modal -->
+    <div class="modal fade" id="stockModal" tabindex="-1" role="dialog" aria-labelledby="stockModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="stockModalLabel">药品名</h4>
+          </div>
+          <div class="modal-body">
+            <form id="stockForm" class="form-horizontal">
+              <div class="form-group">
+                <label for="inputFactory" class="col-sm-2 control-label">生产厂家</label>
+                <div class="col-sm-10">
+                  <input name="factory" type="text" class="form-control" id="inputFactory" placeholder="读取错误" readonly autocomplete="off">
+                  <input name="stock_id" type="hidden" class="form-control" id="inputStockId">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputAmount" class="col-sm-2 control-label">库存数量</label>
+                <div class="col-sm-10">
+                  <input name="amount" type="text" class="form-control" id="inputAmount" placeholder="读取错误" readonly autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputPiHao" class="col-sm-2 control-label">批号</label>
+                <div class="col-sm-10">
+                  <input name="pihao" type="text" class="form-control" id="inputPiHao" placeholder="读取错误" readonly autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputPiZhunWenHao" class="col-sm-2 control-label">批准文号</label>
+                <div class="col-sm-10">
+                  <input name="pizhunwenhao" type="text" class="form-control" id="inputPiZhunWenHao" placeholder="读取错误" readonly autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputProduceDate" class="col-sm-2 control-label">生产日期</label>
+                <div class="col-sm-10">
+                  <input name="producedate" type="text" class="form-control" id="inputProduceDate" placeholder="读取错误" readonly autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputUsefuleDate" class="col-sm-2 control-label">有效日期</label>
+                <div class="col-sm-10">
+                  <input name="usefuldate" type="text" class="form-control" id="inputUsefuleDate" placeholder="读取错误" readonly autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputPrice" class="col-sm-2 control-label">当前价格</label>
+                <div class="col-sm-10">
+                  <input name="price" type="text" class="form-control" id="inputPrice" placeholder="读取错误" readonly autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputNewPrice" class="col-sm-2 control-label">新价格</label>
+                <div class="col-sm-10">
+                  <input name="newprice" type="text" class="form-control" id="inputNewPrice" placeholder="0.00" autocomplete="off">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button id="saveChange" type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="panel panel-default func">
-      <div class="panel-heading" style="text-align: center">功能名称2</div>
-      ...
     </div>
   </div>
 </div>
 <include file="./Public/Tpl/footer.html"/>
+<script>
+  $(document).ready(function () {
+    //点击库存列表填充模态框
+    $("#stockList tr").on("click", function (ev) {
+      $("#stockModalLabel").html("药品名称: "+$(this).find("td")[1].innerHTML);
+      $("#inputStockId").attr("value",$(this).find("td")[0].innerHTML);
+      $("#inputFactory").attr("value",$(this).find("td")[2].innerHTML);
+      $("#inputAmount").attr("value",$(this).find("td")[3].innerHTML);
+      $("#inputPiHao").attr("value",$(this).find("td")[4].innerHTML);
+      $("#inputPiZhunWenHao").attr("value",$(this).find("td")[5].innerHTML);
+      $("#inputProduceDate").attr("value",$(this).find("td")[8].innerHTML);
+      $("#inputUsefuleDate").attr("value",$(this).find("td")[9].innerHTML);
+      $("#inputPrice").attr("value",$(this).find("td")[6].innerHTML);
+    });
+    //响应保存提交事件
+    $("#saveChange").on("click", function (ev) {
+      var newPrice = $("#inputNewPrice").val();
+      if(newPrice == ""){
+        alert("新价格为空,如果您不需要修改请点击'Close'或者按下ESC建来关闭对话框.");
+      }else{
+        //提交事件
+        $.ajax({
+          url:"{:U('Stock/doChangePrice')}",
+          data:$("#stockForm").serialize(),
+          datatype:"json",
+          type:"POST",
+          beforeSend:function(){
+
+          },
+          success:function(data){
+            console.log(data);
+            if(data['code'] == 200){
+              $("#stockModal").modal('toggle');
+              alert("改价成功!");
+            }else{
+              alert("处理失败了!原因:"+data['msg']);
+            }
+          },
+          error:function(){
+            alert("提交过程中发生问题! 请联系管理员");
+          }
+        })
+      }
+    })
+  });
+</script>
 </body>
 </html>

@@ -35,11 +35,11 @@ class StockController extends Controller
     public function getStockList(){
         isset($_POST['page'])?$page=I("post.page"):$page=1;
         isset($_POST['limit'])?$limit=I("post.limit"):$limit=20;
-        $result = $this->db->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id")->page($page,$limit)->select();
+        $result = $this->db->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id")->page($page,$limit)->order("stock_id desc")->select();
         $count = $this->db->count()/$limit;
         $string = "";
         foreach($result as $key=>$value){
-            $string .= "<tr>";
+            $string .= "<tr data-toggle=\"modal\" data-target=\"#stockModal\">";
             $string .= "<td>".$value['stock_id']."</td>";
             $string .= "<td>".$value['name']."</td>";
             $string .= "<td>".$value['factory']."</td>";
@@ -81,6 +81,39 @@ class StockController extends Controller
         }
         $this->ajaxReturn($retMsg,'json');
     }
+    public function doChangePrice(){
+        if(I("post.newprice") != "" && I("post.stock_id") != ""){
+            $newPrice = I("post.newprice");
+            $stockId = I("post.stock_id");
+            $newData['stock_id'] = $stockId;
+            $findRes = $this->db->where($newData)->find();
+            if($findRes){
+                $newData['sellprice'] = $newPrice;
+                $saveRes = $this->db->data($newData)->save();
+                if($saveRes){
+                    $dbAdjust = M("Adjust");
+                    $adjustData['stock_id'] = $stockId;
+                    $adjustData['oldprice'] = $findRes['sellprice'];
+                    $adjustData['newprice'] = $newPrice;
+                    $adjustData['time'] = time();
+                    $adjustData['adjust_by'] = I("session.userId");
+                    $addRes = $dbAdjust->data($adjustData)->add();
+                    if($addRes){
+                        $retMst = array("code"=>200,"msg"=>"ok","result"=>$addRes);
+                    }else{
+                        $retMst = array("code"=>400,"msg"=>"调价记录写入失败","result"=>$addRes);
+                    }
+                }else{
+                    $retMst = array("code"=>400,"msg"=>"调价失败","result"=>$saveRes);
+                }
+            }else{
+                $retMst = array("code"=>400,"msg"=>"库存中没有该药品","result"=>0);
+            }
+        }else{
+            $retMst = array("code"=>400,"msg"=>"参数错误!","result"=>0);
+        }
+        $this->ajaxReturn($retMst,'json');
+    }
 
     /**
      * 保存库存信息
@@ -88,6 +121,11 @@ class StockController extends Controller
      */
     public function save(){
         if(!empty($this->stock_id)){
+            foreach($this->data as $key=>$item){
+                if(empty($item)){
+                    unset($this->data[$key]);
+                }
+            }
             return $this->db->data($this->data)->save();
         }else{
             return false;
