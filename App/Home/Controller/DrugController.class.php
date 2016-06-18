@@ -29,7 +29,7 @@ class DrugController extends Controller
         $count = $this->db->count()/$limit;
         $string = "";
         foreach($data as $key=>$value){
-            $string .= "<tr>";
+            $string .= "<tr data-toggle=\"modal\" data-target=\"#drugModal\">";
             $string .= "<td>".$value['drug_id']."</td>";
             $string .= "<td>".$value['name']."</td>";
             $string .= "<td>".$value['pinyinma']."</td>";
