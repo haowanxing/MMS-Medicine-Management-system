@@ -80,13 +80,18 @@ class UserController extends Controller
         if (empty(I("session.username"))) {
             return false;
         } else {
+            if(time() > I("session.logintime")+1*60*60){    //登录时间超过1小时,需要更新一下session
+                $info = $this->db->where("id=".I("session.userId"))->find();
+                $_SESSION['username'] = $info['username'];
+                $_SESSION['admin'] = $info['admin'];
+            }
             return true;
         }
     }
 
     public function checkAdmin()
     {
-        if (empty(I("session.admin"))) {
+        if (empty(I("session.admin")) || !$this->checkLogin()) {
             return false;
         } else {
             return true;
