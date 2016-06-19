@@ -39,7 +39,7 @@ class StockController extends Controller
         $count = $this->db->count()/$limit;
         $string = "";
         foreach($result as $key=>$value){
-            $string .= "<tr data-toggle=\"modal\" data-target=\"#stockModal\">";
+            $string .= "<tr data-toggle=\"modal\" data-target=\"#stockModal\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"点击我可以进行调价\">";
             $string .= "<td>".$value['stock_id']."</td>";
             $string .= "<td>".$value['name']."</td>";
             $string .= "<td>".$value['factory']."</td>";

@@ -18,12 +18,12 @@
   <div class="col-md-10">
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">退货</div>
-      <div class="panel-body text-info">首先输入销售编码,这由客户提供</div>
+      <div class="panel-body text-info"></div>
       <form id="retForm" class="form-horizontal">
         <div class="col-md-6">
           <div class="form-group">
             <label for="inputSellId" class="col-sm-3 control-label">销售码</label>
-            <div class="col-sm-9">
+            <div class="col-sm-9" data-toggle="tooltip" data-placement="top" title="输入销售码自动获取销售信息">
               <input name="sell_id" type="text" class="form-control" id="inputSellId" placeholder="销售码" autocomplete="off">
             </div>
           </div>

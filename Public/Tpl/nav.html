@@ -7,23 +7,23 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="__MODULE__/Store/index">药品管理系统</a>
+    <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" title="返回总览页面" href="__MODULE__/Store/index">药品管理系统</a>
   </div>
   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
     <ul class="nav navbar-nav">
-      <li class=""><a href="__MODULE__/Store/storage">入库<span class="sr-only">(current)</span></a></li>
-      <li><a href="__MODULE__/Store/adjust">调价</a> </li>
-      <li><a href="__MODULE__/Store/sell">销售</a></li>
-      <li><a href="__MODULE__/Store/ret">退货</a></li>
-      <li><a href="__MODULE__/Store/stock">库存</a></li>
-      <li><a href="__MODULE__/Store/breakage">报损</a></li>
-      <li><a href="__MODULE__/Store/profit">利润统计</a></li>
+      <li data-toggle="tooltip" data-placement="bottom" title="入库操作和相关记录"><a href="__MODULE__/Store/storage">入库<span class="sr-only">(current)</span></a></li>
+      <li data-toggle="tooltip" data-placement="bottom" title="发生调价的记录表"><a href="__MODULE__/Store/adjust">调价</a> </li>
+      <li data-toggle="tooltip" data-placement="bottom" title="销售操作和相关记录"><a href="__MODULE__/Store/sell">销售</a></li>
+      <li data-toggle="tooltip" data-placement="bottom" title="药品退货相关记录"><a href="__MODULE__/Store/ret">退货</a></li>
+      <li data-toggle="tooltip" data-placement="bottom" title="调价和库存列表"><a href="__MODULE__/Store/stock">库存</a></li>
+      <li data-toggle="tooltip" data-placement="bottom" title="药品报损提交"><a href="__MODULE__/Store/breakage">报损</a></li>
+      <li data-toggle="tooltip" data-placement="bottom" title="简单的统计"><a href="__MODULE__/Store/profit">利润统计</a></li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
            aria-expanded="false">店铺管理<span class="caret"></span></a>
         <ul class="dropdown-menu">
-          <li><a href="__MODULE__/Store/base">基本信息</a></li>
-          <li><a href="__MODULE__/Store/people">人员管理</a></li>
+          <li data-toggle="tooltip" data-placement="left" title="药品信息和店铺信息"><a href="__MODULE__/Store/base">基本信息</a></li>
+          <li data-toggle="tooltip" data-placement="left" title="人员管理"><a href="__MODULE__/Store/people">人员管理</a></li>
         </ul>
       </li>
     </ul>
@@ -31,7 +31,7 @@
     if(isset($_SESSION['username'])){
     ?>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="__MODULE__/User/doLogout">退出</a></li>
+      <li data-toggle="tooltip" data-placement="left" title="退出系统"><a href="__MODULE__/User/doLogout">退出</a></li>
     </ul>
     <?php } ?>
   </div>

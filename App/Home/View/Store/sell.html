@@ -18,11 +18,11 @@
   <div class="col-md-10">
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">销售</div>
-      <div class="panel-body text-info">输入拼音码来进行销售</div>
+      <div class="panel-body text-info"></div>
       <form id="sellForm" class="form-horizontal" action="{:U('Sell/doAdd')}">
         <div class="form-group">
           <label for="inputPinyin" class="col-sm-2 control-label">拼音码</label>
-          <div class="col-sm-10">
+          <div class="col-sm-10" data-toggle="tooltip" data-placement="top" title="输入拼音码自动获取药品信息">
             <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码" autocomplete="off">
             <input name="stock_id" type="hidden" class="form-control" id="inputStockId">
           </div>

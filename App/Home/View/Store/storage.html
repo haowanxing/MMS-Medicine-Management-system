@@ -18,12 +18,13 @@
   <div class="col-md-10">
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">药品入库</div>
-      <div class="panel-body text-info">首先输入拼音码,确认药品存在后才能执行入库操作</div>
+      <!--<div class="panel-body text-info">首先输入拼音码,确认药品存在后才能执行入库操作</div>-->
+      <div class="panel-body text-info"></div>
       <form id="storageForm" class="form-horizontal" target="_blank" action="{:U('Storage/doAdd')}">
         <div class="col-md-6">
           <div class="form-group">
             <label for="inputPinyin" class="col-sm-3 control-label">拼音码</label>
-            <div class="col-sm-9">
+            <div class="col-sm-9" data-toggle="tooltip" data-placement="top" title="输入拼音码自动获取药品信息">
               <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码" autocomplete="off">
             </div>
           </div>

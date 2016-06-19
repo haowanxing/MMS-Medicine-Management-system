@@ -18,11 +18,12 @@
   <div class="col-md-10">
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">报损表</div>
+      <div class="panel-body"></div>
       <form id="breakageForm" class="form-horizontal">
         <div class="col-md-6">
           <div class="form-group">
             <label for="inputPinYinMa" class="col-sm-3 control-label">拼音码</label>
-            <div class="col-sm-9">
+            <div class="col-sm-9" data-toggle="tooltip" data-placement="top" title="输入拼音码自动获取库存和药品信息">
               <input name="pinyinma" type="text" class="form-control" id="inputPinYinMa" placeholder="请输入" autocomplete="off">
               <input name="stock_id" type="hidden" class="form-control" id="inputStockId" placeholder="" autocomplete="off">
             </div>

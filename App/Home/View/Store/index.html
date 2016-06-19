@@ -8,9 +8,66 @@
 <div class="container">
   <div class="col-md-10">
     <div class="panel panel-default">
-      <div class="panel-heading">功能</div>
+      <div class="panel-heading">药店总览</div>
       <div class="panel-body">
-        ...
+        <div class="row">
+          <div class="col-sm-12">
+            <h4 class="text-primary">店铺相关:</h4>
+            <div class="col-sm-3 text-info">
+              职工数: {$user.total}人
+            </div>
+            <div class="col-sm-3 text-success">
+              管理员: {$user.admin}人
+            </div>
+            <div class="col-sm-3 text-warning">
+              最近(1小时)登录: {$user.recent}人
+            </div>
+          </div>
+        </div>
+        <hr />
+        <div class="row">
+          <div class="col-sm-12">
+            <h4 class="text-primary">药品相关:</h4>
+            <div class="col-sm-3 text-info">
+              总数: {$drug.total}种
+            </div>
+            <div class="col-sm-3 text-success">
+              已入库: {$drug.stock}种
+            </div>
+            <div class="col-sm-3 text-warning">
+              未入库: {$drug.outstock}种
+            </div>
+            <div class="col-sm-3 text-danger" data-toggle="modal" data-target=".bs-example-modal-sm">
+              <span data-toggle="tooltip" title="点我来查看!" role="button">库存警告: {:count($drug.warning)}件</span>
+            </div>
+          </div>
+        </div>
+        <hr/>
+        <div class="row">
+          <div class="col-sm-12">
+            <h4 class="text-primary">销售相关:</h4>
+            <div class="col-sm-3 text-success">
+              销售额: {$sell.sell_money}元
+            </div>
+            <div class="col-sm-3 text-info">
+              总销售: {$sell.total}件
+            </div>
+            <div class="col-sm-3 text-warning">
+              退货: {$sell.return}件
+            </div>
+            <div class="col-sm-3 text-danger">
+              总退款: {$sell.ret_money}元
+            </div>
+            <div class="col-sm-3 text-warning">
+              实际销售额: {$sell.real_money}元
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            ...
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -19,6 +76,30 @@
       <div class="panel-heading">公告:</div>
       <div class="panel-body">
         暂无...
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
+  <div class="modal fade bs-example-modal-sm" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="warningModalLabel">警告列表<small>(右侧气泡为低限数)</small></h4>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group">
+            <volist name="drug.warning" id="data">
+              <li class="list-group-item">
+                <span class="badge">{$data.lowwarning}</span>
+                {$data.name} (库存: {$data.sum_amount} 件)
+              </li>
+            </volist>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>

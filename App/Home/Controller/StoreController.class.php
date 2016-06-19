@@ -22,6 +22,34 @@ class StoreController extends Controller
 
     public function index()
     {
+        //药店相关
+        $dbUser = M("Users");
+        $User['total'] = $dbUser->count();
+        $User['admin'] = $dbUser->where("admin=1")->count();
+        $User['recent'] = $dbUser->where("lasttime>=".(time()-3600))->count();
+        $this->assign("user",$User);
+        //药品相关
+        $dbDrug = M("Drugs");
+        $dbStock = M("Stock");
+        $Drug['total'] = $dbDrug->count();
+        $Drug['stock'] = $dbStock->count("DISTINCT drug_id");
+        $Drug['outstock'] = $Drug['total']-$Drug['stock'];
+        $Drug['warning'] = $dbDrug->alias("drug")->join("RIGHT JOIN __STOCK__ stock ON stock.drug_id = drug.drug_id")->group("stock.drug_id")->field("sum(stock.stock_amount) sum_amount,stock.*,drug.*")->select();
+        foreach($Drug['warning'] as $key=>$value){
+            if($value['sum_amount'] > $value['lowwarning']){
+                unset($Drug['warning'][$key]);
+            }
+        }
+        $this->assign("drug",$Drug);
+        //销售相关
+        $dbSell = M("Sell");
+        $dbRet = M("Return");
+        $Sell['total'] = $dbSell->sum("sell_amount");//销售数量
+        $Sell['return'] = $dbRet->sum("ret_amount");//退货数量
+        $Sell['sell_money'] = $dbSell->sum("allprice");
+        $Sell['ret_money'] = $dbRet->sum("totalprice");
+        $Sell['real_money'] = $Sell['sell_money']-$Sell['ret_money'];
+        $this->assign("sell",$Sell);
         $this->display();
     }
 
