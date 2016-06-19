@@ -93,6 +93,7 @@
             </form>
           </div>
           <div class="modal-footer">
+            <button id="delDrugBtn" type="button" class="btn btn-danger btn-sm" style="float: left" data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该药品">删除</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
             <button id="saveChange" type="button" class="btn btn-primary">修改</button>
           </div>
@@ -154,6 +155,32 @@
         })
       }
     })
+    //响应删除用户
+    $("#delDrugBtn").on("click", function () {
+      if(confirm("确定要删除该药品?")){
+        var Form = $("#drugForm");
+        $.ajax({
+          url:"{:U('Drug/delDrug')}",
+          data:"do=delDrug&"+Form.serialize(),
+          datatype:"json",
+          type:"POST",
+          success:function(data){
+            console.log(data);
+            if(data['code'] == 200){
+              $("#drugModal").modal('toggle');
+              loadMore("#drugList","{:U('Index/getDrugList')}",NOW_PAGE);
+              Form[0].reset();
+              alert("删除了!");
+            }else{
+              alert("处理失败了!原因:"+data['msg']);
+            }
+          },
+          error:function(){
+            alert("提交过程中发生问题! 请联系管理员");
+          }
+        })
+      }
+    });
 
   });
 </script>

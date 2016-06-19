@@ -98,6 +98,25 @@ class DrugController extends Controller
             $this->display();
         }
     }
+    public function delDrug()
+    {
+        if (A("User")->checkAdmin() === true) {
+            if (I("post.do") == "delDrug") {
+                $info['drug_id'] = I("post.drug_id");
+                $findRes = $this->db->where($info)->find();
+                if ($findRes) {
+                    $res = $this->db->where($findRes)->delete();
+                    $this->ajaxReturn(array('code' => 200, 'msg' => "ok", 'result' => $res));
+                } else {
+                    $this->ajaxReturn(array('code' => 400, 'msg' => "找不到药品", 'result' => $info['drug_id']));
+                }
+            } else {
+                $this->ajaxReturn(array('code' => 400, 'msg' => "缺少必要参数", 'result' => 0));
+            }
+        } else {
+            $this->ajaxReturn(array('code' => 400, 'msg' => "权限错误", 'result' => 0));
+        }
+    }
     public function getInfo(){
         if(!empty(I("get.pinyinma"))){
             $this->data['pinyinma'] = I("get.pinyinma");

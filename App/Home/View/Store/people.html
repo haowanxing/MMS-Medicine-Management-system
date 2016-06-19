@@ -37,8 +37,47 @@
       </div>
     </div>
     <div class="panel panel-default func">
-      <div class="panel-heading" style="text-align: center">功能名称2</div>
-      ...
+      <div class="panel-heading" style="text-align: center">添加员工</div>
+      <div class="panel-body">
+        <div class="col-sm-7 col-sm-offset-2">
+          <form id="addForm" class="form-horizontal" action="{:U('User/doAdd')}" method="post">
+            <div class="form-group">
+              <label for="inputName2" class="col-sm-2 control-label">姓名</label>
+              <div class="col-sm-10">
+                <input name="realname" type="text" class="form-control" id="inputName2" autocomplete="off">
+                <input name="do" type="hidden" value="addUser" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputUserName2" class="col-sm-2 control-label">登录名</label>
+              <div class="col-sm-10">
+                <input name="username" type="text" class="form-control" id="inputUserName2" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputPassword2" class="col-sm-2 control-label">密码</label>
+              <div class="col-sm-10">
+                <input name="password" type="password" class="form-control" id="inputPassword2" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputAdmin2" class="col-sm-2 control-label">身份权限</label>
+              <div class="col-sm-10">
+                <select name="admin" class="form-control" id="inputAdmin2">
+                  <option value="0" text="普通">普通</option>
+                  <option value="1" text="管理员">管理员</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button id="doAdd" type="submit" class="btn btn-success submit">提交</button>
+                <button type="reset" class="btn btn-warning">清空输入</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
   <div class="row">
@@ -67,7 +106,7 @@
               </div>
               <div class="form-group">
                 <label for="inputPassword" class="col-sm-2 control-label">密码</label>
-                <div class="col-sm-10"  data-toggle="tooltip" data-placement="top" title="不修改请留空">
+                <div class="col-sm-10" data-toggle="tooltip" data-placement="top" title="不修改请留空">
                   <input name="password" type="password" class="form-control" id="inputPassword" placeholder="不修改请留空" autocomplete="off">
                 </div>
               </div>
@@ -83,6 +122,7 @@
             </form>
           </div>
           <div class="modal-footer">
+            <button id="delUserBtn" type="button" class="btn btn-danger btn-sm" style="float: left" data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该用户">删除</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
             <button id="saveChange" type="button" class="btn btn-primary">修改</button>
           </div>
@@ -141,6 +181,32 @@
             alert("提交过程中发生问题! 请联系管理员");
           }
         })
+    });
+    //响应删除用户
+    $("#delUserBtn").on("click", function () {
+      if(confirm("确定要删除该用户?")){
+        var Form = $("#userForm");
+        $.ajax({
+          url:"{:U('User/delUser')}",
+          data:"do=delUser&"+Form.serialize(),
+          datatype:"json",
+          type:"POST",
+          success:function(data){
+            console.log(data);
+            if(data['code'] == 200){
+              $("#userModal").modal('toggle');
+              loadMore("#userList","{:U('Index/getUserList')}",NOW_PAGE);
+              Form[0].reset();
+              alert("删除了!");
+            }else{
+              alert("处理失败了!原因:"+data['msg']);
+            }
+          },
+          error:function(){
+            alert("提交过程中发生问题! 请联系管理员");
+          }
+        })
+      }
     });
 
   });

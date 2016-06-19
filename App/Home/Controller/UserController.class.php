@@ -49,7 +49,7 @@ class UserController extends Controller
             $string .= "<td>" . $value['username'] . "</td>";
             $string .= "<td>" . $value['realname'] . "</td>";
             $string .= "<td>" . ($value['admin'] == 0 ? "普通" : "管理员") . "</td>";
-            $string .= "<td>" . date("Y/m/d h:i:s", $value['lasttime']) . "</td>";
+            $string .= "<td>" . ($value['lasttime'] == 0 ? "从未登录" : date("Y/m/d h:i:s", $value['lasttime'])) . "</td>";
             $string .= "</tr>";
         }
         $retMsg = array('code' => 200, "pageCount" => ceil($count), "table" => $string);
@@ -65,6 +65,7 @@ class UserController extends Controller
             $this->error("请登录后再试!", U("Home/User/login"), 2);
         }
     }
+
     /**
      *其他模块调用,检测用户身份状态
      */
@@ -80,8 +81,8 @@ class UserController extends Controller
         if (empty(I("session.username"))) {
             return false;
         } else {
-            if(time() > I("session.logintime")+1*60*60){    //登录时间超过1小时,需要更新一下session
-                $info = $this->db->where("id=".I("session.userId"))->find();
+            if (time() > I("session.logintime") + 1 * 60 * 60) {    //登录时间超过1小时,需要更新一下session
+                $info = $this->db->where("id=" . I("session.userId"))->find();
                 $_SESSION['username'] = $info['username'];
                 $_SESSION['admin'] = $info['admin'];
             }
@@ -195,6 +196,11 @@ class UserController extends Controller
                 $info['password'] = I("post.password");
                 $info['realname'] = I("post.realname");
                 $info['admin'] = I("post.admin", 0);
+                foreach ($info as $k => $v) {
+                    if (empty($v)) {
+                        $this->ajaxReturn(array('code' => 400, 'msg' => $k . "为必填项", 'result' => 0));
+                    }
+                }
                 $res = $this->db->data($info)->add();
                 if ($res) {
                     $this->ajaxReturn(array('code' => 200, 'msg' => "ok", 'result' => $res));
@@ -209,11 +215,41 @@ class UserController extends Controller
         }
     }
 
+    public function doAdd()
+    {
+        if ($this->checkAdmin() === true) {
+            if (I("post.do") == "addUser") {
+                $info['username'] = I("post.username");
+                $info['password'] = I("post.password");
+                $info['realname'] = I("post.realname");
+                $info['admin'] = I("post.admin", 0);
+                foreach ($info as $k => $v) {
+                    if (empty($v) && $v < 0) {
+                        $this->error($k . "为必填项");
+                    }
+                }
+                if($this->db->where(array("username"=>$info['username']))->find()){
+                    $this->error("登录名重复!");
+                }
+                $res = $this->db->data($info)->add();
+                if ($res) {
+                    $this->success("添加用户成功");
+                } else {
+                    $this->error("写入出错:" . $this->db->error());
+                }
+            } else {
+                $this->error("干啥呢?");
+            }
+        } else {
+            $this->error("权限错误!");
+        }
+    }
+
     public function delUser()
     {
         if ($this->checkAdmin() === true) {
             if (I("post.do") == "delUser") {
-                $info['id'] = I("post.id");
+                $info['id'] = I("post.user_id");
                 $user = $this->db->where($info)->find();
                 if ($user) {
                     if ($user['admin'] == 0) {
@@ -223,13 +259,13 @@ class UserController extends Controller
                         $this->ajaxReturn(array('code' => 400, 'msg' => "不能删除管理员", 'result' => ""));
                     }
                 } else {
-                    $this->ajaxReturn(array('code' => 400, 'msg' => "no this user", 'result' => $this->db->error()));
+                    $this->ajaxReturn(array('code' => 400, 'msg' => "no this user", 'result' => 0));
                 }
             } else {
-                $this->display();
+                $this->ajaxReturn(array('code' => 400, 'msg' => "缺少必要参数", 'result' => 0));
             }
         } else {
-            $this->error("权限错误!");
+            $this->ajaxReturn(array('code' => 400, 'msg' => "权限错误", 'result' => 0));
         }
     }
 
