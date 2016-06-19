@@ -141,4 +141,11 @@ class StoreController extends Controller
         $this->assign("store",$this->data);
         $this->display();
     }
+    public function people(){
+        $User = A("User");
+        $List = $User->getUserList();
+        $this->assign("userList",$List['table']);
+        $this->assign("userListCount",$List['pageCount']);
+        $this->display();
+    }
 }
