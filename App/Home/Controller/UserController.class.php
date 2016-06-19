@@ -81,10 +81,16 @@ class UserController extends Controller
         if (empty(I("session.username"))) {
             return false;
         } else {
-            if (time() > I("session.logintime") + 1 * 60 * 60) {    //登录时间超过1小时,需要更新一下session
+            $freshTime = I("session.freshTime");
+            if (time() > ($freshTime + 30 * 60)) {    //空闲时间超过30分钟,自动退出登录
+                $this->logout();
+                return false;
+            }
+            if (time() > ($freshTime + 5 * 60)) {    //登录时间超过5分钟,需要更新一下session
                 $info = $this->db->where("id=" . I("session.userId"))->find();
                 $_SESSION['username'] = $info['username'];
                 $_SESSION['admin'] = $info['admin'];
+                $_SESSION['freshTime'] = time();
             }
             return true;
         }
@@ -115,27 +121,29 @@ class UserController extends Controller
         $result = $this->db->where($user)->find();
         if ($result) {
             $this->db->where($result)->data(array("lasttime" => time()))->save();
-            $this->id = $result['id'];
-            $this->username = $result['username'];
-            $this->password = $result['password'];
-            $this->realname = $result['realname'];
-            $this->admin = $result['admin'];
-            $_SESSION['userId'] = $this->id;
-            $_SESSION['username'] = $this->username;
-            $_SESSION['admin'] = $this->admin;
+            $_SESSION['userId'] = $result['id'];
+            $_SESSION['username'] = $result['username'];
+            $_SESSION['admin'] = $result['admin'];
+            $_SESSION['freshTime'] = time();
             $this->redirect("/Home/Store/Index");
         } else {
             $this->error("用户名或者密码不正确");
         }
     }
 
+    public function logout()
+    {
+        unset($_SESSION['username']);
+        unset($_SESSION['admin']);
+        unset($_SESSION['userId']);
+        unset($_SESSION['freshTime']);
+        return $this;
+    }
+
     public function doLogout()
     {
         if ($this->checkLogin() === true) {
-            unset($_SESSION['username']);
-            unset($_SESSION['admin']);
-            unset($_SESSION['userId']);
-            $this->success("成功退出!");
+            $this->logout()->success("成功退出!");
         } else {
             $this->error("当前没有登录的用户可以退出!");
         }
@@ -228,7 +236,7 @@ class UserController extends Controller
                         $this->error($k . "为必填项");
                     }
                 }
-                if($this->db->where(array("username"=>$info['username']))->find()){
+                if ($this->db->where(array("username" => $info['username']))->find()) {
                     $this->error("登录名重复!");
                 }
                 $res = $this->db->data($info)->add();
