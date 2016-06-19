@@ -134,6 +134,7 @@ class StoreController extends Controller
         $this->display();
     }
     public function base(){
+        A("User")->adminCheck();
         $Drug = A("Drug");
         $List = $Drug->getDrugList();
         $this->assign("drugList",$List['table']);
@@ -143,6 +144,7 @@ class StoreController extends Controller
     }
     public function people(){
         $User = A("User");
+        $User->adminCheck();
         $List = $User->getUserList();
         $this->assign("userList",$List['table']);
         $this->assign("userListCount",$List['pageCount']);
