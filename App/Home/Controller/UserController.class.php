@@ -17,7 +17,7 @@ class UserController extends Controller
     public function _initialize()
     {
         $this->db = M("users");
-        if ($this->checkLogin() === true) {
+        /*if ($this->checkLogin() === true) {
             $data['username'] = I("session.username");
             $info = $this->db->where($data)->find();
             if ($info) {
@@ -27,7 +27,7 @@ class UserController extends Controller
                 $this->realname = $info['realname'];
                 $this->admin = $info['admin'];
             }
-        }
+        }*/
     }
 
     public function index()
@@ -123,6 +123,7 @@ class UserController extends Controller
             $this->db->where($result)->data(array("lasttime" => time()))->save();
             $_SESSION['userId'] = $result['id'];
             $_SESSION['username'] = $result['username'];
+            $_SESSION['realname'] = $result['realname'];
             $_SESSION['admin'] = $result['admin'];
             $_SESSION['freshTime'] = time();
             $this->redirect("/Home/Store/Index");
@@ -134,6 +135,7 @@ class UserController extends Controller
     public function logout()
     {
         unset($_SESSION['username']);
+        unset($_SESSION['realname']);
         unset($_SESSION['admin']);
         unset($_SESSION['userId']);
         unset($_SESSION['freshTime']);
@@ -194,6 +196,28 @@ class UserController extends Controller
             $retMsg = array("code" => 400, "msg" => "缺少必要参数或不正确", "result" => 0);
         }
         $this->ajaxReturn($retMsg, 'json');
+    }
+    public function chPass(){
+        $this->loginCheck();
+        if(I("post.do") == "chpassword"){
+            if(I("post.new") == I("post.old") || I("post.new") == ""){
+                $this->error("新旧密码不能相同或为空!");
+            }else{
+                $findRes = $this->setId(I("session.userId"))->setPassword(md5(I("post.old")))->formatData()->db->where($this->data)->find();
+                if($findRes){
+                    $saveRes = $this->db->data('password='.md5(I("post.new")))->where($this->data)->save();
+                    if($saveRes){
+                        $this->logout()->success("修改成功!请使用新密码重新登录");
+                    }else{
+                        $this->error("修改失败!");
+                    }
+                }else{
+                    $this->error("原密码错误!");
+                }
+            }
+        }else{
+            $this->display();
+        }
     }
 
     public function addUser()
