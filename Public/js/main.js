@@ -3,6 +3,7 @@
  */
 var NOW_PAGE;//全局
 $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();//提示绑定
     var menu = $(".list-menu");
     var func = $(".func");
 
