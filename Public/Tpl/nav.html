@@ -31,10 +31,14 @@
     if(isset($_SESSION['username'])){
     ?>
     <ul class="nav navbar-nav navbar-right">
-      <li data-toggle="tooltip" data-placement="left" title="退出系统"><a href="__MODULE__/User/doLogout">退出</a></li>
+      <li data-toggle="tooltip" data-placement="left" title="退出系统"><a href="{:U('User/doLogout')}">退出</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li data-toggle="tooltip" data-placement="bottom" title="个人信息"><a href="{:U('User/chPass')}">({:I("session.realname")})</a></li>
+    </ul>
+    <?php }else{ ?>
+    <ul class="nav navbar-nav navbar-right">
+      <li data-toggle="tooltip" data-placement="left" title="登录本系统"><a href="{:U('User/')}">登录</a></li>
     </ul>
     <?php } ?>
   </div>
