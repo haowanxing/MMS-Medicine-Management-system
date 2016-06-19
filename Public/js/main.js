@@ -24,7 +24,10 @@ $(document).ready(function () {
     });
     //模态框关闭
     $('.modal').on('hidden.bs.modal', function (e) {
-        $(this).find("form")[0].reset();
+        var form = $(this).find("form")[0];
+        if(form){
+            form.reset();
+        }
     })
 });
 function loadMore(target, url, page) {
