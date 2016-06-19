@@ -34,6 +34,24 @@ class UserController extends Controller
         $this->show("<h2>用户类</h2>");
     }
 
+    public function getUserList(){
+        isset($_POST['page'])?$page=I("post.page"):$page=1;
+        isset($_POST['limit'])?$limit=I("post.limit"):$limit=20;
+        $result = $this->db->page($page,$limit)->order("id desc")->select();
+        $count = $this->db->count()/$limit;
+        $string = "";
+        foreach($result as $key=>$value){
+            $string .= "<tr data-toggle=\"modal\" data-target=\"#userModal\">";
+            $string .= "<td>".$value['id']."</td>";
+            $string .= "<td>".$value['username']."</td>";
+            $string .= "<td>".$value['realname']."</td>";
+            $string .= "<td>".($value['admin']==0?"普通":"管理员")."</td>";
+            $string .= "<td>".date("Y/m/d h:i:s",$value['lasttime'])."</td>";
+            $string .= "</tr>";
+        }
+        $retMsg = array('code'=>200,"pageCount"=>ceil($count),"table"=>$string);
+        return $retMsg;
+    }
     /**
      *其他模块调用,检测用户登陆状态,未登录则提示登录
      */
@@ -73,6 +91,7 @@ class UserController extends Controller
         $user['password'] = md5(I("post.password"));
         $result = $this->db->where($user)->find();
         if ($result) {
+            $this->db->where($result)->data(array("lasttime"=>time()))->save();
             $this->id = $result['id'];
             $this->username = $result['username'];
             $this->password = $result['password'];
@@ -81,7 +100,6 @@ class UserController extends Controller
             $_SESSION['userId'] = $this->id;
             $_SESSION['username'] = $this->username;
             $_SESSION['admin'] = $this->admin;
-//            $this->success("登录成功!","/Store/Index");
             $this->redirect("/Home/Store/Index");
         } else {
             $this->error("用户名或者密码不正确");
