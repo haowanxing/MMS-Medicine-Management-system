@@ -124,7 +124,6 @@
     });
     //点击库存列表填充模态框
     $("#stockList").on("click","tr", function (ev) {
-      console.log(ev);
       $("#stockModalLabel").html("药品名称: "+$(this).find("td")[1].innerHTML);
       $("#inputStockId").attr("value",$(this).find("td")[0].innerHTML);
       $("#inputFactory").attr("value",$(this).find("td")[2].innerHTML);
