@@ -2,6 +2,7 @@
 namespace Home\Controller;
 
 use Think\Controller;
+use Think\Model;
 
 class StoreController extends Controller
 {
@@ -22,6 +23,7 @@ class StoreController extends Controller
 
     public function index()
     {
+        $Model = new Model();
         //药店相关
         $dbUser = M("Users");
         $User['total'] = $dbUser->count();
@@ -31,9 +33,9 @@ class StoreController extends Controller
         //药品相关
         $dbDrug = M("Drugs");
         $dbStock = M("Stock");
-        $Drug['total'] = $dbDrug->count();
-        $Drug['stock'] = $dbStock->count("DISTINCT drug_id");
-        $Drug['outstock'] = $Drug['total']-$Drug['stock'];
+        $Drug['total'] = $dbDrug->count();//药品种类数量
+        $Drug['stock'] = $dbStock->count("DISTINCT drug_id");//库存中药品种类数量
+        $Drug['out_stock'] = $Model->query("SELECT * FROM __DRUGS__ WHERE drug_id NOT IN (SELECT DISTINCT drug_id FROM __STOCK__)");
         $Drug['warning'] = $dbDrug->alias("drug")->join("RIGHT JOIN __STOCK__ stock ON stock.drug_id = drug.drug_id")->group("stock.drug_id")->field("sum(stock.stock_amount) sum_amount,stock.*,drug.*")->select();
         foreach($Drug['warning'] as $key=>$value){
             if($value['sum_amount'] > $value['lowwarning']){

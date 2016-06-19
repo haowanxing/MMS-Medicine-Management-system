@@ -7,11 +7,11 @@
 <include file="./Public/Tpl/nav.html"/>
 <div class="container">
   <div class="col-md-2">
-    <div class="panel panel-default">
+    <div class="panel panel-info">
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">药店信息</button>
-        <button type="button" class="list-group-item list-menu" data-to="1">药品</button>
+        <button type="button" class="list-group-item list-menu" data-to="1">药品基础信息</button>
       </div>
     </div>
   </div>
@@ -27,24 +27,27 @@
         <tr><td>店铺地址:</td><td>{$store.address}</td></tr>
       </table>
     </div>
-    <div class="panel panel-default func">
+    <div class="panel panel-info func">
       <div class="panel-heading" style="text-align: center">药品信息库</div>
-      <table class="table table-hover">
-        <thead>
-        <tr><th>药品编号</th><th>药品名称</th><th>拼音码</th><th>规格</th><th>单位</th><th>最低限数量</th></tr>
-        </thead>
-        <tbody id="drugList">
-        {$drugList}
-        </tbody>
-      </table>
-      <div id="drugPage" class="center">
-        <nav>
-          <ul class="pagination">
-            <for start="1" end="$drugListCount+1">
-              <li><a href="#" data-to="{$i}">{$i}</a></li>
-            </for>
-          </ul>
-        </nav>
+      <div class="panel-body">
+        <span data-toggle="tooltip" data-placement="right" title="添加新的药品"><button type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增药品</button></span>
+        <table class="table table-hover">
+          <thead>
+          <tr><th>药品编号</th><th>药品名称</th><th>拼音码</th><th>规格</th><th>单位</th><th>最低限数量</th></tr>
+          </thead>
+          <tbody id="drugList">
+          {$drugList}
+          </tbody>
+        </table>
+        <div id="drugPage" class="center">
+          <nav>
+            <ul class="pagination">
+              <for start="1" end="$drugListCount+1">
+                <li><a href="#" data-to="{$i}">{$i}</a></li>
+              </for>
+            </ul>
+          </nav>
+        </div>
       </div>
     </div>
   </div>
@@ -96,6 +99,56 @@
             <button id="delDrugBtn" type="button" class="btn btn-danger btn-sm" style="float: left" data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该药品">删除</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
             <button id="saveChange" type="button" class="btn btn-primary">修改</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Add Modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="addModalLabel">添加新药品</h4>
+          </div>
+          <div class="modal-body">
+            <form id="addForm" class="form-horizontal">
+              <input name="do" type="hidden" value="doAdd" />
+              <div class="form-group">
+                <label for="addName" class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-10">
+                  <input name="name" type="text" class="form-control" id="addName" autocomplete="off" data-toggle="tooltip" data-placement="top" title="请输入药品通用名称">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="addPinYinMa" class="col-sm-2 control-label">拼音码</label>
+                <div class="col-sm-10">
+                  <input name="pinyinma" type="text" class="form-control" id="addPinYinMa" autocomplete="off" data-toggle="tooltip" data-placement="top" title="大写的药品拼音缩写">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="addSpec" class="col-sm-2 control-label">规格</label>
+                <div class="col-sm-10">
+                  <input name="spec" type="text" class="form-control" id="addSpec" autocomplete="off" data-toggle="tooltip" data-placement="top" title="药品的规格,或者包装">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="addUnit" class="col-sm-2 control-label">单位</label>
+                <div class="col-sm-10">
+                  <input name="unit" type="text" class="form-control" id="addUnit" autocomplete="off" data-toggle="tooltip" data-placement="top" title="计量单位">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="addLowWarning" class="col-sm-2 control-label">低限警告</label>
+                <div class="col-sm-10">
+                  <input name="lowwarning" type="number" class="form-control" id="addLowWarning" autocomplete="off" data-toggle="tooltip" data-placement="top" title="库存最低限度,低于这个值会有提醒">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button id="addBtn" type="button" class="btn btn-primary">增加</button>
           </div>
         </div>
       </div>
@@ -154,7 +207,40 @@
           }
         })
       }
-    })
+    });
+    //响应添加药品
+    $("#addBtn").on("click", function (ev) {
+      var lowWarning = $("#addLowWarning").val();
+      if(lowWarning == "" || isNaN(lowWarning)){
+        alert("低限必须填写且只能为整数!");
+      }else{
+        //提交事件
+        var Form = $("#addForm");
+        $.ajax({
+          url:"{:U('Drug/addDrug')}",
+          data:Form.serialize(),
+          datatype:"json",
+          type:"POST",
+          beforeSend:function(){
+
+          },
+          success:function(data){
+            console.log(data);
+            if(data['code'] == 200){
+              $("#addModal").modal('toggle');
+              loadMore("#drugList","{:U('Index/getDrugList')}",NOW_PAGE);
+              Form[0].reset();
+              alert("添加成功!");
+            }else{
+              alert("处理失败了!原因:"+data['msg']);
+            }
+          },
+          error:function(){
+            alert("提交过程中发生问题! 请联系管理员");
+          }
+        })
+      }
+    });
     //响应删除用户
     $("#delDrugBtn").on("click", function () {
       if(confirm("确定要删除该药品?")){

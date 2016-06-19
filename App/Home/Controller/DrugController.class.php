@@ -52,6 +52,14 @@ class DrugController extends Controller
         $this->setId(I("post.drug_id"))->setName(I("post.name"))->setPinYinMa(I("post.pinyinma"))->setSpec(I("post.spec"))->setUnit(I("post.unit"))->setLowwarning(I("post.lowwarning"));
         return $this;
     }
+    public function formatData(){
+        foreach($this->data as $key=>$value){
+            if(empty($value) && $value!=0){
+                unset($this->data[$key]);
+            }
+        }
+        return $this;
+    }
 
     public function doChangeInfo(){
         $drugId = I("post.drug_id");
@@ -68,21 +76,20 @@ class DrugController extends Controller
         $this->ajaxReturn($retMsg,'json');
     }
 
-    public function add(){
+    public function addDrug(){
         if(I("post.do")=="doAdd"){
-            $this->data['name'] = I("post.name");
-            $this->data['pinyinma'] = I("post.pinyinma");
-            $this->data['spec'] = I("post.spec");
-            $this->data['unit'] = I("post.unit");
-            $this->data['lowwarning'] = I("post.lowwarning");
-            $res = $this->db->data($this->data)->add();
+            $findRes = $this->db->where(array("pinyinma"=>I("post.pinyinma")))->find();
+            if($findRes){
+                $this->ajaxReturn(array('code'=>400,'msg'=>"拼音码重复",'result'=>$findRes));
+            }
+            $res = $this->setDataFromPost()->formatData()->db->data($this->data)->add();
             if($res){
                 $this->ajaxReturn(array('code'=>200,'msg'=>"ok",'result'=>$res));
             }else{
                 $this->ajaxReturn(array('code'=>400,'msg'=>"add error",'result'=>$this->db->error()));
             }
         }else{
-            $this->display();
+            $this->ajaxReturn(array('code'=>400,'msg'=>"缺少必要参数",'result'=>0));
         }
     }
     public function delete(){

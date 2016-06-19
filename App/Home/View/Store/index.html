@@ -34,10 +34,10 @@
             <div class="col-sm-3 text-success">
               已入库: {$drug.stock}种
             </div>
-            <div class="col-sm-3 text-warning">
-              未入库: {$drug.outstock}种
+            <div class="col-sm-3 text-warning" data-toggle="modal" data-target="#out_stockModal">
+              <span data-toggle="tooltip" title="点我来查看!" role="button">未入库: {:count($drug['out_stock'])}种</span>
             </div>
-            <div class="col-sm-3 text-danger" data-toggle="modal" data-target=".bs-example-modal-sm">
+            <div class="col-sm-3 text-danger" data-toggle="modal" data-target="#warningModal">
               <span data-toggle="tooltip" title="点我来查看!" role="button">库存警告: {:count($drug.warning)}件</span>
             </div>
           </div>
@@ -79,7 +79,31 @@
       </div>
     </div>
   </div>
-  <!-- Modal -->
+  <!-- OutStock Modal -->
+  <div class="modal fade bs-example-modal-sm" id="out_stockModal" tabindex="-1" role="dialog" aria-labelledby="outStockModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="outStockModalLabel">未入库列表<small>(右侧气泡为低限数)</small></h4>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group">
+            <volist name="drug.out_stock" id="data">
+              <li class="list-group-item">
+                <span class="badge">{$data.lowwarning}</span>
+                {$data.pinyinma} - {$data.name} - {$data.spec}
+              </li>
+            </volist>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Warning Modal -->
   <div class="modal fade bs-example-modal-sm" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
