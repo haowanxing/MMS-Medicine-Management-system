@@ -40,4 +40,7 @@ class IndexController extends Controller
     public function getBreakageList(){
         $this->ajaxReturn(A("Return")->getBreakageList(),'json');
     }
+    public function getUserList(){
+        $this->ajaxReturn(A("User")->getUserList(),'json');
+    }
 }
