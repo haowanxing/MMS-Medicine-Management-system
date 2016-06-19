@@ -22,6 +22,10 @@ $(document).ready(function () {
         language: 'zh-CN',
         autoclose: true,
     });
+    //模态框关闭
+    $('.modal').on('hidden.bs.modal', function (e) {
+        $(this).find("form")[0].reset();
+    })
 });
 function loadMore(target, url, page) {
     $.ajax({
