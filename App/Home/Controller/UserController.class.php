@@ -251,8 +251,11 @@ class UserController extends Controller
     {
         if ($this->checkAdmin() === true) {
             if (I("post.do") == "addUser") {
+                if(I("post.username") == "" || I("post.password") == "" || I("post.realname") ==""){
+                    $this->error("表单必须填写完整,不得出现空项!");
+                }
                 $info['username'] = I("post.username");
-                $info['password'] = I("post.password");
+                $info['password'] = md5(I("post.password"));
                 $info['realname'] = I("post.realname");
                 $info['admin'] = I("post.admin", 0);
                 foreach ($info as $k => $v) {
