@@ -103,7 +103,6 @@
       data:{"do":"loadmore","page":page},
       success: function (data) {
         if(data){
-          console.log(data);
           $('#sellList').html(data.table);
         }
       }
@@ -129,6 +128,7 @@
           console.log(data);
           if(data['code'] == 200){
             alert("销售成功!");
+            window.location.reload();
           }else{
             alert("处理失败了!原因:"+data['msg']);
           }

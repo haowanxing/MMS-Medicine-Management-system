@@ -62,7 +62,7 @@ class ReturnController extends Controller
             $sellData = array("sell_id"=>$sell_id);
             $findRes = $dbSell->where($sellData)->find();
             if($findRes){
-                if($findRes['sell_status'] == 0){
+                if($findRes['sell_status'] == 0 && $findRes['sell_amount'] >= I("post.ret_amount")){
                     //修改销售记录状态
                     if($dbSell->where($findRes)->setInc("sell_status") && $dbStock->where(array("stock_id"=>$findRes['stock_id']))->setInc("stock_amount",$ret_amount)){
                         $addRes = $this->setSellId(I("post.sell_id"))->setRetAmount(I("post.ret_amount"))->setTotalprice($ret_price)->setTime(time())->setReturnBy(I("session.userId"))->setReason(I("post.reason"))
@@ -70,15 +70,13 @@ class ReturnController extends Controller
                         if($addRes){
                             $retMsg = array("code"=>200,"msg"=>"ok","result"=>$addRes);
                         }else{
-                            $dbStock->rollback();
-                            $dbSell->rollback();
                             $retMsg = array("code"=>400,"msg"=>"记录出错","result"=>$addRes);
                         }
                     }else{
                         $retMsg = array("code"=>400,"msg"=>"修改销售单出错","result"=>0);
                     }
                 }else{
-                    $retMsg = array("code"=>400,"msg"=>"该销售码已经是退货状态","result"=>0);
+                    $retMsg = array("code"=>400,"msg"=>"该销售码已经是退货状态或数量不正确!","result"=>0);
                 }
             }else{
                 $retMsg = array("code"=>400,"msg"=>"销售码不存在","result"=>"error");

@@ -11,7 +11,7 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">药品退货</button>
-        <button type="button" class="list-group-item list-menu" data-to="1">退货记录</button>
+        <button type="button" class="list-group-item list-menu" onclick="loadRet()" data-to="1">退货记录</button>
       </div>
     </div>
   </div>
@@ -145,7 +145,7 @@
     //加载更多
     $("#returnPage").on("click", "li", function (ev) {
       NOW_PAGE = ev.target.getAttribute("data-to");
-      loadMore("#returnList", "{:U('Index/getRetList')}", NOW_PAGE);
+      loadRet(NOW_PAGE);
       $(this).addClass("active");
       $(this).siblings().removeClass("active");
     });
@@ -167,7 +167,8 @@
         },
         success:function(data){
           if(data['code'] == 200){
-            alert("成功确认退货!");
+            alert("退货成功!");
+            window.location.reload();
           }else{
             alert("操作失败了!原因:"+data['msg']);
           }
@@ -227,6 +228,9 @@
       })
     });
   });
+  function loadRet(page){
+    loadMore("#returnList", "{:U('Index/getRetList')}", page);
+  }
 </script>
 </body>
 </html>
