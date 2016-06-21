@@ -158,16 +158,16 @@
 <include file="./Public/Tpl/footer.html"/>
 <js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
 <script>
-  $("#storagePage").on("click","li", function (ev) {
-      NOW_PAGE = ev.target.getAttribute("data-to");
-    loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE);
-    $(this).addClass("active");
-    $(this).siblings().removeClass("active");
-  });
   function loadStorage(){
     loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE)
   }
   $(document).ready(function(){
+    $("#storagePage").on("click","li", function (ev) {
+      NOW_PAGE = ev.target.getAttribute("data-to");
+      loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE);
+      $(this).addClass("active");
+      $(this).siblings().removeClass("active");
+    });
     $("#doStorage").click(function(){
       $.ajax({
         url:"{:U('Storage/doAdd')}",
@@ -189,8 +189,13 @@
         }
       })
     });
+    //拼音码自动提示
+    $("#inputPinyin").Kcomplete({
+      location       : "{:U('Drug/nameTips')}",
+      dataType       : 'json'
+    });
     //拼音码事件
-    $("#inputPinyin").on("blur",function(){
+    $("#inputPinyin").on("keyup",function(){
       $.ajax({
         url:"{:U('Drug/getInfo')}",
         data:"pinyinma="+$("#inputPinyin").val(),
@@ -216,11 +221,6 @@
         },
         error:function(){},
       })
-    });
-    //拼音码自动提示
-    $("#inputPinyin").Kcomplete({
-      location       : "{:U('Drug/nameTips')}",
-      dataType       : 'json'
     });
 
 

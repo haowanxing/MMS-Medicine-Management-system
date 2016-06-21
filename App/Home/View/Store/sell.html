@@ -144,8 +144,13 @@
         $("#inputAllprice").attr("value",this.value*$("#inputprice").val());
       }
     });
+    //拼音码自动提示
+    $("#inputPinyin").Kcomplete({
+      location       : "{:U('Drug/nameTips')}",
+      dataType       : 'json'
+    });
     //拼音码事件
-    $("#inputPinyin").on("blur",function(){
+    $("#inputPinyin").on("keyup",function(){
       if(this.value==""){
         return;
       }
@@ -177,11 +182,6 @@
         },
         error:function(){},
       })
-    });
-    //拼音码自动提示
-    $("#inputPinyin").Kcomplete({
-      location       : "{:U('Drug/nameTips')}",
-      dataType       : 'json'
     });
 
   });
