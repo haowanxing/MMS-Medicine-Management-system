@@ -24,7 +24,8 @@
           <div class="form-group">
             <label for="inputSellId" class="col-sm-3 control-label">销售码</label>
             <div class="col-sm-9" data-toggle="tooltip" data-placement="top" title="输入销售码自动获取销售信息">
-              <input name="sell_id" type="text" class="form-control" id="inputSellId" placeholder="销售码" autocomplete="off">
+              <input name="sell_id" type="text" class="form-control" id="inputSellId" placeholder="销售码"
+                     autocomplete="off">
             </div>
           </div>
           <div class="form-group">
@@ -121,7 +122,19 @@
       <div class="panel-heading" style="text-align: center">退货记录</div>
       <table class="table table-hover">
         <thead>
-        <tr><th>退货编号</th><th>销售编号</th><th>药品名称</th><th>规格</th><th>单位</th><th>单价</th><th>退货数量</th><th>退货总额</th><th>退货日期</th><th>操作员</th><th>原因</th></tr>
+        <tr>
+          <th>退货编号</th>
+          <th>销售编号</th>
+          <th>药品名称</th>
+          <th>规格</th>
+          <th>单位</th>
+          <th>单价</th>
+          <th>退货数量</th>
+          <th>退货总额</th>
+          <th>退货日期</th>
+          <th>操作员</th>
+          <th>原因</th>
+        </tr>
         </thead>
         <tbody id="returnList">
         {$returnList}
@@ -153,45 +166,45 @@
     $("#doReturn").on("click", function () {
       var amount = $("#inputRetAmount").val();
       var price = $("#inputRetPrice").val();
-      if(amount==0 || price==0){
+      if (amount == 0 || price == 0) {
         alert("退货数量和价格不能为空或为零!");
         return;
       }
       $.ajax({
-        url:"{:U('Return/doAdd')}",
-        data:$("#retForm").serialize(),
-        datatype:"json",
-        type:"POST",
-        beforeSend:function(){
+        url: "{:U('Return/doAdd')}",
+        data: $("#retForm").serialize(),
+        datatype: "json",
+        type: "POST",
+        beforeSend: function () {
 
         },
-        success:function(data){
-          if(data['code'] == 200){
+        success: function (data) {
+          if (data['code'] == 200) {
             alert("退货成功!");
             window.location.reload();
-          }else{
-            alert("操作失败了!原因:"+data['msg']);
+          } else {
+            alert("操作失败了!原因:" + data['msg']);
           }
         },
-        error:function(){
+        error: function () {
           alert("提交过程中发生问题! ");
         }
       })
     });
     //填写完数量
-    $("#inputRetAmount").on("blur", function () {
-      $("#inputRetPrice").attr("value",this.value*$("#inputPrice").val());
+    $("#inputRetAmount").on("keyup", function () {
+      $("#inputRetPrice").attr("value", (this.value * $("#inputPrice").val()).toFixed(2));
     });
     //销售单事件
-    $("#inputSellId").on("blur",function(){
+    $("#inputSellId").on("keyup", function () {
       $.ajax({
-        url:"{:U('Sell/getInfo')}",
-        data:"sell_id="+$("#inputSellId").val(),
-        datatype:"json",
-        type:"POST",
-        success:function(data){
+        url: "{:U('Sell/getInfo')}",
+        data: "sell_id=" + $("#inputSellId").val(),
+        datatype: "json",
+        type: "POST",
+        success: function (data) {
           console.log(data);
-          if(data['code']==200){
+          if (data['code'] == 200 && data.result.sell_status!=1) {
             var tempName = data.result.name;
             var tempSpec = data.result.spec;
             var tempUnit = data.result.unit;
@@ -202,33 +215,28 @@
             var tempAmount = data.result.sell_amount;
             var tempAllprice = data.result.allprice;
             var tempTime = formatDate(data.result.time);
-          }else{
-            var tempName = data.msg;
-            var tempSpec = data.msg;
-            var tempUnit = data.msg;
-            var tempFactory = data.msg;
-            var tempSeller = data.msg;
-            var tempPrice = data.msg;
-            var tempAmount = data.msg;
-            var tempAllprice = data.msg;
-            var tempTime = data.msg;
+          }else if(data['code'] == 200 && data.result.sell_status==1){
+            var tempName = tempSpec = tempUnit = tempFactory = tempProduceDate = tempSeller = tempPrice = tempAmount = tempAllprice = tempTime = "该销售单已经发生退货行为";
+          } else {
+            var tempName = tempSpec = tempUnit = tempFactory = tempProduceDate = tempSeller = tempPrice = tempAmount = tempAllprice = tempTime = data.msg;
           }
-          $("#inputName").attr("value",tempName);
-          $("#inputSpec").attr("value",tempSpec);
-          $("#inputUnit").attr("value",tempUnit);
-          $("#inputFactory").attr("value",tempFactory);
-          $("#inputProduceDate").attr("value",tempProduceDate);
-          $("#inputSeller").attr("value",tempSeller);
-          $("#inputPrice").attr("value",tempPrice);
-          $("#inputAmount").attr("value",tempAmount);
-          $("#inputAllprice").attr("value",tempAllprice);
-          $("#inputTime").attr("value",tempTime);
+          $("#inputName").attr("value", tempName);
+          $("#inputSpec").attr("value", tempSpec);
+          $("#inputUnit").attr("value", tempUnit);
+          $("#inputFactory").attr("value", tempFactory);
+          $("#inputProduceDate").attr("value", tempProduceDate);
+          $("#inputSeller").attr("value", tempSeller);
+          $("#inputPrice").attr("value", tempPrice);
+          $("#inputAmount").attr("value", tempAmount);
+          $("#inputAllprice").attr("value", tempAllprice);
+          $("#inputTime").attr("value", tempTime);
         },
-        error:function(){},
+        error: function () {
+        },
       })
     });
   });
-  function loadRet(page){
+  function loadRet(page) {
     loadMore("#returnList", "{:U('Index/getRetList')}", page);
   }
 </script>

@@ -139,9 +139,9 @@
       })
     });
     //自动算价
-    $("#inputCount").on("blur", function () {
+    $("#inputCount").on("keyup", function () {
       if(this.value!=="" && $("#inputprice").val()!=""){
-        $("#inputAllprice").attr("value",this.value*$("#inputprice").val());
+        $("#inputAllprice").attr("value",(this.value*$("#inputprice").val()).toFixed(2));
       }
     });
     //拼音码自动提示

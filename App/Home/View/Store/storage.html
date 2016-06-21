@@ -161,13 +161,26 @@
   function loadStorage(){
     loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE)
   }
+  function fillTotalMoney(){
+    var amount = $("#inputAmount").val();
+    var price = $("#inputPrice").val();
+    if(amount!="" && price!=""){
+      $("#inputAllprice").attr("value",(amount*price).toFixed(2));
+    }
+  }
+  //总价集成
+  $(document).on("keyup","#inputPrice,#inputAmount", function () {
+    fillTotalMoney();
+  });
   $(document).ready(function(){
+    //翻页
     $("#storagePage").on("click","li", function (ev) {
       NOW_PAGE = ev.target.getAttribute("data-to");
       loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE);
       $(this).addClass("active");
       $(this).siblings().removeClass("active");
     });
+    //提交入库
     $("#doStorage").click(function(){
       $.ajax({
         url:"{:U('Storage/doAdd')}",
