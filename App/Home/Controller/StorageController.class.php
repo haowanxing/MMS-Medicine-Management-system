@@ -80,8 +80,17 @@ class StorageController extends Controller
             $addResult = $this->addStorage();
             if($addResult){
                 //写库存 首先找是否存在已经入库的,否则新增
-                $Stock = A("Stock");
-                $stockRes = $Stock->setDrugId($drug['drug_id'])->setFactory($this->factory)->setAmount($this->amount)->setPizhunwenhao($this->pizhunwenhao)->setPihao($this->pihao)->setSellprice($this->inprice)->setInTime($this->in_time)->setProducedate($this->producedate)->setUsefuldate($this->usefuldate)->add();
+
+                $Stock = M("Stock");
+                if($stock = $Stock->where('drug_id='.$drug['drug_id'])->find()){
+                    $stockRes = $Stock->where($stock)->setInc('stock_amount',$this->amount);
+                }else{
+                    $dData = array('drug_id'=>$drug['drug_id'],
+                            'stock_amount'=>$this->amount,
+                            'sellprice'=>$this->inprice,
+                            );
+                    $stockRes = $Stock->data($dData)->add();
+                }
                 if($stockRes){
                     $retMsg = array("code"=>200,"msg"=>"ok","result"=>array("Srorage"=>$addResult,"Stock"=>$stockRes));
                 }else{
