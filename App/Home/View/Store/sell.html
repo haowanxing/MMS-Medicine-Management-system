@@ -19,7 +19,7 @@
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">销售</div>
       <div class="panel-body text-info">
-        <form id="sellForm" class="form-horizontal" action="{:U('Sell/doAdd')}">
+        <form id="sellForm" class="form-horizontal" >
           <div class="form-group">
             <label for="buyyer" class="col-sm-2 control-label">购方单位:</label>
             <div class="col-sm-10" data-toggle="tooltip" data-placement="top" title="发票抬头">
@@ -187,7 +187,7 @@
                 <input name="amount[]" type="text" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="allprice[]" type="text" class="form-control" readonly placeholder="自动计算...">
+                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算...">
               </td>
               <td>
                 <input name="beizhu[]" type="text" class="form-control" placeholder="...">
@@ -213,7 +213,7 @@
         <thead>
         <tr>
           <th>销售码</th>
-          <th>库存号</th>
+          <th>订单编号</th>
           <th>药品名称</th>
           <th>规格</th>
           <th>单位</th>

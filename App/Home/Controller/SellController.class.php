@@ -32,19 +32,19 @@ class SellController extends Controller
     public function getSellList(){
         isset($_POST['page'])?$page=I("post.page"):$page=1;
         isset($_POST['limit'])?$limit=I("post.limit"):$limit=20;
-        $result = $this->db->join("__STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id")->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id")->join("__USERS__ ON __USERS__.id = __SELL__.sell_by")->page($page,$limit)->order("sell_id DESC")->select();
+        $result = $this->db->join("LEFT JOIN __ORDER__ ON __ORDER__.orderno = __SELL__.orderno")->join("__STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id")->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id")->join("LEFT JOIN __USERS__ ON __USERS__.id = __ORDER__.sell_by")->page($page,$limit)->order("sell_id DESC")->select();
         $count = $this->db->count()/$limit;
         $string = "";
         foreach($result as $key=>$value){
             $string .= "<tr>";
             $string .= "<td>".$value['sell_id']."</td>";
-            $string .= "<td>".$value['stock_id']."</td>";
+            $string .= "<td>".$value['orderno']."</td>";
             $string .= "<td>".$value['name']."</td>";
             $string .= "<td>".$value['spec']."</td>";
             $string .= "<td>".$value['unit']."</td>";
             $string .= "<td>".$value['price']."</td>";
             $string .= "<td>".$value['sell_amount']."</td>";
-            $string .= "<td>".$value['allprice']."</td>";
+            $string .= "<td>".$value['subtotal']."</td>";
             $string .= "<td>".date("Y-m-d H:i:s",$value['time'])."</td>";
             $string .= "<td>".$value['realname']."</td>";
             $string .= "<td>".($value['sell_status']==0?"正常":"退货")."</td>";
@@ -58,31 +58,14 @@ class SellController extends Controller
         return $this;
     }
     public function doAdd(){
-        $this->setDataFromPost();
-        $dbStock = M("Stock");
-        $stock = $dbStock->where(array("stock_id"=>$this->stock_id))->find();
-        if($stock){
-            if($this->sell_amount>$stock['stock_amount']){
-                $retMsg = array("code"=>400,"msg"=>"库存不足,剩余:".$stock['stock_amount'],"result"=>0);
-            }else{
-                $stockRes = $dbStock->where($stock)->setDec("stock_amount",$this->sell_amount);
-                if($stockRes){
-                    $addRes = $this->addSell();
-                    if($addRes){    //销售记录成功
-                        $retMsg = array("code"=>200,"msg"=>"ok","result"=>$addRes);
-                    }else{
-                        $retMsg = array("code"=>400,"msg"=>"记录失败","result"=>$addRes);
-                    }
-                }else{
-                    $retMsg = array("code"=>400,"msg"=>"扣除库存失败","result"=>0);
-                }
-            }
+        $sellRes = D('Sell')->sell(I("post."));
+        if($sellRes){
+            $retMsg = array("code"=>200,"msg"=>"ok","result"=>$sellRes);
         }else{
-            $retMsg = array("code"=>400,"msg"=>"库存中未找到药品".$dbStock->getLastSql(),"result"=>$_POST);
+            $retMsg = array("code"=>400,"msg"=>D('Sell')->getError(),"result"=>0);
         }
         $this->ajaxReturn($retMsg,'json');
     }
-
     public function addSell($data = array()){
         if(!empty($data)){
             $tempData = $data;

@@ -85,11 +85,12 @@ class StorageController extends Controller
                 if($stock = $Stock->where('drug_id='.$drug['drug_id'])->find()){
                     $stockRes = $Stock->where($stock)->setInc('stock_amount',$this->amount);
                 }else{
-                    $dData = array('drug_id'=>$drug['drug_id'],
-                            'stock_amount'=>$this->amount,
-                            'sellprice'=>$this->inprice,
-                            );
-                    $stockRes = $Stock->data($dData)->add();
+//                    $dData = array('drug_id'=>$drug['drug_id'],
+//                            'stock_amount'=>$this->amount,
+//                            'sellprice'=>$this->inprice,
+//                            );
+//                    $stockRes = $Stock->data($dData)->add();
+                    $stockRes = $Stock->setDrugId($drug['drug_id'])->setFactory($this->factory)->setAmount($this->amount)->setPizhunwenhao($this->pizhunwenhao)->setPihao($this->pihao)->setSellprice($this->inprice)->setInTime($this->in_time)->setProducedate($this->producedate)->setUsefuldate($this->usefuldate)->add();
                 }
                 if($stockRes){
                     $retMsg = array("code"=>200,"msg"=>"ok","result"=>array("Srorage"=>$addResult,"Stock"=>$stockRes));

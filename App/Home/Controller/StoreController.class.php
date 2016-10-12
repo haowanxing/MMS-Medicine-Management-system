@@ -48,7 +48,7 @@ class StoreController extends Controller
         $dbRet = M("Return");
         $Sell['total'] = $dbSell->sum("sell_amount");//销售数量
         $Sell['return'] = $dbRet->sum("ret_amount");//退货数量
-        $Sell['sell_money'] = $dbSell->sum("allprice");
+        $Sell['sell_money'] = $dbSell->sum("subtotal");
         $Sell['ret_money'] = $dbRet->sum("totalprice");
         $Sell['real_money'] = $Sell['sell_money']-$Sell['ret_money'];
         $this->assign("sell",$Sell);
