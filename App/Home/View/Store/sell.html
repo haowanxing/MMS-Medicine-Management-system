@@ -19,7 +19,7 @@
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">销售</div>
       <div class="panel-body text-info">
-        <form id="sellForm" class="form-horizontal" >
+        <form id="sellForm" class="form-horizontal">
           <div class="form-group">
             <label for="buyyer" class="col-sm-2 control-label">购方单位:</label>
             <div class="col-sm-10" data-toggle="tooltip" data-placement="top" title="发票抬头">
@@ -42,7 +42,7 @@
               <td>
                 <div class="" data-toggle="tooltip" data-placement="top" title="输入拼音码自动获取药品信息">
                   <input name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
-                  <input name="stock_id[]" type="hidden" class="form-control" >
+                  <input name="stock_id[]" type="hidden" class="form-control">
                 </div>
               </td>
               <td>
@@ -63,7 +63,7 @@
                 <input name="amount[]" type="text" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="allprice[]" type="text" class="form-control" readonly placeholder="自动计算...">
+                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算...">
               </td>
               <td>
                 <input name="beizhu[]" type="text" class="form-control" placeholder="...">
@@ -94,7 +94,7 @@
                 <input name="amount[]" type="text" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="allprice[]" type="text" class="form-control" readonly placeholder="自动计算...">
+                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算...">
               </td>
               <td>
                 <input name="beizhu[]" type="text" class="form-control" placeholder="...">
@@ -125,7 +125,7 @@
                 <input name="amount[]" type="text" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="allprice[]" type="text" class="form-control" readonly placeholder="自动计算...">
+                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算...">
               </td>
               <td>
                 <input name="beizhu[]" type="text" class="form-control" placeholder="...">
@@ -156,7 +156,7 @@
                 <input name="amount[]" type="text" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="allprice[]" type="text" class="form-control" readonly placeholder="自动计算...">
+                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算...">
               </td>
               <td>
                 <input name="beizhu[]" type="text" class="form-control" placeholder="...">
@@ -196,7 +196,7 @@
             </tbody>
           </table>
           <div class="col-sm-10">
-            总计:<span>0.0</span>元
+            总计:<span id="totalPrice">0.0</span>元
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
@@ -289,14 +289,22 @@
     //自动算价
     $("input[name='amount[]']").on("keyup", function () {
       $Price = $(this).parents('tr').find("[name='price[]']");
-      $allPrice = $(this).parents('tr').find("[name='allprice[]']");
+      $allPrice = $(this).parents('tr').find("[name='subtotal[]']");
       if (this.value !== "" && $Price.val() != "") {
-        $allPrice.attr("value", (this.value * $Price.val()).toFixed(2));
+        var subTotal = (this.value * $Price.val()).toFixed(2);
+        $allPrice.attr("value", subTotal);
+      }
+      $("#totalPrice").html("0");
+      for (var i = 0; i < $("[name='subtotal[]']").length; i++) {
+        var oldPrice = parseFloat($("#totalPrice").html());
+        var add = parseFloat($("[name='subtotal[]']").eq(i).val());
+        if (add)
+          $("#totalPrice").html((oldPrice + add).toFixed(2));
       }
     });
     //拼音码自动提示
     $pinyinDom = $("input[name='pinyinma[]']");
-    for(var i=0; i<$pinyinDom.length; i++){
+    for (var i = 0; i < $pinyinDom.length; i++) {
       $pinyinDom.eq(i).Kcomplete({
         location: "{:U('Drug/nameTips')}",
         dataType: 'json'
@@ -308,7 +316,7 @@
         return;
       }
       $pTr = $(this).parents('tr');
-      $pTr.find("[name='allprice[]']").attr("value","");
+      $pTr.find("[name='subtotal[]']").attr("value", "");
       $.ajax({
         url: "{:U('Stock/getInfo')}",
         data: "pinyinma=" + $(this).val(),
