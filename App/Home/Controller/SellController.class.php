@@ -58,7 +58,9 @@ class SellController extends Controller
         return $this;
     }
     public function doAdd(){
-        $sellRes = D('Sell')->sell(I("post."));
+        $data = I("post.");
+        $data["sell_amount"] = I("post.amount");
+        $sellRes = D('Sell')->sell($data);
         if($sellRes){
             $retMsg = array("code"=>200,"msg"=>"ok","result"=>$sellRes);
         }else{

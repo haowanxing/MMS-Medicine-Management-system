@@ -13,17 +13,17 @@ class SellModel extends Model
             if(empty($v))
                 continue;
             if($stock = $Stock->where('stock_id='.$v)->find()){
-                if($data['amount'][$k] > $stock['stock_amount']){
+                if($data['sell_amount'][$k] > $stock['stock_amount']){
                     $this->error = "库存不足,剩余:".$stock['stock_amount'];
                     return false;
                 }else{
-                    $stockRes = $Stock->where($stock)->setDec('stock_amount',$data['amount'][$k]);
+                    $stockRes = $Stock->where($stock)->setDec('stock_amount',$data['sell_amount'][$k]);
                     if($stockRes){
                         $sData = array(
                                 'stock_id'=>$data['stock_id'][$k],
                                 'price'=>$data['price'][$k],
-                                'sell_amount'=>$data['amount'][$k],
-                                'subtotal'=>$stock['sellprice']*$data['amount'][$k],
+                                'sell_amount'=>$data['sell_amount'][$k],
+                                'subtotal'=>$stock['sellprice']*$data['sell_amount'][$k],
                                 'orderno'=>$orderNo,
                                 );
                         if($addRes = $this->data($sData)->add()){ //销售记录成功
