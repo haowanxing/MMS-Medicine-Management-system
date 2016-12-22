@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./Public/Tpl/head.html" title="订单：{$order.orderno}-({:date('Y-m-d H:i:s')})" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title" style="text-align: center">中南民族大学学子有限公司销售单</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-3">客户：{$order.buyyer}</div>
+            <div class="col-sm-3">订单编号：{$order.orderno}</div>
+            <div class="col-sm-3">日期：{$order.time}</div>
+          </div>
+          <table class="table table-bordered">
+            <thead>
+            <th>#</th>
+            <th>销售码</th>
+            <th>商品名</th>
+            <th>规格</th>
+            <th>单位</th>
+            <th>数量</th>
+            <th>单价</th>
+            <th>金额</th>
+            </thead>
+            <tbody>
+            <volist name="order_details" id="od">
+              <tr>
+                <td>{$i}</td>
+                <td>{$od.sell_id}</td>
+                <td>{$od.name}</td>
+                <td>{$od.spec}</td>
+                <td>{$od.unit}</td>
+                <td>{$od.sell_amount}</td>
+                <td>{$od.price}</td>
+                <td>{$od.subtotal}</td>
+              </tr>
+            </volist>
+            </tbody>
+          </table>
+          <div class="row">
+            <div class="col-sm-3"><strong>总计：{$order.total}元</strong></div>
+            <div class="col-sm-3 col-sm-offset-6">打印时间：{:date('Y年m月d日 H:i:s')}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+//  window.print();
+</script>
+</body>
+</html>

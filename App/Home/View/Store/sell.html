@@ -241,6 +241,7 @@
     </div>
   </div>
 </div>
+<iframe id="ifm" style="display: none"></iframe>
 <include file="./Public/Tpl/footer.html"/>
 <js href="__PUBLIC__/js/jquery.Kcomplete-1.1.js"/>
 <script>
@@ -283,7 +284,8 @@
                     console.log(data);
                     if (data['code'] == 200) {
                         alert("销售成功!");
-                        window.location.reload();
+                        $("#ifm").attr('src',data.result);
+//                        window.location.reload();
                     } else {
                         alert("处理失败了!原因:" + data['msg']);
                     }

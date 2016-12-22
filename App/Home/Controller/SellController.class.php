@@ -74,7 +74,7 @@ class SellController extends Controller{
         $data["sell_amount"] = I("post.amount");
         $sellRes = D('Sell')->sell($data);
         if ($sellRes){
-            $retMsg = array("code" => 200, "msg" => "ok", "result" => $sellRes);
+            $retMsg = array("code" => 200, "msg" => "ok", "result" => U('Print/sales_slip',array('order'=>$sellRes)));
         }else{
             $retMsg = array("code"   => 400, "msg" => D('Sell')->getError(),
                             "result" => 0);

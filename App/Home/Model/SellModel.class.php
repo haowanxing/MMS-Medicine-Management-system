@@ -15,11 +15,11 @@ class SellModel extends Model
                 continue;
             if($stock = $Stock->where('stock_id='.$v)->find()){
                 if($data['sell_amount'][$k] < 1){
-                    $this->error = "输入的{$data['name'][$k]}的数量有误";
+                    $this->error = "输入的'{$data['name'][$k]}'的数量有误";
                     return false;
                 }
                 if($data['sell_amount'][$k] > $stock['stock_amount']){
-                    $this->error = "库存不足,剩余:".$stock['stock_amount'];
+                    $this->error = "'{$data['name'][$k]}'库存不足,剩余:".$stock['stock_amount'];
                     return false;
                 }else{
                     $stockRes = $Stock->where($stock)->setDec('stock_amount',$data['sell_amount'][$k]);
@@ -58,7 +58,7 @@ class SellModel extends Model
                 );
         if(M('Order')->data($oData)->add()){
             $this->commit();
-            return true;
+            return $orderNo;
         }else{
             $this->rollback();
             $this->error = '记录订单失败,但是已经销售成功';
