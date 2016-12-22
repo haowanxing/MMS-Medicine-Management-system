@@ -89,7 +89,7 @@
                     if($.trim(K_COMPLETE.val()).length && startDOM.length > 0)
                     {
                         NUMBER = 0;
-                        CURRENT.show();console.log(CURRENT);
+                        CURRENT.show();
                     }
                     else
                     {
@@ -143,7 +143,7 @@
             }
         }
 
-        $('.K_complete li').on('click', function(){
+        $('.K_complete').on('click', 'li', function(){
             K_COMPLETE.val($(this).text());
             CURRENT.trigger('boxClose')
         });
