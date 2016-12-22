@@ -9,10 +9,15 @@ class SellModel extends Model
         $orderNo = createOrderNo();
         $seller = I("session.userId");
         $totalPrice = 0;
+        $this->startTrans();
         foreach($data['stock_id'] as $k => $v){
             if(empty($v))
                 continue;
             if($stock = $Stock->where('stock_id='.$v)->find()){
+                if($data['sell_amount'][$k] < 1){
+                    $this->error = "输入的{$data['name'][$k]}的数量有误";
+                    return false;
+                }
                 if($data['sell_amount'][$k] > $stock['stock_amount']){
                     $this->error = "库存不足,剩余:".$stock['stock_amount'];
                     return false;
@@ -29,10 +34,12 @@ class SellModel extends Model
                         if($addRes = $this->data($sData)->add()){ //销售记录成功
                             $totalPrice += $sData['subtotal'];
                         }else{
+                            $this->rollback();
                             $this->error = "记录失败!";
                             return false;
                         }
                     }else{
+                        $this->rollback();
                         $this->error = "扣除库存的时候发生错误!";
                         return false;
                     }
@@ -50,8 +57,10 @@ class SellModel extends Model
                 'sell_by'=>$seller,
                 );
         if(M('Order')->data($oData)->add()){
+            $this->commit();
             return true;
         }else{
+            $this->rollback();
             $this->error = '记录订单失败,但是已经销售成功';
             return false;
         }

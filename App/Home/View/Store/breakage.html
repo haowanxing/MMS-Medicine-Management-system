@@ -191,7 +191,7 @@
       dataType       : 'json'
     });
     //销售单事件
-    $("#inputPinYinMa").on("keyup",function(){
+    $("#inputPinYinMa").bind("keyup change",function(){
       $.ajax({
         url:"{:U('Stock/getInfo')}",
         data:"pinyinma="+$("#inputPinYinMa").val(),
