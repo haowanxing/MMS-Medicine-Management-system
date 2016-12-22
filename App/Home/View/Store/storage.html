@@ -208,7 +208,8 @@
       dataType       : 'json'
     });
     //拼音码事件
-    $("#inputPinyin").on("keyup",function(){
+    $("#inputPinyin").on("keypress",function(){
+        if($(this).val() == '') return;
       $.ajax({
         url:"{:U('Drug/getInfo')}",
         data:"pinyinma="+$("#inputPinyin").val(),
