@@ -242,7 +242,7 @@
   </div>
 </div>
 <include file="./Public/Tpl/footer.html"/>
-<js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
+<js href="__PUBLIC__/js/jquery.Kcomplete-1.1.js"/>
 <script>
     function loadSell(page) {
         $.ajax({
@@ -310,7 +310,7 @@
             }
         });
         //拼音码事件
-        $("input[name='pinyinma[]']").on("keyup", function () {
+        $("input[name='pinyinma[]']").bind("keyup change", function () {
             if (this.value == "") {
                 return;
             }

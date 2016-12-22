@@ -143,9 +143,10 @@
             }
         }
 
-        $('.K_complete').on('click', 'li', function(){
+        CURRENT.on('click', 'li', function(){
             K_COMPLETE.val($(this).text());
-            CURRENT.trigger('boxClose')
+            CURRENT.trigger('boxClose');
+            K_COMPLETE.trigger('change');
         });
 
         $(document).bind('click', function(e){
