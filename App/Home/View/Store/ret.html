@@ -213,7 +213,7 @@
             var tempSeller = data.result.realname;
             var tempPrice = data.result.price;
             var tempAmount = data.result.sell_amount;
-            var tempAllprice = data.result.allprice;
+            var tempAllprice = data.result.subtotal;
             var tempTime = formatDate(data.result.time);
           }else if(data['code'] == 200 && data.result.sell_status==1){
             var tempName = tempSpec = tempUnit = tempFactory = tempProduceDate = tempSeller = tempPrice = tempAmount = tempAllprice = tempTime = "该销售单已经发生退货行为";

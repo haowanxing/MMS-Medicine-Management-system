@@ -74,7 +74,7 @@ class StockController extends Controller
             if($this->data){
                 $retMsg = array("code"=>200,"msg"=>"ok","result"=>array_merge($drugRes,$this->data));
             }else{
-                $retMsg = array("code"=>400,"msg"=>"没有该药品:".I("get.pinyinma"),"result"=>$this->data);
+                $retMsg = array("code"=>400,"msg"=>"库存中没有该药品:".I("get.pinyinma"),"result"=>$this->data);
             }
         }else{
             $retMsg = array("code"=>400,"msg"=>"缺少参数:pinyinma","result"=>0);
