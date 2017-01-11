@@ -11,7 +11,7 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">销售药品</button>
-        <button type="button" class="list-group-item list-menu" onclick="loadSell()" data-to="1">销售记录</button>
+        <button type="button" class="list-group-item list-menu" onclick="loadSell(size, page)" data-to="1">销售记录</button>
       </div>
     </div>
   </div>
@@ -207,7 +207,7 @@
         </form>
       </div>
     </div>
-    <div class="panel panel-default func">
+    <div class="panel panel-default func" id="sellList">
       <div class="panel-heading" style="text-align: center">销售记录</div>
       <table class="table table-hover">
         <thead>
@@ -225,16 +225,30 @@
           <th>状态</th>
         </tr>
         </thead>
-        <tbody id="sellList">
-        {$sellList}
+        <tbody>
+        <tr v-for="info in list">
+          <td>{{ info.sell_id }}</td>
+          <td>{{ info.orderno }}</td>
+          <td>{{ info.name }}</td>
+          <td>{{ info.spec }}</td>
+          <td>{{ info.unit }}</td>
+          <td>{{ info.price }}</td>
+          <td>{{ info.sell_amount }}</td>
+          <td>{{ info.subtotal }}</td>
+          <td>{{ info.time }}</td>
+          <td>{{ info.realname }}</td>
+          <td v-if="info.sell_status == 1">退货</td>
+          <td v-else>正常</td>
+        </tr>
         </tbody>
       </table>
+      {$show}
       <div id="sellPage" class="center">
         <nav>
           <ul class="pagination">
-            <for start="1" end="$sellListCount+1">
-              <li><a href="#" data-to="{$i}">{$i}</a></li>
-            </for>
+            <li v-for="i in count">
+              <a href="javascript:" :data-to="i">{{ i }}</a>
+            </li>
           </ul>
         </nav>
       </div>
@@ -245,21 +259,30 @@
 <include file="./Public/Tpl/footer.html"/>
 <js href="__PUBLIC__/js/jquery.Kcomplete-1.1.js"/>
 <script>
-    function loadSell(page) {
+    var size = 10;
+    var page = 1;
+    var sellList = {list: [], count: 10};
+    var app = new Vue({
+        el: '#sellList',
+        data: sellList
+    })
+    function loadSell(size, page) {
         $.ajax({
             type: 'POST',
             url: "{:U('Index/getSellList')}",
-            data: {"do": "loadmore", "page": page},
-            success: function (data) {
-                if (data) {
-                    $('#sellList').html(data.table);
+            data: {"do": "loadmore", "size": size, "page": page},
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.code == 200) {
+                    sellList.list = rs.data.list;
+                    sellList.count = parseInt(rs.data.count) / size;
                 }
             }
         });
     }
     $("#sellPage").on("click", function (ev) {
-        var page = ev.target.getAttribute("data-to");
-        loadSell(page);
+        page = ev.target.getAttribute("data-to");
+        loadSell(size, page);
     });
 
     $(document).ready(function () {
@@ -284,7 +307,7 @@
                     console.log(data);
                     if (data['code'] == 200) {
                         alert("销售成功!");
-                        $("#ifm").attr('src',data.result);
+                        $("#ifm").attr('src', data.result);
 //                        window.location.reload();
                     } else {
                         alert("处理失败了!原因:" + data['msg']);

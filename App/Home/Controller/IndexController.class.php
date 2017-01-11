@@ -23,8 +23,10 @@ class IndexController extends Controller
         $this->ajaxReturn($Storage->getStorageRecord(),'json');
     }
     public function getSellList(){
-        $Sell = A("Sell");
-        $this->ajaxReturn($Sell->getSellList(),'json');
+        isset($_POST['page']) ? $page = I("post.page") : $page = 1;
+        isset($_POST['size']) ? $size = I("post.size") : $size = 10;
+        $rs = D("Sell")->get_list(array(),$size,$page);
+        $this->ajaxReturn($rs,'json');
     }
     public function getStockList(){
         $Stock = A("Stock");

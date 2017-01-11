@@ -4,6 +4,23 @@ use Think\Model;
 
 class SellModel extends Model
 {
+    public function get_list($condition=array(),$size=null,$page=1){
+        $this->join("LEFT JOIN __ORDER__ ON __ORDER__.orderno = __SELL__.orderno");
+        $this->join("__STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id");
+        $this->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
+        $this->join("LEFT JOIN __USERS__ ON __USERS__.id = __ORDER__.sell_by");
+        if($size) $this->page($page, $size);
+        if(!empty($condition)) $this->where($condition);
+        $this->order("sell_id DESC");
+        $rs = $this->select();
+        array_walk($rs,function(&$i){
+            $i['time'] = date("Y-m-d H:i",$i['time']);
+//            $i['sell_status'] = $i['sell_status']?"退货":"正常";
+        });
+        $count = $this->count();
+        return result(200,'ok',array('list'=>$rs,'count'=>$count));
+    }
+
     public function sell($data = array()){
         $Stock = M('Stock');
         $orderNo = createOrderNo();

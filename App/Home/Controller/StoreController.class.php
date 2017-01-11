@@ -123,10 +123,11 @@ class StoreController extends Controller
         $this->display();
     }
     public function sell(){
-        $Sell = A("Sell");
-        $sellList = $Sell->getSellList();
-        $this->assign("sellList",$sellList['table']);
-        $this->assign("sellListCount",$sellList['pageCount']);
+        isset($_POST['page']) ? $page = I("post.page") : $page = 1;
+        isset($_POST['size']) ? $limit = I("post.size") : $size = 20;
+        $rs = D("Sell")->get_list(array(),$size,$page);
+        $this->assign("sellList",$rs['data']['list']);
+        $this->assign("show",$rs['data']['show']);
         $this->display();
     }
     public function ret(){
