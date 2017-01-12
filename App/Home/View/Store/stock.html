@@ -17,29 +17,51 @@
       </div>
     </div>
     <div class="col-md-10">
-      <div class="panel panel-default func">
+      <div class="panel panel-default func" id="stockList">
         <div class="panel-heading" style="text-align: center">库存列表</div>
         <table class="table table-hover">
           <thead>
-          <tr><th>库存编号</th><th>药品名称</th><th>生产厂家</th><th>库存数量</th><th>批号</th><th>批准文号</th><th>销售单价</th><th>入库时间</th><th>生产日期</th><th>失效期</th></tr>
+          <tr>
+            <th>库存编号</th>
+            <th>药品名称</th>
+            <th>生产厂家</th>
+            <th>库存数量</th>
+            <th>批号</th>
+            <th>批准文号</th>
+            <th>销售单价</th>
+            <th>入库时间</th>
+            <th>生产日期</th>
+            <th>失效期</th>
+          </tr>
           </thead>
-          <tbody id="stockList">
-          {$stockList}
+          <tbody>
+          <tr v-for="info in list" data-toggle="modal" data-target="#stockModal" data-placement="left" title="点击我可以进行调价">
+            <td>{{ info.stock_id }}</td>
+            <td>{{ info.name }}</td>
+            <td>{{ info.factory }}</td>
+            <td>{{ info.stock_amount }}</td>
+            <td>{{ info.pihao }}</td>
+            <td>{{ info.pizhunwenhao }}</td>
+            <td>{{ info.sellprice }}</td>
+            <td>{{ info.in_time }}</td>
+            <td>{{ info.producedate }}</td>
+            <td>{{ info.usefuldate }}</td>
+          </tr>
           </tbody>
         </table>
         <div id="stockPage" class="center">
           <nav>
             <ul class="pagination">
-              <for start="1" end="$stockListCount+1">
-                <li><a href="#" data-to="{$i}">{$i}</a></li>
-              </for>
+              <li v-for="i in count">
+                <a href="javascript:" :data-to="i">{{ i }}</a>
+              </li>
             </ul>
           </nav>
         </div>
       </div>
       <!--<div class="panel panel-default func">-->
-        <!--<div class="panel-heading" style="text-align: center">功能名称2</div>-->
-        <!--...-->
+      <!--<div class="panel-heading" style="text-align: center">功能名称2</div>-->
+      <!--...-->
       <!--</div>-->
     </div>
   </div>
@@ -49,7 +71,8 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="stockModalLabel">药品名</h4>
           </div>
           <div class="modal-body">
@@ -57,50 +80,58 @@
               <div class="form-group">
                 <label for="inputFactory" class="col-sm-2 control-label">生产厂家</label>
                 <div class="col-sm-10">
-                  <input name="factory" type="text" class="form-control" id="inputFactory" placeholder="读取错误" readonly autocomplete="off">
+                  <input name="factory" type="text" class="form-control" id="inputFactory" placeholder="读取错误" readonly
+                         autocomplete="off">
                   <input name="stock_id" type="hidden" class="form-control" id="inputStockId">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputAmount" class="col-sm-2 control-label">库存数量</label>
                 <div class="col-sm-10">
-                  <input name="amount" type="text" class="form-control" id="inputAmount" placeholder="读取错误" readonly autocomplete="off">
+                  <input name="amount" type="text" class="form-control" id="inputAmount" placeholder="读取错误" readonly
+                         autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputPiHao" class="col-sm-2 control-label">批号</label>
                 <div class="col-sm-10">
-                  <input name="pihao" type="text" class="form-control" id="inputPiHao" placeholder="读取错误" readonly autocomplete="off">
+                  <input name="pihao" type="text" class="form-control" id="inputPiHao" placeholder="读取错误" readonly
+                         autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputPiZhunWenHao" class="col-sm-2 control-label">批准文号</label>
                 <div class="col-sm-10">
-                  <input name="pizhunwenhao" type="text" class="form-control" id="inputPiZhunWenHao" placeholder="读取错误" readonly autocomplete="off">
+                  <input name="pizhunwenhao" type="text" class="form-control" id="inputPiZhunWenHao" placeholder="读取错误"
+                         readonly autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputProduceDate" class="col-sm-2 control-label">生产日期</label>
                 <div class="col-sm-10">
-                  <input name="producedate" type="text" class="form-control" id="inputProduceDate" placeholder="读取错误" readonly autocomplete="off">
+                  <input name="producedate" type="text" class="form-control" id="inputProduceDate" placeholder="读取错误"
+                         readonly autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputUsefuleDate" class="col-sm-2 control-label">有效日期</label>
                 <div class="col-sm-10">
-                  <input name="usefuldate" type="text" class="form-control" id="inputUsefuleDate" placeholder="读取错误" readonly autocomplete="off">
+                  <input name="usefuldate" type="text" class="form-control" id="inputUsefuleDate" placeholder="读取错误"
+                         readonly autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputPrice" class="col-sm-2 control-label">当前价格</label>
                 <div class="col-sm-10">
-                  <input name="price" type="text" class="form-control" id="inputPrice" placeholder="读取错误" readonly autocomplete="off">
+                  <input name="price" type="text" class="form-control" id="inputPrice" placeholder="读取错误" readonly
+                         autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputNewPrice" class="col-sm-2 control-label">新价格</label>
                 <div class="col-sm-10" data-toggle="tooltip" data-placement="top" title="填写一个新的价格">
-                  <input name="newprice" type="text" class="form-control" id="inputNewPrice" placeholder="0.00" autocomplete="off">
+                  <input name="newprice" type="text" class="form-control" id="inputNewPrice" placeholder="0.00"
+                         autocomplete="off">
                 </div>
               </div>
             </form>
@@ -116,59 +147,92 @@
 </div>
 <include file="./Public/Tpl/footer.html"/>
 <script>
-  $(document).ready(function () {
-    //加载更多
-    $("#stockPage li").on("click", function (ev) {
-      NOW_PAGE = ev.target.getAttribute("data-to");
-      loadMore("#stockList","{:U('Index/getStockList')}",NOW_PAGE);
+    var size = 10;
+    var page = 1;
+    var stockList = {list: [], count: 10};
+    var app = new Vue({
+        el: '#stockList',
+        data: stockList
     });
-    //点击库存列表填充模态框
-    $("#stockList").on("click","tr", function (ev) {
-      $("#stockModalLabel").html("药品名称: "+$(this).find("td")[1].innerHTML);
-      $("#inputStockId").attr("value",$(this).find("td")[0].innerHTML);
-      $("#inputFactory").attr("value",$(this).find("td")[2].innerHTML);
-      $("#inputAmount").attr("value",$(this).find("td")[3].innerHTML);
-      $("#inputPiHao").attr("value",$(this).find("td")[4].innerHTML);
-      $("#inputPiZhunWenHao").attr("value",$(this).find("td")[5].innerHTML);
-      $("#inputProduceDate").attr("value",$(this).find("td")[8].innerHTML);
-      $("#inputUsefuleDate").attr("value",$(this).find("td")[9].innerHTML);
-      $("#inputPrice").attr("value",$(this).find("td")[6].innerHTML);
-    });
-    //响应保存提交事件
-    $("#saveChange").on("click", function (ev) {
-      var newPrice = $("#inputNewPrice").val();
-      if(newPrice == ""){
-        alert("新价格为空,如果您不需要修改请点击'Close'或者按下ESC建来关闭对话框.");
-      }else if(isNaN(newPrice)){
-        alert("价格只能数字!");
-      }else{
-        //提交事件
-        var Form = $("#stockForm");
+    function loadList(size, page) {
         $.ajax({
-          url:"{:U('Stock/doChangePrice')}",
-          data:Form.serialize(),
-          datatype:"json",
-          type:"POST",
-          beforeSend:function(){
-
-          },
-          success:function(data){
-            if(data['code'] == 200){
-              $("#stockModal").modal('toggle');
-              loadMore("#stockList","{:U('Index/getStockList')}",NOW_PAGE);
-              Form[0].reset();
-              alert("改价成功!");
-            }else{
-              alert("处理失败了!原因:"+data['msg']);
+            type: 'POST',
+            url: "{:U('Stock/getStockList')}",
+            data: {"size": size, "page": page},
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.code == 200) {
+                    stockList.list = rs.data.list;
+                    stockList.count = Math.ceil(rs.data.count/size);
+                }
+            },
+            beforeSend:function(){
+                this.layerIndex = layer.load(1,{ shade: [0.1, '#393D49'] });
+            },
+            complete:function(){
+                layer.close(this.layerIndex);
             }
-          },
-          error:function(){
-            alert("提交过程中发生问题! 请联系管理员");
-          }
+        });
+    }
+    $(document).ready(function () {
+        loadList(size,page);
+        //加载更多
+        $("#stockPage").on("click","li", function (ev) {
+            page = ev.target.getAttribute("data-to");
+            loadList(size, page);
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        });
+        //点击库存列表填充模态框
+        $("#stockList").on("click", "tr", function (ev) {
+            $("#stockModalLabel").html("药品名称: " + $(this).find("td")[1].innerHTML);
+            $("#inputStockId").attr("value", $(this).find("td")[0].innerHTML);
+            $("#inputFactory").attr("value", $(this).find("td")[2].innerHTML);
+            $("#inputAmount").attr("value", $(this).find("td")[3].innerHTML);
+            $("#inputPiHao").attr("value", $(this).find("td")[4].innerHTML);
+            $("#inputPiZhunWenHao").attr("value", $(this).find("td")[5].innerHTML);
+            $("#inputProduceDate").attr("value", $(this).find("td")[8].innerHTML);
+            $("#inputUsefuleDate").attr("value", $(this).find("td")[9].innerHTML);
+            $("#inputPrice").attr("value", $(this).find("td")[6].innerHTML);
+        });
+        //响应保存提交事件
+        $("#saveChange").on("click", function (ev) {
+            var newPrice = $("#inputNewPrice").val();
+            if (newPrice == "") {
+                layer.msg("新价格为空,如果您不需要修改请点击'Close'或者按下ESC建来关闭对话框.");
+            } else if (isNaN(newPrice)) {
+                layer.msg("价格只能数字!");
+            } else {
+                //提交事件
+                var Form = $("#stockForm");
+                $.ajax({
+                    url: "{:U('Stock/doChangePrice')}",
+                    data: Form.serialize(),
+                    dataType: "json",
+                    type: "POST",
+                    success: function (data) {
+                        if (data['code'] == 200) {
+                            $("#stockModal").modal('toggle');
+                            loadList(size,page);
+                            Form[0].reset();
+                            layer.msg("改价成功!",{icon:1});
+                        } else {
+                            layer.msg("原因:" + data['msg'],{icon:2});
+                        }
+                    },
+                    error: function () {
+                        layer.msg("提交过程中发生问题! 请联系管理员",{icon:0});
+                    },
+                    beforeSend:function(){
+                        this.layerIndex = layer.load(0,{ shade: [0.1, '#393D49'] });
+                    },
+                    complete:function(){
+                        layer.close(this.layerIndex);
+                    }
+                })
+            }
         })
-      }
-    })
-  });
+    });
 </script>
 </body>
 </html>

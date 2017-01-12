@@ -11,7 +11,7 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">药品入库</button>
-        <button type="button" class="list-group-item list-menu" onclick="loadStorage()" data-to="1">入库记录</button>
+        <button type="button" class="list-group-item list-menu" onclick="loadStorage(size,page)" data-to="1">入库记录</button>
       </div>
     </div>
   </div>
@@ -25,7 +25,8 @@
           <div class="form-group">
             <label for="inputPinyin" class="col-sm-3 control-label">拼音码</label>
             <div class="col-sm-9" data-toggle="tooltip" data-placement="top" title="输入拼音码自动获取药品信息">
-              <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码" autocomplete="off">
+              <input name="pinyinma" type="text" class="form-control" id="inputPinyin" placeholder="拼音码"
+                     autocomplete="off">
             </div>
           </div>
           <div class="form-group">
@@ -43,7 +44,7 @@
           <div class="form-group">
             <label for="inputAmount" class="col-sm-3 control-label">进货数量</label>
             <div class="col-sm-9">
-              <input name="amount" type="text" width="10" class="form-control" id="inputAmount" placeholder="0">
+              <input name="storage_amount" type="text" width="10" class="form-control" id="inputAmount" placeholder="0">
             </div>
           </div>
           <div class="form-group">
@@ -61,7 +62,8 @@
           <div class="form-group">
             <label for="inputTime" class="col-sm-3 control-label">进货时间</label>
             <div class="col-sm-9 input-append date form_datetime">
-              <input name="in_time" type="text" class="form-control" id="inputTime" value="{:date('Y/m/d',time())}" readonly placeholder="点击选择">
+              <input name="in_time" type="text" class="form-control" id="inputTime" value="{:date('Y/m/d',time())}"
+                     readonly placeholder="点击选择">
               <span class="add-on"><i class="icon-th"></i></span>
             </div>
           </div>
@@ -95,7 +97,8 @@
           <div class="form-group">
             <label for="inputLowwarning" class="col-sm-3 control-label">库存低限</label>
             <div class="col-sm-9">
-              <input name="lowwarning" type="text" class="form-control" disabled id="inputLowwarning" placeholder="最低库存保存">
+              <input name="lowwarning" type="text" class="form-control" disabled id="inputLowwarning"
+                     placeholder="最低库存保存">
             </div>
           </div>
           <div class="form-group">
@@ -107,14 +110,16 @@
           <div class="form-group">
             <label for="inputProduceDate" class="col-sm-3 control-label">生产日期</label>
             <div class="col-sm-9 input-append date form_datetime">
-              <input name="producedate" type="text" class="form-control" id="inputProduceDate" readonly placeholder="点击选择">
+              <input name="producedate" type="text" class="form-control" id="inputProduceDate" readonly
+                     placeholder="点击选择">
               <span class="add-on"><i class="icon-th"></i></span>
             </div>
           </div>
           <div class="form-group">
             <label for="inputUsefulDate" class="col-sm-3 control-label">失效日期</label>
             <div class="col-sm-9 input-append date form_datetime">
-              <input name="usefuldate" type="text" class="form-control" id="inputUsefulDate" readonly placeholder="点击选择">
+              <input name="usefuldate" type="text" class="form-control" id="inputUsefulDate" readonly
+                     placeholder="点击选择">
               <span class="add-on"><i class="icon-th"></i></span>
             </div>
           </div>
@@ -133,22 +138,52 @@
         </div>
       </form>
     </div>
-    <div class="panel panel-default func">
+    <div class="panel panel-default func" id="storageList">
       <div class="panel-heading" style="text-align: center">入库记录</div>
       <table class="table table-hover">
         <thead>
-        <tr><th>编号</th><th>药品名称</th><th>批号</th><th>批准文号</th><th>数量</th><th>进货单价</th><th>总额</th><th>进货时间</th><th>进货单位</th><th>生产厂家</th><th>生产日期</th><th>到期</th><th>操作员</th><th>备注</th></tr>
+        <tr>
+          <th>编号</th>
+          <th>药品名称</th>
+          <th>批号</th>
+          <th>批准文号</th>
+          <th>数量</th>
+          <th>进货单价</th>
+          <th>总额</th>
+          <th>进货时间</th>
+          <th>进货单位</th>
+          <th>生产厂家</th>
+          <th>生产日期</th>
+          <th>到期</th>
+          <th>操作员</th>
+          <th>备注</th>
+        </tr>
         </thead>
-        <tbody id="storageList">
-        {$storageList}
+        <tbody>
+        <tr v-for="info in list">
+          <td>{{ info.storage_id }}</td>
+          <td>{{ info.name }}</td>
+          <td>{{ info.pihao }}</td>
+          <td>{{ info.pizhunwenhao }}</td>
+          <td>{{ info.storage_amount }}</td>
+          <td>{{ info.inprice }}</td>
+          <td>{{ info.allprice }}</td>
+          <td>{{ info.in_time }}</td>
+          <td>{{ info.in_from }}</td>
+          <td>{{ info.factory }}</td>
+          <td>{{ info.producedate }}</td>
+          <td>{{ info.usefuldate }}</td>
+          <td>{{ info.realname }}</td>
+          <td>{{ info.remark }}</td>
+        </tr>
         </tbody>
       </table>
       <div id="storagePage" class="center">
         <nav>
           <ul class="pagination">
-            <for start="1" end="$storageListCount+1">
-              <li><a href="#" data-to="{$i}">{$i}</a></li>
-            </for>
+            <li v-for="i in count">
+              <a href="javascript:" :data-to="i">{{ i }}</a>
+            </li>
           </ul>
         </nav>
       </div>
@@ -158,87 +193,116 @@
 <include file="./Public/Tpl/footer.html"/>
 <js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
 <script>
-  function loadStorage(){
-    loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE)
-  }
-  function fillTotalMoney(){
-    var amount = $("#inputAmount").val();
-    var price = $("#inputPrice").val();
-    if(amount!="" && price!=""){
-      $("#inputAllprice").attr("value",(amount*price).toFixed(2));
+    var size = 10;
+    var page = 1;
+    var storageList = {list: [], count: 10};
+    var app = new Vue({
+        el: '#storageList',
+        data: storageList
+    });
+    function loadStorage(size, page) {
+        $.ajax({
+            type: 'POST',
+            url: "{:U('Storage/getStorageRecord')}",
+            data: {"size": size, "page": page},
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.code == 200) {
+                    storageList.list = rs.data.list;
+                    storageList.count = Math.ceil(rs.data.count/size);console.log(storageList.count);
+                }
+            },
+            beforeSend: function () {
+                this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+            },
+            complete: function () {
+                layer.close(this.layerIndex);
+            }
+        });
     }
-  }
-  //总价集成
-  $(document).on("keyup","#inputPrice,#inputAmount", function () {
-    fillTotalMoney();
-  });
-  $(document).ready(function(){
-    //翻页
-    $("#storagePage").on("click","li", function (ev) {
-      NOW_PAGE = ev.target.getAttribute("data-to");
-      loadMore("#storageList","{:U('Index/getStorageList')}",NOW_PAGE);
-      $(this).addClass("active");
-      $(this).siblings().removeClass("active");
-    });
-    //提交入库
-    $("#doStorage").click(function(){
-      $.ajax({
-        url:"{:U('Storage/doAdd')}",
-        data:$("#storageForm").serialize(),
-        datatype:"json",
-        type:"POST",
-        beforeSend:function(){
-
-        },
-        success:function(data){
-          if(data['code'] == 200){
-            alert("入库成功!");
-          }else{
-            alert("入库失败了!原因:"+data['msg']);
-          }
-        },
-        error:function(){
-          alert("提交过程中发生问题! ");
+    function fillTotalMoney() {
+        var amount = $("#inputAmount").val();
+        var price = $("#inputPrice").val();
+        if (amount != "" && price != "") {
+            $("#inputAllprice").attr("value", (amount * price).toFixed(2));
         }
-      })
+    }
+    //总价集成
+    $(document).on("keyup", "#inputPrice,#inputAmount", function () {
+        fillTotalMoney();
     });
-    //拼音码自动提示
-    $("#inputPinyin").Kcomplete({
-      location       : "{:U('Drug/nameTips')}",
-      dataType       : 'json'
-    });
-    //拼音码事件
-    $("#inputPinyin").bind("keyup change",function(){
-        if($(this).val() == '') return;
-      $.ajax({
-        url:"{:U('Drug/getInfo')}",
-        data:"pinyinma="+$("#inputPinyin").val(),
-        datatype:"json",
-        type:"get",
-        success:function(data){
-          console.log(data['code']+" "+data.msg);
-          if(data['code']==200){
-            var tempName = data.result.name;
-            var tempSpec = data.result.spec;
-            var tempUnit = data.result.unit;
-            var tempLowwarning = data.result.lowwarning;
-          }else{
-            var tempName = data.msg;
-            var tempSpec = data.msg;
-            var tempUnit = data.msg;
-            var tempLowwarning = data.msg;
-          }
-          $("#inputName").attr("value",tempName);
-          $("#inputSpec").attr("value",tempSpec);
-          $("#inputUnit").attr("value",tempUnit);
-          $("#inputLowwarning").attr("value",tempLowwarning);
-        },
-        error:function(){},
-      })
-    });
+    $(document).ready(function () {
+        //翻页
+        $("#storagePage").on("click", "li", function (ev) {
+            page = ev.target.getAttribute("data-to");
+            loadStorage(size, page);
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        });
+
+        //提交入库
+        $("#doStorage").click(function () {
+            $.ajax({
+                url: "{:U('Storage/doAdd')}",
+                data: $("#storageForm").serialize(),
+                dataType: "json",
+                type: "POST",
+                beforeSend: function () {
+                    this.layerIndex = layer.load(1,{ shade: [0.1, '#393D49'] });
+                },
+                success: function (data) {
+                    if (data['code'] == 200) {
+                        layer.msg("入库成功!",{icon:1});
+                    } else {
+                        layer.msg("原因:" + data['msg'],{icon:2});
+                    }
+                },
+                error: function () {
+                    layer.msg("提交过程中发生问题! ",{icon:0});
+                },
+                complete:function(){
+                    layer.close(this.layerIndex);
+                }
+            })
+        });
+        //拼音码自动提示
+        $("#inputPinyin").Kcomplete({
+            location: "{:U('Drug/nameTips')}",
+            dataType: 'json'
+        });
+        //拼音码事件
+        $("#inputPinyin").bind("keyup change", function () {
+            if ($(this).val() == '') return;
+            $.ajax({
+                url: "{:U('Drug/getInfo')}",
+                data: "pinyinma=" + $("#inputPinyin").val(),
+                datatype: "json",
+                type: "get",
+                success: function (data) {
+                    console.log(data['code'] + " " + data.msg);
+                    if (data['code'] == 200) {
+                        var tempName = data.data.name;
+                        var tempSpec = data.data.spec;
+                        var tempUnit = data.data.unit;
+                        var tempLowwarning = data.data.lowwarning;
+                    } else {
+                        var tempName = data.msg;
+                        var tempSpec = data.msg;
+                        var tempUnit = data.msg;
+                        var tempLowwarning = data.msg;
+                    }
+                    $("#inputName").attr("value", tempName);
+                    $("#inputSpec").attr("value", tempSpec);
+                    $("#inputUnit").attr("value", tempUnit);
+                    $("#inputLowwarning").attr("value", tempLowwarning);
+                },
+                error: function () {
+                },
+            })
+        });
 
 
-  });
+    });
 
 </script>
 </body>

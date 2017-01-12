@@ -5,30 +5,8 @@ use Think\Controller;
 
 class UserController extends Controller
 {
-    private $data = array();
-    private $id;
-    private $username;
-    private $password;
-    private $realname;
-    private $lasttime;
-    private $admin;
-    private $db;
 
-    public function _initialize()
-    {
-        $this->db = M("users");
-        /*if ($this->checkLogin() === true) {
-            $data['username'] = I("session.username");
-            $info = $this->db->where($data)->find();
-            if ($info) {
-                $this->id = $info['id'];
-                $this->username = $info['username'];
-                $this->password = $info['password'];
-                $this->realname = $info['realname'];
-                $this->admin = $info['admin'];
-            }
-        }*/
-    }
+    public function _initialize(){}
 
     public function index()
     {
@@ -36,24 +14,14 @@ class UserController extends Controller
         $this->show("<h2>用户类</h2>");
     }
 
-    public function getUserList()
-    {
-        isset($_POST['page']) ? $page = I("post.page") : $page = 1;
-        isset($_POST['limit']) ? $limit = I("post.limit") : $limit = 20;
-        $result = $this->db->page($page, $limit)->order("id desc")->select();
-        $count = $this->db->count() / $limit;
-        $string = "";
-        foreach ($result as $key => $value) {
-            $string .= "<tr data-toggle=\"modal\" data-target=\"#userModal\">";
-            $string .= "<td>" . $value['id'] . "</td>";
-            $string .= "<td>" . $value['username'] . "</td>";
-            $string .= "<td>" . $value['realname'] . "</td>";
-            $string .= "<td>" . ($value['admin'] == 0 ? "普通" : "管理员") . "</td>";
-            $string .= "<td>" . ($value['lasttime'] == 0 ? "从未登录" : date("Y/m/d h:i:s", $value['lasttime'])) . "</td>";
-            $string .= "</tr>";
-        }
-        $retMsg = array('code' => 200, "pageCount" => ceil($count), "table" => $string);
-        return $retMsg;
+    public function getUserList(){
+        $data = array();
+        $page = I("post.page",1);
+        $size = I("post.size",15);
+        $list = D("User")->get_list($data,$size,$page);
+        $count = D("User")->count();
+        $ret = result(200,'ok',array('list'=>$list,'count'=>intval($count)));
+        $this->ajaxReturn($ret,'json');
     }
 
     /**
@@ -87,7 +55,7 @@ class UserController extends Controller
                 return false;
             }
             if (time() > ($freshTime + 5 * 60)) {    //登录时间超过5分钟,需要更新一下session
-                $info = $this->db->where("id=" . I("session.userId"))->find();
+                $info = M("Users")->where("id=" . I("session.userId"))->find();
                 $_SESSION['username'] = $info['username'];
                 $_SESSION['admin'] = $info['admin'];
                 $_SESSION['freshTime'] = time();
@@ -118,9 +86,9 @@ class UserController extends Controller
         }
         $user['username'] = I("post.username");
         $user['password'] = md5(I("post.password"));
-        $result = $this->db->where($user)->find();
+        $result = M("Users")->where($user)->find();
         if ($result) {
-            $this->db->where($result)->data(array("lasttime" => time()))->save();
+            M("Users")->where($result)->data(array("lasttime" => time()))->save();
             $_SESSION['userId'] = $result['id'];
             $_SESSION['username'] = $result['username'];
             $_SESSION['realname'] = $result['realname'];
@@ -151,65 +119,35 @@ class UserController extends Controller
         }
     }
 
-    public function formatData()
-    {
-        foreach ($this->data as $key => $item) {
-            if (empty($item) && $item != 0) {
-                unset($this->data[$key]);
-            }
+    public function doChangeInfo(){
+        $data = I("post.");
+        $user_id = $data['user_id'];unset($data['user_id']);
+        if($data['password'] == "") unset($data['password']);
+        $rs = D("User")->edit($user_id,$data);
+        if($rs){
+            $retMsg = result(200,'ok',$rs);
+        }else{
+            $retMsg = result(400,D("User")->getError());
         }
-        return $this;
+        $this->ajaxReturn($retMsg,'json');
     }
 
-    public function saveInfo()
-    {
-        if ($this->id !== I("session.userId") || $this->checkAdmin() === false) {
-            return false;
-        }
-        return $this->formatData()->db->data($this->data)->save();
-    }
-
-    public function setDataFromPost()
-    {
-        if (I("post.password") != "") {
-            $this->setPassword(md5(I("post.password")));
-        }
-        return $this->setId(I("post.user_id"))->setUsername(I("post.username"))->setRealname(I("post.realname"))->setAdmin(I("post.admin"));
-    }
-
-    public function doChangeInfo()
-    {
-        $this->setId(I("post.user_id"));
-        if (!empty($this->id) && $this->id > 0) {
-            $findRes = $this->formatData()->db->where($this->data)->find();
-            if ($findRes) {
-                $saveRes = $this->setDataFromPost()->formatData()->db->data($this->data)->save();
-                if ($saveRes) {
-                    $retMsg = array("code" => 200, "msg" => "ok", "result" => $saveRes);
-                } else {
-                    $retMsg = array("code" => 400, "msg" => "修改失败", "result" => $this->data);
-                }
-            } else {
-                $retMsg = array("code" => 400, "msg" => "用户不存在", "result" => 0);
-            }
-        } else {
-            $retMsg = array("code" => 400, "msg" => "缺少必要参数或不正确", "result" => 0);
-        }
-        $this->ajaxReturn($retMsg, 'json');
-    }
     public function chPass(){
         $this->loginCheck();
         if(I("post.do") == "chpassword"){
             if(I("post.new") == I("post.old") || I("post.new") == ""){
                 $this->error("新旧密码不能相同或为空!");
             }else{
-                $findRes = $this->setId(I("session.userId"))->setPassword(md5(I("post.old")))->formatData()->db->where($this->data)->find();
+                $user_id = I("session.userId");
+                $old_password = md5(I("post.old"));
+                $new_password = md5(I("post.new"));
+                $findRes = M("Users")->where(array("id"=>$user_id,"password"=>$old_password))->find();
                 if($findRes){
-                    $saveRes = $this->db->data('password='.md5(I("post.new")))->where($this->data)->save();
+                    $saveRes = D("User")->edit($user_id,array("password"=>$new_password));
                     if($saveRes){
                         $this->logout()->success("修改成功!请使用新密码重新登录");
                     }else{
-                        $this->error("修改失败!");
+                        $this->error(D("User")->getError());
                     }
                 }else{
                     $this->error("原密码错误!");
@@ -227,147 +165,39 @@ class UserController extends Controller
                 $info['username'] = I("post.username");
                 $info['password'] = I("post.password");
                 $info['realname'] = I("post.realname");
-                $info['admin'] = I("post.admin", 0);
-                foreach ($info as $k => $v) {
-                    if (empty($v)) {
-                        $this->ajaxReturn(array('code' => 400, 'msg' => $k . "为必填项", 'result' => 0));
-                    }
-                }
-                $res = $this->db->data($info)->add();
-                if ($res) {
-                    $this->ajaxReturn(array('code' => 200, 'msg' => "ok", 'result' => $res));
-                } else {
-                    $this->ajaxReturn(array('code' => 400, 'msg' => "add error", 'result' => $this->db->error()));
+                $info['admin'] = I("post.admin",0);
+                $rs = D("User")->doAdd($info);
+                if($rs){
+                    $retMsg = result(200,'ok',$rs);
+                }else{
+                    $retMsg = result(400,D("User")->getError());
                 }
             } else {
-                $this->display();
+                $retMsg = result(300,'干啥呢');
             }
         } else {
-            $this->error("权限错误!");
+            $retMsg = result(300,'干啥呢');
         }
-    }
-
-    public function doAdd()
-    {
-        if ($this->checkAdmin() === true) {
-            if (I("post.do") == "addUser") {
-                if(I("post.username") == "" || I("post.password") == "" || I("post.realname") ==""){
-                    $this->error("表单必须填写完整,不得出现空项!");
-                }
-                $info['username'] = I("post.username");
-                $info['password'] = md5(I("post.password"));
-                $info['realname'] = I("post.realname");
-                $info['admin'] = I("post.admin", 0);
-                foreach ($info as $k => $v) {
-                    if (empty($v) && $v < 0) {
-                        $this->error($k . "为必填项");
-                    }
-                }
-                if ($this->db->where(array("username" => $info['username']))->find()) {
-                    $this->error("登录名重复!");
-                }
-                $res = $this->db->data($info)->add();
-                if ($res) {
-                    $this->success("添加用户成功");
-                } else {
-                    $this->error("写入出错:" . $this->db->error());
-                }
-            } else {
-                $this->error("干啥呢?");
-            }
-        } else {
-            $this->error("权限错误!");
-        }
+        $this->ajaxReturn($retMsg,'json');
     }
 
     public function delUser()
     {
         if ($this->checkAdmin() === true) {
             if (I("post.do") == "delUser") {
-                $info['id'] = I("post.user_id");
-                $user = $this->db->where($info)->find();
-                if ($user) {
-                    if ($user['admin'] == 0) {
-                        $res = $this->db->where($user)->delete();
-                        $this->ajaxReturn(array('code' => 200, 'msg' => "ok", 'result' => $res));
-                    } else {
-                        $this->ajaxReturn(array('code' => 400, 'msg' => "不能删除管理员", 'result' => ""));
-                    }
-                } else {
-                    $this->ajaxReturn(array('code' => 400, 'msg' => "no this user", 'result' => 0));
+                $user_id = I("post.user_id");
+                $rs = D("User")->del($user_id);
+                if($rs){
+                    $retMsg = result(200,'ok',$rs);
+                }else{
+                    $retMsg = result(400,D("User")->getError());
                 }
             } else {
-                $this->ajaxReturn(array('code' => 400, 'msg' => "缺少必要参数", 'result' => 0));
+                $retMsg = result(300,"缺少必要参数");
             }
         } else {
-            $this->ajaxReturn(array('code' => 400, 'msg' => "权限错误", 'result' => 0));
+            $retMsg = result(302,"权限错误");
         }
-    }
-
-
-    /**
-     * @param mixed $id
-     * @return UserController
-     */
-    public function setId($id)
-    {
-        $this->data['id'] = $id;
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @param mixed $username
-     * @return UserController
-     */
-    public function setUsername($username)
-    {
-        $this->data['username'] = $username;
-        $this->username = $username;
-        return $this;
-    }
-
-    /**
-     * @param mixed $password
-     * @return UserController
-     */
-    public function setPassword($password)
-    {
-        $this->data['password'] = $password;
-        $this->password = $password;
-        return $this;
-    }
-
-    /**
-     * @param mixed $realname
-     * @return UserController
-     */
-    public function setRealname($realname)
-    {
-        $this->data['realname'] = $realname;
-        $this->realname = $realname;
-        return $this;
-    }
-
-    /**
-     * @param mixed $admin
-     * @return UserController
-     */
-    public function setAdmin($admin)
-    {
-        $this->data['admin'] = $admin;
-        $this->admin = $admin;
-        return $this;
-    }
-
-    /**
-     * @param mixed $lasttime
-     * @return UserController
-     */
-    public function setLasttime($lasttime)
-    {
-        $this->data['lasttime'] = $lasttime;
-        $this->lasttime = $lasttime;
-        return $this;
+        $this->ajaxReturn($retMsg,'json');
     }
 }

@@ -16,22 +16,29 @@
     </div>
   </div>
   <div class="col-md-10">
-    <div class="panel panel-default func">
+    <div class="panel panel-default func" id="userList">
       <div class="panel-heading" style="text-align: center">在职职工</div>
       <table class="table table-hover">
         <thead>
         <tr><th>职工号</th><th>登录名</th><th>姓名</th><th>权限</th><th>最后登录时间</th></tr>
         </thead>
-        <tbody id="userList">
-        {$userList}
+        <tbody>
+        <tr v-for="info in list" data-toggle="modal" data-target="#userModal">
+          <td>{{ info.id }}</td>
+          <td>{{ info.username }}</td>
+          <td>{{ info.realname }}</td>
+          <td v-if="info.admin == 0">普通</td>
+          <td v-else>管理员</td>
+          <td>{{ info.lasttime }}</td>
+        </tr>
         </tbody>
       </table>
       <div id="userPage" class="center">
         <nav>
           <ul class="pagination">
-            <for start="1" end="$userListCount+1">
-              <li><a href="#" data-to="{$i}">{$i}</a></li>
-            </for>
+            <li v-for="i in count">
+              <a href="javascript:" :data-to="i">{{ i }}</a>
+            </li>
           </ul>
         </nav>
       </div>
@@ -40,7 +47,7 @@
       <div class="panel-heading" style="text-align: center">添加员工</div>
       <div class="panel-body">
         <div class="col-sm-7 col-sm-offset-2">
-          <form id="addForm" class="form-horizontal" action="{:U('User/doAdd')}" method="post">
+          <form id="addForm" class="form-horizontal" method="post">
             <div class="form-group">
               <label for="inputName2" class="col-sm-2 control-label">姓名</label>
               <div class="col-sm-10">
@@ -71,7 +78,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
-                <button id="doAdd" type="submit" class="btn btn-success submit">提交</button>
+                <button id="doAdd" type="button" class="btn btn-success submit">提交</button>
                 <button type="reset" class="btn btn-warning">清空输入</button>
               </div>
             </div>
@@ -133,13 +140,42 @@
 </div>
 <include file="./Public/Tpl/footer.html"/>
 <script>
+    var size = 10;
+    var page = 1;
+    var userList = {list: [], count: 10};
+    var app = new Vue({
+        el: '#userList',
+        data: userList
+    });
+    function loadList(size, page) {
+        $.ajax({
+            type: 'POST',
+            url: "{:U('user/getUserList')}",
+            data: {"size": size, "page": page},
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.code == 200) {
+                    userList.list = rs.data.list;
+                    userList.count = Math.ceil(rs.data.count / size);
+                }
+            },
+            beforeSend: function () {
+                this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+            },
+            complete: function () {
+                layer.close(this.layerIndex);
+            }
+        });
+    }
   $(document).ready(function () {
+      loadList(size,page);
     //加载更多
     $("#userPage").on("click","li", function (ev) {
-      NOW_PAGE = ev.target.getAttribute("data-to");
-      loadMore("#userList", "{:U('Index/getUserList')}", NOW_PAGE);
-      $(this).addClass("active");
-      $(this).siblings().removeClass("active");
+        var page2 = ev.target.getAttribute("data-to");
+        if(page2 == page) return 0;else page=page2;
+        loadList(size, page);
+        $(this).addClass("active");
+        $(this).siblings().removeClass("active");
     });
     //点击库存列表填充模态框
     $("#userList").on("click","tr", function (ev) {
@@ -161,54 +197,81 @@
         $.ajax({
           url:"{:U('User/doChangeInfo')}",
           data:Form.serialize(),
-          datatype:"json",
+          dataType:"json",
           type:"POST",
-          beforeSend:function(){
-
-          },
           success:function(data){
             console.log(data);
             if(data['code'] == 200){
               $("#userModal").modal('toggle');
-              loadMore("#userList","{:U('Index/getUserList')}",NOW_PAGE);
+              loadList(size,page);
               Form[0].reset();
-              alert("修改成功!");
+              layer.msg("修改成功!",{icon:1});
             }else{
-              alert("处理失败了!原因:"+data['msg']);
+              layer.msg("原因:"+data['msg'],{icon:2});
             }
           },
           error:function(){
-            alert("提交过程中发生问题! 请联系管理员");
-          }
+            layer.msg("提交过程中发生问题! 请联系管理员",{icon:0});
+          },
+            beforeSend: function () {
+                this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+            },
+            complete: function () {
+                layer.close(this.layerIndex);
+            }
         })
     });
     //响应删除用户
     $("#delUserBtn").on("click", function () {
-      if(confirm("确定要删除该用户?")){
-        var Form = $("#userForm");
-        $.ajax({
-          url:"{:U('User/delUser')}",
-          data:"do=delUser&"+Form.serialize(),
-          datatype:"json",
-          type:"POST",
-          success:function(data){
-            console.log(data);
-            if(data['code'] == 200){
-              $("#userModal").modal('toggle');
-              loadMore("#userList","{:U('Index/getUserList')}",NOW_PAGE);
-              Form[0].reset();
-              alert("删除了!");
-            }else{
-              alert("处理失败了!原因:"+data['msg']);
-            }
-          },
-          error:function(){
-            alert("提交过程中发生问题! 请联系管理员");
-          }
-        })
-      }
+        layer.confirm('确定要删除该用户？', {
+            btn: ['确认','取消'] //按钮
+        }, function(){
+            var Form = $("#userForm");
+            $.ajax({
+                url:"{:U('User/delUser')}",
+                data:"do=delUser&"+Form.serialize(),
+                dataType:"json",
+                type:"POST",
+                success:function(data){
+                    console.log(data);
+                    if(data['code'] == 200){
+                        $("#userModal").modal('toggle');
+                        loadList(size,page);
+                        Form[0].reset();
+                        layer.msg("删除了!",{icon:1});
+                    }else{
+                        layer.msg("处理失败了!原因:"+data['msg'],{icon:2});
+                    }
+                },
+                error:function(){
+                    layer.msg("提交过程中发生问题! 请联系管理员",{icon:0});
+                }
+            })
+        },function(){});
     });
-
+    //新增用户
+      $("#doAdd").on("click",function(){
+          var Form = $("#addForm");
+          $.ajax({
+              url:"{:U('User/addUser')}",
+              data:"do=addUser&"+Form.serialize(),
+              dataType:"json",
+              type:"POST",
+              success:function(data){
+                  console.log(data);
+                  if(data['code'] == 200){
+                      loadList(size,page);
+                      Form[0].reset();
+                      layer.msg("新增成功！",{icon:1});
+                  }else{
+                      layer.msg(data['msg'],{icon:2});
+                  }
+              },
+              error:function(){
+                  layer.msg("提交过程中发生问题! 请联系管理员",{icon:0});
+              }
+          })
+      });
   });
 </script>
 </body>

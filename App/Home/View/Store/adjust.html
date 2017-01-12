@@ -16,22 +16,32 @@
     </div>
   </div>
   <div class="col-md-10">
-    <div class="panel panel-default func">
+    <div class="panel panel-default func" id="adjustList">
       <div class="panel-heading" style="text-align: center">调价记录</div>
       <table class="table table-hover">
         <thead>
         <tr><th>调价编号</th><th>库存编号</th><th>药品名称</th><th>规格</th><th>单位</th><th>旧价格</th><th>新价格</th><th>调价时间</th><th>操作员</th></tr>
         </thead>
-        <tbody id="adjustList">
-        {$adjustList}
+        <tbody>
+        <tr v-for="info in list">
+          <td>{{ info.adjust_id }}</td>
+          <td>{{ info.stock_id }}</td>
+          <td>{{ info.name }}</td>
+          <td>{{ info.spec }}</td>
+          <td>{{ info.unit }}</td>
+          <td>{{ info.oldprice }}</td>
+          <td>{{ info.newprice }}</td>
+          <td>{{ info.time }}</td>
+          <td>{{ info.realname }}</td>
+        </tr>
         </tbody>
       </table>
       <div id="adjustPage" class="center">
         <nav>
           <ul class="pagination">
-            <for start="1" end="$adjustListCount+1">
-              <li><a href="#" data-to="{$i}">{$i}</a></li>
-            </for>
+            <li v-for="i in count">
+              <a href="javascript:" :data-to="i">{{ i }}</a>
+            </li>
           </ul>
         </nav>
       </div>
@@ -44,11 +54,41 @@
 </div>
 <include file="./Public/Tpl/footer.html"/>
 <script>
+    var size = 10;
+    var page = 1;
+    var adjustList = {list: [], count: 10};
+    var app = new Vue({
+        el: '#adjustList',
+        data: adjustList
+    });
+    function loadList(size, page) {
+        $.ajax({
+            type: 'POST',
+            url: "{:U('Index/getAdjustList')}",
+            data: {"size": size, "page": page},
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.code == 200) {
+                    adjustList.list = rs.data.list;
+                    adjustList.count = Math.ceil(rs.data.count/size);
+                }
+            },
+            beforeSend:function(){
+                this.layerIndex = layer.load(1,{ shade: [0.1, '#393D49'] });
+            },
+            complete:function(){
+                layer.close(this.layerIndex);
+            }
+        });
+    }
   $(document).ready(function () {
+      loadList(size,page);
     //加载更多
     $("#adjustPage li").on("click", function (ev) {
-      NOW_PAGE = ev.target.getAttribute("data-to");
-      loadMore("#adjustList", "{:U('Index/getAdjustList')}", NOW_PAGE);
+        page = ev.target.getAttribute("data-to");
+        loadList(size, page);
+        $(this).addClass("active");
+        $(this).siblings().removeClass("active");
     });
 
   });
