@@ -123,6 +123,7 @@ class UserController extends Controller
         $data = I("post.");
         $user_id = $data['user_id'];unset($data['user_id']);
         if($data['password'] == "") unset($data['password']);
+        else $data['password'] = md5($data['password']);
         $rs = D("User")->edit($user_id,$data);
         if($rs){
             $retMsg = result(200,'ok',$rs);

@@ -10,7 +10,7 @@
     <div class="panel panel-default">
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
-        <button type="button" class="list-group-item list-menu active" data-to="0">调价记录</button>
+        <button type="button" class="list-group-item list-menu active" onclick="loadList(size,page)" data-to="0">调价记录</button>
         <button type="button" class="list-group-item list-menu" data-to="1">药品调价</button>
       </div>
     </div>
@@ -20,7 +20,17 @@
       <div class="panel-heading" style="text-align: center">调价记录</div>
       <table class="table table-hover">
         <thead>
-        <tr><th>调价编号</th><th>库存编号</th><th>药品名称</th><th>规格</th><th>单位</th><th>旧价格</th><th>新价格</th><th>调价时间</th><th>操作员</th></tr>
+        <tr>
+          <th>调价编号</th>
+          <th>库存编号</th>
+          <th>药品名称</th>
+          <th>规格</th>
+          <th>单位</th>
+          <th>旧价格</th>
+          <th>新价格</th>
+          <th>调价时间</th>
+          <th>操作员</th>
+        </tr>
         </thead>
         <tbody>
         <tr v-for="info in list">
@@ -36,19 +46,13 @@
         </tr>
         </tbody>
       </table>
+      <div id="hehe"></div>
       <div id="adjustPage" class="center">
-        <nav>
-          <ul class="pagination">
-            <li v-for="i in count">
-              <a href="javascript:" :data-to="i">{{ i }}</a>
-            </li>
-          </ul>
-        </nav>
       </div>
     </div>
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">药品调价</div>
-      <div class="penel-body text-danger">调价请到库存页面:<a href="{:U('Store/Stock')}">点击跳转</a> </div>
+      <div class="penel-body text-danger">调价请到库存页面:<a href="{:U('Store/Stock')}">点击跳转</a></div>
     </div>
   </div>
 </div>
@@ -61,37 +65,46 @@
         el: '#adjustList',
         data: adjustList
     });
+    $(document).ready(function () {
+        layui.use(['laypage', 'layer'], function () {
+            loadList(size, page);
+            layer = layui.layer;
+            laypage = layui.laypage;
+            laypage({
+                cont: 'adjustPage'
+                , pages: adjustList.count
+                , skin: '#337ab7'
+                , skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        loadList(size, page);
+                    }
+                }
+            });
+        });
+    });
     function loadList(size, page) {
         $.ajax({
             type: 'POST',
             url: "{:U('Index/getAdjustList')}",
             data: {"size": size, "page": page},
             dataType: 'json',
+            async: false,
             success: function (rs) {
                 if (rs.code == 200) {
                     adjustList.list = rs.data.list;
-                    adjustList.count = Math.ceil(rs.data.count/size);
+                    adjustList.count = Math.ceil(rs.data.count / size);
                 }
             },
-            beforeSend:function(){
-                this.layerIndex = layer.load(1,{ shade: [0.1, '#393D49'] });
+            beforeSend: function () {
+                this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
             },
-            complete:function(){
+            complete: function () {
                 layer.close(this.layerIndex);
             }
         });
     }
-  $(document).ready(function () {
-      loadList(size,page);
-    //加载更多
-    $("#adjustPage li").on("click", function (ev) {
-        page = ev.target.getAttribute("data-to");
-        loadList(size, page);
-        $(this).addClass("active");
-        $(this).siblings().removeClass("active");
-    });
-
-  });
 </script>
 </body>
 </html>

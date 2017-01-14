@@ -181,6 +181,7 @@
             url: "{:U('Breakage/getBreakageList')}",
             data: {"size": size, "page": page},
             dataType: 'json',
+            async:false,
             success: function (rs) {
                 if (rs.code == 200) {
                     breakageList.list = rs.data.list;
@@ -197,18 +198,29 @@
     }
     $(document).ready(function () {
         //加载更多
-        $("#breakagePage").on("click", "li", function (ev) {
-            page = ev.target.getAttribute("data-to");
-            loadList(size, page);
-            $(this).addClass("active");
-            $(this).siblings().removeClass("active");
+        layui.use(['laypage', 'layer'], function () {
+            loadList(size,page);
+            layer = layui.layer;
+            laypage = layui.laypage;
+            laypage({
+                cont: 'breakagePage'
+                , pages: breakageList.count
+                , skin: '#337ab7'
+                , skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        loadList(size, page);
+                    }
+                }
+            });
         });
         //退货按钮
         $("#doBreak").on("click", function () {
             var amount = $("#inputBreakAmount").val();
             var price = $("#inputBreakPrice").val();
             if (amount == 0 || price == 0) {
-                layer.msg("数量和价格不能为空或为零!");
+                layer.msg("数量和价格不能为空或为零!",{icon:2});
                 return;
             }
             var Form = $("#breakageForm");
@@ -222,7 +234,7 @@
                         layer.msg("成功确认报损!",{icon:1});
                         Form[0].reset();
                     } else {
-                        layer.msg("原因:" + data['msg'],{icon:2});
+                        layer.msg(data['msg'],{icon:2});
                     }
                 },
                 error: function () {

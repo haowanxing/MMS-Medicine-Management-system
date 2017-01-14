@@ -11,7 +11,7 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">药品退货</button>
-        <button type="button" class="list-group-item list-menu" onclick="loadList(size,page)" data-to="1">退货记录</button>
+        <button type="button" class="list-group-item list-menu" data-to="1" onclick="loadList(size,page)">退货记录</button>
       </div>
     </div>
   </div>
@@ -179,6 +179,7 @@
             url: "{:U('Return/getRetList')}",
             data: {"size": size, "page": page},
             dataType: 'json',
+            async:false,
             success: function (rs) {
                 if (rs.code == 200) {
                     returnList.list = rs.data.list;
@@ -195,11 +196,22 @@
     }
     $(document).ready(function () {
         //加载更多
-        $("#returnPage").on("click", "li", function (ev) {
-            page = ev.target.getAttribute("data-to");
-            loadList(size, page);
-            $(this).addClass("active");
-            $(this).siblings().removeClass("active");
+        layui.use(['laypage', 'layer'], function () {
+            loadList(size,page);
+            layer = layui.layer;
+            laypage = layui.laypage;
+            laypage({
+                cont: 'returnPage'
+                , pages: returnList.count
+                , skin: '#337ab7'
+                , skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        loadList(size, page);
+                    }
+                }
+            });
         });
         //退货按钮
         $("#doReturn").on("click", function () {

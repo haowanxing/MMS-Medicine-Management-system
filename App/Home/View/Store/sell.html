@@ -11,11 +11,11 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">销售药品</button>
-        <button type="button" class="list-group-item list-menu" onclick="loadSell(size, page)" data-to="1">销售记录</button>
+        <button type="button" class="list-group-item list-menu" data-to="1" onclick="loadList(size,page)">销售记录</button>
       </div>
     </div>
   </div>
-  <div class="col-md-10">
+  <div class="col-sm-10">
     <div class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">销售</div>
       <div class="panel-body text-info">
@@ -29,13 +29,12 @@
           <table class="table table-bordered">
             <thead>
             <th style="width: 15%;">拼音码</th>
-            <th style="width: 20%;">名称</th>
-            <th>规格大小</th>
-            <th style="width: 10%;">计量单位</th>
+            <th style="width: 22%;">名称</th>
+            <th style="width: 15%">规格大小</th>
+            <th style="width: 8%;">计量单位</th>
             <th style="width: 10%;">单价</th>
             <th style="width: 10%;">数量</th>
-            <th style="width: 13%;">小计</th>
-            <th>备注</th>
+            <th style="width: 10%;">小计</th>
             </thead>
             <tbody>
             <tr>
@@ -60,13 +59,10 @@
                 <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
               </td>
               <td>
-                <input name="amount[]" type="text" class="form-control" placeholder="0">
+                <input name="amount[]" type="number" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
-              </td>
-              <td>
-                <input name="beizhu[]" type="text" class="form-control" placeholder="...">
+                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
               </td>
             </tr>
             <tr>
@@ -91,13 +87,10 @@
                 <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
               </td>
               <td>
-                <input name="amount[]" type="text" class="form-control" placeholder="0">
+                <input name="amount[]" type="number" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
-              </td>
-              <td>
-                <input name="beizhu[]" type="text" class="form-control" placeholder="...">
+                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
               </td>
             </tr>
             <tr>
@@ -122,13 +115,10 @@
                 <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
               </td>
               <td>
-                <input name="amount[]" type="text" class="form-control" placeholder="0">
+                <input name="amount[]" type="number" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
-              </td>
-              <td>
-                <input name="beizhu[]" type="text" class="form-control" placeholder="...">
+                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
               </td>
             </tr>
             <tr>
@@ -153,13 +143,10 @@
                 <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
               </td>
               <td>
-                <input name="amount[]" type="text" class="form-control" placeholder="0">
+                <input name="amount[]" type="number" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
-              </td>
-              <td>
-                <input name="beizhu[]" type="text" class="form-control" placeholder="...">
+                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
               </td>
             </tr>
             <tr>
@@ -184,13 +171,10 @@
                 <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
               </td>
               <td>
-                <input name="amount[]" type="text" class="form-control" placeholder="0">
+                <input name="amount[]" type="number" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="subtotal[]" type="text" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
-              </td>
-              <td>
-                <input name="beizhu[]" type="text" class="form-control" placeholder="...">
+                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
               </td>
             </tr>
             </tbody>
@@ -266,12 +250,13 @@
         el: '#sellList',
         data: sellList
     });
-    function loadSell(size, page) {
+    function loadList(size, page) {
         $.ajax({
             type: 'POST',
             url: "{:U('Index/getSellList')}",
             data: {"do": "loadmore", "size": size, "page": page},
             dataType: 'json',
+            async:false,
             success: function (rs) {
                 if (rs.code == 200) {
                     sellList.list = rs.data.list;
@@ -286,14 +271,26 @@
             }
         });
     }
-    $("#sellPage").on("click","li", function (ev) {
-        page = ev.target.getAttribute("data-to");
-        loadSell(size, page);
-        $(this).addClass("active");
-        $(this).siblings().removeClass("active");
-    });
 
     $(document).ready(function () {
+        //加载更多
+        layui.use(['laypage', 'layer'], function () {
+            loadList(size,page);
+            layer = layui.layer;
+            laypage = layui.laypage;
+            laypage({
+                cont: 'sellPage'
+                , pages: sellList.count
+                , skin: '#337ab7'
+                , skip: true
+                ,jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        loadList(size, page);
+                    }
+                }
+            });
+        });
         //拼音码自动提示
         $("input[name='pinyinma[]']").each(function () {
             $(this).Kcomplete({
@@ -369,11 +366,11 @@
                 success: function (data) {
                     console.log(data);
                     if (data['code'] == 200) {
-                        var tempStockId = data.result.stock_id;
-                        var tempName = data.result.name;
-                        var tempSpec = data.result.spec;
-                        var tempUnit = data.result.unit;
-                        var tempSellprice = data.result.sellprice;
+                        var tempStockId = data.data.stock_id;
+                        var tempName = data.data.name;
+                        var tempSpec = data.data.spec;
+                        var tempUnit = data.data.unit;
+                        var tempSellprice = data.data.sellprice;
                     } else {
                         var tempName = data.msg;
                         var tempSpec = data.msg;

@@ -11,7 +11,7 @@
       <div class="panel panel-default">
         <div class="panel-heading">功能</div>
         <div class="list-group list-menu">
-          <button type="button" class="list-group-item list-menu active" data-to="0">库存列表</button>
+          <button type="button" class="list-group-item list-menu active" data-to="0" onclick="loadList(size,page)">库存列表</button>
           <!--<button type="button" class="list-group-item list-menu" data-to="1">库存功能</button>-->
         </div>
       </div>
@@ -50,13 +50,6 @@
           </tbody>
         </table>
         <div id="stockPage" class="center">
-          <nav>
-            <ul class="pagination">
-              <li v-for="i in count">
-                <a href="javascript:" :data-to="i">{{ i }}</a>
-              </li>
-            </ul>
-          </nav>
         </div>
       </div>
       <!--<div class="panel panel-default func">-->
@@ -160,6 +153,7 @@
             url: "{:U('Stock/getStockList')}",
             data: {"size": size, "page": page},
             dataType: 'json',
+            async:false,
             success: function (rs) {
                 if (rs.code == 200) {
                     stockList.list = rs.data.list;
@@ -175,13 +169,23 @@
         });
     }
     $(document).ready(function () {
-        loadList(size,page);
         //加载更多
-        $("#stockPage").on("click","li", function (ev) {
-            page = ev.target.getAttribute("data-to");
-            loadList(size, page);
-            $(this).addClass("active");
-            $(this).siblings().removeClass("active");
+        layui.use(['laypage', 'layer'], function () {
+            loadList(size,page);
+            layer = layui.layer;
+            laypage = layui.laypage;
+            laypage({
+                cont: 'stockPage'
+                , pages: stockList.count
+                , skin: '#337ab7'
+                , skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        loadList(size, page);
+                    }
+                }
+            });
         });
         //点击库存列表填充模态框
         $("#stockList").on("click", "tr", function (ev) {

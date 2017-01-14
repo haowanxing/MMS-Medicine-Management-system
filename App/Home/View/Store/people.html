@@ -10,7 +10,8 @@
     <div class="panel panel-default">
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
-        <button type="button" class="list-group-item list-menu active" data-to="0" data-toggle="tooltip" data-placement="right" title="管理员工信息">人员列表</button>
+        <button type="button" class="list-group-item list-menu active" data-to="0" data-toggle="tooltip" data-placement="right" title="管理员工信息" onclick="loadList(size,page)">人员列表
+        </button>
         <button type="button" class="list-group-item list-menu" data-to="1">新增人员</button>
       </div>
     </div>
@@ -20,7 +21,13 @@
       <div class="panel-heading" style="text-align: center">在职职工</div>
       <table class="table table-hover">
         <thead>
-        <tr><th>职工号</th><th>登录名</th><th>姓名</th><th>权限</th><th>最后登录时间</th></tr>
+        <tr>
+          <th>职工号</th>
+          <th>登录名</th>
+          <th>姓名</th>
+          <th>权限</th>
+          <th>最后登录时间</th>
+        </tr>
         </thead>
         <tbody>
         <tr v-for="info in list" data-toggle="modal" data-target="#userModal">
@@ -52,7 +59,7 @@
               <label for="inputName2" class="col-sm-2 control-label">姓名</label>
               <div class="col-sm-10">
                 <input name="realname" type="text" class="form-control" id="inputName2" autocomplete="off">
-                <input name="do" type="hidden" value="addUser" />
+                <input name="do" type="hidden" value="addUser"/>
               </div>
             </div>
             <div class="form-group">
@@ -93,7 +100,8 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="userModalLabel">职工号</h4>
           </div>
           <div class="modal-body">
@@ -101,20 +109,23 @@
               <div class="form-group">
                 <label for="inputName" class="col-sm-2 control-label">姓名</label>
                 <div class="col-sm-10">
-                  <input name="realname" type="text" class="form-control" id="inputName" placeholder="读取错误" autocomplete="off">
+                  <input name="realname" type="text" class="form-control" id="inputName" placeholder="读取错误"
+                         autocomplete="off">
                   <input name="user_id" type="hidden" class="form-control" id="inputUserId">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputUserName" class="col-sm-2 control-label">登录名</label>
                 <div class="col-sm-10">
-                  <input name="username" type="text" class="form-control" id="inputUserName" placeholder="读取错误" autocomplete="off">
+                  <input name="username" type="text" class="form-control" id="inputUserName" placeholder="读取错误"
+                         autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputPassword" class="col-sm-2 control-label">密码</label>
                 <div class="col-sm-10" data-toggle="tooltip" data-placement="top" title="不修改请留空">
-                  <input name="password" type="password" class="form-control" id="inputPassword" placeholder="不修改请留空" autocomplete="off">
+                  <input name="password" type="password" class="form-control" id="inputPassword" placeholder="不修改请留空"
+                         autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
@@ -129,7 +140,9 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button id="delUserBtn" type="button" class="btn btn-danger btn-sm" style="float: left" data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该用户">删除</button>
+            <button id="delUserBtn" type="button" class="btn btn-danger btn-sm" style="float: left"
+                    data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该用户">删除
+            </button>
             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
             <button id="saveChange" type="button" class="btn btn-primary">修改</button>
           </div>
@@ -153,6 +166,7 @@
             url: "{:U('user/getUserList')}",
             data: {"size": size, "page": page},
             dataType: 'json',
+            async: false,
             success: function (rs) {
                 if (rs.code == 200) {
                     userList.list = rs.data.list;
@@ -167,112 +181,122 @@
             }
         });
     }
-  $(document).ready(function () {
-      loadList(size,page);
-    //加载更多
-    $("#userPage").on("click","li", function (ev) {
-        var page2 = ev.target.getAttribute("data-to");
-        if(page2 == page) return 0;else page=page2;
-        loadList(size, page);
-        $(this).addClass("active");
-        $(this).siblings().removeClass("active");
-    });
-    //点击库存列表填充模态框
-    $("#userList").on("click","tr", function (ev) {
-      var tdData = $(this).find("td");
-      $("#userModalLabel").html("员工编号: "+tdData[0].innerHTML);
-      $("#inputUserId").attr("value",tdData[0].innerHTML);
-      $("#inputName").attr("value",tdData[2].innerHTML);
-      $("#inputUserName").attr("value",tdData[1].innerHTML);
-      $("#inputAdmin").find("option[text='"+tdData[3].innerHTML+"']").attr("selected",true);
-    });
-    //响应保存提交事件
-    $("#saveChange").on("click", function (ev) {
-      var Password = $("#inputPassword").val();
-      if(Password != "" && !confirm("您确定要修改密码为:"+Password+"吗?")){
-        return 0;
-      }
-        //提交事件
-        var Form = $("#userForm");
-        $.ajax({
-          url:"{:U('User/doChangeInfo')}",
-          data:Form.serialize(),
-          dataType:"json",
-          type:"POST",
-          success:function(data){
-            console.log(data);
-            if(data['code'] == 200){
-              $("#userModal").modal('toggle');
-              loadList(size,page);
-              Form[0].reset();
-              layer.msg("修改成功!",{icon:1});
-            }else{
-              layer.msg("原因:"+data['msg'],{icon:2});
+    $(document).ready(function () {
+        //加载更多
+        layui.use(['laypage', 'layer'], function () {
+            loadList(size, page);
+            layer = layui.layer;
+            laypage = layui.laypage;
+            laypage({
+                cont: 'userPage'
+                , pages: userList.count
+                , skin: '#337ab7'
+                , skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        loadList(size, page);
+                    }
+                }
+            });
+        });
+        //点击库存列表填充模态框
+        $("#userList").on("click", "tr", function (ev) {
+            var tdData = $(this).find("td");
+            $("#userModalLabel").html("员工编号: " + tdData[0].innerHTML);
+            $("#inputUserId").attr("value", tdData[0].innerHTML);
+            $("#inputName").attr("value", tdData[2].innerHTML);
+            $("#inputUserName").attr("value", tdData[1].innerHTML);
+            $("#inputAdmin").find("option[text='" + tdData[3].innerHTML + "']").attr("selected", true);
+        });
+        //响应保存提交事件
+        $("#saveChange").on("click", function (ev) {
+            var Password = $("#inputPassword").val();
+            if (Password != "" && !confirm("您确定要修改密码为:" + Password + "吗?")) {
+                return 0;
             }
-          },
-          error:function(){
-            layer.msg("提交过程中发生问题! 请联系管理员",{icon:0});
-          },
-            beforeSend: function () {
-                this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
-            },
-            complete: function () {
-                layer.close(this.layerIndex);
-            }
-        })
-    });
-    //响应删除用户
-    $("#delUserBtn").on("click", function () {
-        layer.confirm('确定要删除该用户？', {
-            btn: ['确认','取消'] //按钮
-        }, function(){
+            //提交事件
             var Form = $("#userForm");
             $.ajax({
-                url:"{:U('User/delUser')}",
-                data:"do=delUser&"+Form.serialize(),
-                dataType:"json",
-                type:"POST",
-                success:function(data){
+                url: "{:U('User/doChangeInfo')}",
+                data: Form.serialize(),
+                dataType: "json",
+                type: "POST",
+                success: function (data) {
                     console.log(data);
-                    if(data['code'] == 200){
+                    if (data['code'] == 200) {
                         $("#userModal").modal('toggle');
-                        loadList(size,page);
+                        loadList(size, page);
                         Form[0].reset();
-                        layer.msg("删除了!",{icon:1});
-                    }else{
-                        layer.msg("处理失败了!原因:"+data['msg'],{icon:2});
+                        layer.msg("修改成功!", {icon: 1});
+                    } else {
+                        layer.msg("原因:" + data['msg'], {icon: 2});
                     }
                 },
-                error:function(){
-                    layer.msg("提交过程中发生问题! 请联系管理员",{icon:0});
+                error: function () {
+                    layer.msg("提交过程中发生问题! 请联系管理员", {icon: 0});
+                },
+                beforeSend: function () {
+                    this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                },
+                complete: function () {
+                    layer.close(this.layerIndex);
                 }
             })
-        },function(){});
+        });
+        //响应删除用户
+        $("#delUserBtn").on("click", function () {
+            layer.confirm('确定要删除该用户？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                var Form = $("#userForm");
+                $.ajax({
+                    url: "{:U('User/delUser')}",
+                    data: "do=delUser&" + Form.serialize(),
+                    dataType: "json",
+                    type: "POST",
+                    success: function (data) {
+                        console.log(data);
+                        if (data['code'] == 200) {
+                            $("#userModal").modal('toggle');
+                            loadList(size, page);
+                            Form[0].reset();
+                            layer.msg("删除了!", {icon: 1});
+                        } else {
+                            layer.msg("处理失败了!原因:" + data['msg'], {icon: 2});
+                        }
+                    },
+                    error: function () {
+                        layer.msg("提交过程中发生问题! 请联系管理员", {icon: 0});
+                    }
+                })
+            }, function () {
+            });
+        });
+        //新增用户
+        $("#doAdd").on("click", function () {
+            var Form = $("#addForm");
+            $.ajax({
+                url: "{:U('User/addUser')}",
+                data: "do=addUser&" + Form.serialize(),
+                dataType: "json",
+                type: "POST",
+                success: function (data) {
+                    console.log(data);
+                    if (data['code'] == 200) {
+                        loadList(size, page);
+                        Form[0].reset();
+                        layer.msg("新增成功！", {icon: 1});
+                    } else {
+                        layer.msg(data['msg'], {icon: 2});
+                    }
+                },
+                error: function () {
+                    layer.msg("提交过程中发生问题! 请联系管理员", {icon: 0});
+                }
+            })
+        });
     });
-    //新增用户
-      $("#doAdd").on("click",function(){
-          var Form = $("#addForm");
-          $.ajax({
-              url:"{:U('User/addUser')}",
-              data:"do=addUser&"+Form.serialize(),
-              dataType:"json",
-              type:"POST",
-              success:function(data){
-                  console.log(data);
-                  if(data['code'] == 200){
-                      loadList(size,page);
-                      Form[0].reset();
-                      layer.msg("新增成功！",{icon:1});
-                  }else{
-                      layer.msg(data['msg'],{icon:2});
-                  }
-              },
-              error:function(){
-                  layer.msg("提交过程中发生问题! 请联系管理员",{icon:0});
-              }
-          })
-      });
-  });
 </script>
 </body>
 </html>

@@ -6,8 +6,8 @@ class SellModel extends Model
 {
     public function get_list($condition=array(),$size=null,$page=1){
         $this->join("LEFT JOIN __ORDER__ ON __ORDER__.orderno = __SELL__.orderno");
-        $this->join("__STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id");
-        $this->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
+        $this->join("LEFT JOIN __STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id");
+        $this->join("LEFT JOIN __DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
         $this->join("LEFT JOIN __USERS__ ON __USERS__.id = __ORDER__.sell_by");
         if($size) $this->page($page, $size);
         if(!empty($condition)) $this->where($condition);
@@ -35,6 +35,7 @@ class SellModel extends Model
         $orderNo = createOrderNo();
         $seller = I("session.userId");
         $totalPrice = 0;
+        $data_all = array();
         $this->startTrans();
         foreach($data['stock_id'] as $k => $v){
             if(empty($v))
@@ -48,22 +49,17 @@ class SellModel extends Model
                     $this->error = "'{$data['name'][$k]}'库存不足,剩余:".$stock['stock_amount'];
                     return false;
                 }else{
-                    $stockRes = $Stock->where($stock)->setDec('stock_amount',$data['sell_amount'][$k]);
+                    $stockRes = $Stock->where($stock)->setDec('stock_amount',intval($data['sell_amount'][$k]));
                     if($stockRes){
                         $sData = array(
                                 'stock_id'=>$data['stock_id'][$k],
                                 'price'=>$data['price'][$k],
                                 'sell_amount'=>$data['sell_amount'][$k],
-                                'subtotal'=>$stock['sellprice']*$data['sell_amount'][$k],
+                                'subtotal'=>$stock['sellprice']*intval($data['sell_amount'][$k]),
                                 'orderno'=>$orderNo,
                                 );
-                        if($addRes = $this->data($sData)->add()){ //销售记录成功
-                            $totalPrice += $sData['subtotal'];
-                        }else{
-                            $this->rollback();
-                            $this->error = "记录失败!";
-                            return false;
-                        }
+                        array_push($data_all,$sData);
+                        $totalPrice += $sData['subtotal'];
                     }else{
                         $this->rollback();
                         $this->error = "扣除库存的时候发生错误!";
@@ -75,19 +71,26 @@ class SellModel extends Model
                 return false;
             }
         }
-        $oData = array(
+        if(empty($data_all)){ $this->error = "销售数据为空";$this->rollback();return false;}
+        if($addRes = $this->addAll($data_all)){ //销售记录成功
+            $oData = array(
                 'orderno'=>$orderNo,
                 'buyyer'=>$data['buyyer'],
                 'time'=>time(),
                 'total'=>$totalPrice,
                 'sell_by'=>$seller,
-                );
-        if(M('Order')->data($oData)->add()){
-            $this->commit();
-            return $orderNo;
+            );
+            if(M('Order')->data($oData)->add()){
+                $this->commit();
+                return $orderNo;
+            }else{
+                $this->rollback();
+                $this->error = '记录订单失败,但是已经销售成功';
+                return false;
+            }
         }else{
             $this->rollback();
-            $this->error = '记录订单失败,但是已经销售成功';
+            $this->error = "记录失败!";
             return false;
         }
     }

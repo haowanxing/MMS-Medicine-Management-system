@@ -12,8 +12,8 @@ use Think\Model;
 class StorageModel extends Model{
 
     public function get_list($condition=array(),$size=null,$page=1){
-        $this->join("__DRUGS__ ON __DRUGS__.drug_id = __STORAGE__.drug_id");
-        $this->join("__USERS__ ON __USERS__.id = __STORAGE__.in_by");
+        $this->join("LEFT JOIN __DRUGS__ ON __DRUGS__.drug_id = __STORAGE__.drug_id");
+        $this->join("LEFT JOIN __USERS__ ON __USERS__.id = __STORAGE__.in_by");
         if($size) $this->page($page, $size);
         if(!empty($condition)) $this->where($condition);
         $this->order("storage_id desc");

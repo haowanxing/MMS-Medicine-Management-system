@@ -30,7 +30,7 @@ class BreakageController extends Controller
         if($rs){
             $retMsg = result(200,'ok',$rs);
         }else{
-            $retMsg = result(400,D("Return")->getError());
+            $retMsg = result(400,D("Breakage")->getError());
         }
         $this->ajaxReturn($retMsg,'json');
     }

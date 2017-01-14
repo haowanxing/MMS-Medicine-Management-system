@@ -14,7 +14,7 @@ use Think\Model;
 class StockModel extends Model{
 
     public function get_list(array $condition=array(),$size=null,$page=1){
-        $this->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
+        $this->join("LEFT JOIN __DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
         if($size) $this->page($page, $size);
         if(!empty($condition)) $this->where($condition);
         $this->order("stock_id desc");

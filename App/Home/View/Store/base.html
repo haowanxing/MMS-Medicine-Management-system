@@ -64,13 +64,6 @@
           </tbody>
         </table>
         <div id="drugPage" class="center">
-          <nav>
-            <ul class="pagination">
-              <li v-for="i in count">
-                <a href="javascript:" :data-to="i">{{ i }}</a>
-              </li>
-            </ul>
-          </nav>
         </div>
       </div>
     </div>
@@ -202,33 +195,24 @@
         el: '#drugList',
         data: drugList
     });
-    function loadList(size, page) {
-        $.ajax({
-            type: 'POST',
-            url: "{:U('Drug/getDrugList')}",
-            data: {"size": size, "page": page},
-            dataType: 'json',
-            success: function (rs) {
-                if (rs.code == 200) {
-                    drugList.list = rs.data.list;
-                    drugList.count = Math.ceil(rs.data.count / size);
-                }
-            },
-            beforeSend: function () {
-                this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
-            },
-            complete: function () {
-                layer.close(this.layerIndex);
-            }
-        });
-    }
     $(document).ready(function () {
         //加载更多
-        $("#drugPage").on("click", "li", function (ev) {
-            page = ev.target.getAttribute("data-to");
-            loadList(size, page);
-            $(this).addClass("active");
-            $(this).siblings().removeClass("active");
+        layui.use(['laypage', 'layer'], function () {
+            loadList(size,page);
+            layer = layui.layer;
+            laypage = layui.laypage;
+            laypage({
+                cont: 'drugPage'
+                , pages: drugList.count
+                , skin: '#337ab7'
+                , skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        loadList(size, page);
+                    }
+                }
+            });
         });
         //点击库存列表填充模态框
         $("#drugList").on("click", "tr", function (ev) {
@@ -341,6 +325,28 @@
         });
 
     });
+    function loadList(size, page) {
+        $.ajax({
+            type: 'POST',
+            url: "{:U('Drug/getDrugList')}",
+            data: {"size": size, "page": page},
+            dataType: 'json',
+            async:  false,
+            success: function (rs) {
+                if (rs.code == 200) {
+                    drugList.list = rs.data.list;
+                    drugList.count = Math.ceil(rs.data.count / size);
+                }
+            },
+            beforeSend: function () {
+                this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+            },
+            complete: function () {
+                layer.close(this.layerIndex);
+            }
+        });
+    }
+
 </script>
 </body>
 </html>
