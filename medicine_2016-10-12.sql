@@ -328,6 +328,24 @@ VALUES
 /*!40000 ALTER TABLE `medic_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
+# Dump of table medic_company
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `medic_company`;
+
+CREATE TABLE `medic_company` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `s_id` int(10) unsigned DEFAULT '1' COMMENT '店铺ID',
+  `c_name` varchar(255) NOT NULL DEFAULT '' COMMENT '公司名称',
+  `c_addr` varchar(255) DEFAULT '不祥' COMMENT '公司地址',
+  `c_phone` varchar(15) DEFAULT '0' COMMENT '公司电话',
+  `c_man1` varchar(32) DEFAULT '无' COMMENT '联系人1',
+  `c_manphone1` varchar(15) DEFAULT '0' COMMENT '联系人1电话',
+  `c_man2` varchar(32) DEFAULT '无' COMMENT '联系人2',
+  `c_manphone2` varchar(15) DEFAULT '0' COMMENT '联系人2电话',
+  `c_remark` varchar(255) DEFAULT '无' COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
