@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./Public/Tpl/head.html" title="合作伙伴" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<include file="./Public/Tpl/nav.html"/>
+<div class="container">
+  <div class="col-md-2">
+    <div class="panel panel-default">
+      <div class="panel-heading">功能</div>
+      <div class="list-group list-menu">
+        <button type="button" class="list-group-item list-menu active" data-to="0" data-toggle="tooltip" data-placement="top" title="管理合作厂商信息" onclick="loadList(size,page)">厂商列表
+        </button>
+        <button type="button" class="list-group-item list-menu" data-to="1">新增伙伴</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-10">
+    <div class="panel panel-default func" id="comList">
+      <div class="panel-heading" style="text-align: center">我的合作伙伴</div>
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>编号</th>
+          <th>名称</th>
+          <th>地址</th>
+          <th>电话</th>
+          <th>联系人(1)</th>
+          <th>电话(1)</th>
+          <th>联系人(2)</th>
+          <th>电话(2)</th>
+          <th>备注</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="info in list" data-toggle="modal" data-target="#comModal">
+          <td>{{ info.id }}</td>
+          <td>{{ info.c_name }}</td>
+          <td>{{ info.c_addr }}</td>
+          <td>{{ info.c_phone }}</td>
+          <td>{{ info.c_man1 }}</td>
+          <td>{{ info.c_manphone1 }}</td>
+          <td>{{ info.c_man2 }}</td>
+          <td>{{ info.c_manphone2 }}</td>
+          <td>{{ info.c_remark }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <div id="comPage" class="center">
+        <nav>
+          <ul class="pagination">
+            <li v-for="i in count">
+              <a href="javascript:" :data-to="i">{{ i }}</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <div class="panel panel-default func">
+      <div class="panel-heading" style="text-align: center">添加小伙伴</div>
+      <div class="panel-body">
+        <div class="col-sm-7 col-sm-offset-2">
+          <form id="addForm" class="form-horizontal" method="post">
+            <div class="form-group">
+              <label for="inputName2" class="col-sm-3 control-label">名称</label>
+              <div class="col-sm-8">
+                <input name="c_name" type="text" class="form-control" id="inputName2" autocomplete="off">
+                <input name="do" type="hidden" value="addCom"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputUserName2" class="col-sm-3 control-label">地址</label>
+              <div class="col-sm-8">
+                <input name="c_addr" type="text" class="form-control" id="inputUserName2" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputPhone2" class="col-sm-3 control-label">公司电话</label>
+              <div class="col-sm-8">
+                <input name="c_phone" type="tel" class="form-control" id="inputPhone2" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputMan1" class="col-sm-3 control-label">联系人1</label>
+              <div class="col-sm-8">
+                <input name="c_man1" type="text" class="form-control" id="inputMan1" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputManPhone1" class="col-sm-3 control-label">联系人1电话</label>
+              <div class="col-sm-8">
+                <input name="c_manphone1" type="tel" class="form-control" id="inputManPhone1" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputMan2" class="col-sm-3 control-label">联系人2</label>
+              <div class="col-sm-8">
+                <input name="c_man2" type="text" class="form-control" id="inputMan2" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputManPhone2" class="col-sm-3 control-label">联系人2电话</label>
+              <div class="col-sm-8">
+                <input name="c_manphone2" type="tel" class="form-control" id="inputManPhone2" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputRemark" class="col-sm-3 control-label">备注</label>
+              <div class="col-sm-8">
+                <input name="c_remark" type="text" class="form-control" id="inputRemark" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-4 col-sm-8">
+                <button id="doAdd" type="button" class="btn btn-success submit">提交</button>
+                <button type="reset" class="btn btn-warning">清空输入</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <!-- Modal -->
+    <div class="modal fade" id="comModal" tabindex="-1" role="dialog" aria-labelledby="comModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="comModalLabel">职工号</h4>
+          </div>
+          <div class="modal-body">
+            <form id="comForm" class="form-horizontal">
+              <div class="form-group">
+                <label for="c_name" class="col-sm-3 control-label">名称</label>
+                <div class="col-sm-8">
+                  <input name="c_name" type="text" class="form-control" id="c_name" autocomplete="off">
+                  <input name="id" type="hidden" id="c_id"/>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="c_addr" class="col-sm-3 control-label">地址</label>
+                <div class="col-sm-8">
+                  <input name="c_addr" type="text" class="form-control" id="c_addr" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="c_phone" class="col-sm-3 control-label">公司电话</label>
+                <div class="col-sm-8">
+                  <input name="c_phone" type="tel" class="form-control" id="c_phone" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="c_man1" class="col-sm-3 control-label">联系人1</label>
+                <div class="col-sm-8">
+                  <input name="c_man1" type="text" class="form-control" id="c_man1" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="c_manphone1" class="col-sm-3 control-label">联系人1电话</label>
+                <div class="col-sm-8">
+                  <input name="c_manphone1" type="tel" class="form-control" id="c_manphone1" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="c_man2" class="col-sm-3 control-label">联系人2</label>
+                <div class="col-sm-8">
+                  <input name="c_man2" type="text" class="form-control" id="c_man2" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="c_manphone2" class="col-sm-3 control-label">联系人2电话</label>
+                <div class="col-sm-8">
+                  <input name="c_manphone2" type="tel" class="form-control" id="c_manphone2" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="c_remark" class="col-sm-3 control-label">备注</label>
+                <div class="col-sm-8">
+                  <input name="c_remark" type="text" class="form-control" id="c_remark" autocomplete="off">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button id="delUserBtn" type="button" class="btn btn-danger btn-sm" style="float: left"
+                    data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该小伙伴">删除
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button id="saveChange" type="button" class="btn btn-primary">修改</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<include file="./Public/Tpl/footer.html"/>
+<script>
+    var size = 10;
+    var page = 1;
+    var comList = {list: [], count: 10};
+    var app = new Vue({
+        el: '#comList',
+        data: comList
+    });
+    function loadList(size, page) {
+        $.ajax({
+            type: 'POST',
+            url: "{:U('company/getComList')}",
+            data: {"size": size, "page": page},
+            dataType: 'json',
+            async: false,
+            success: function (rs) {
+                if (rs.code == 200) {
+                    comList.list = rs.data.list;
+                    comList.count = Math.ceil(rs.data.count / size);
+                }
+            },
+            beforeSend: function () {
+                this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+            },
+            complete: function () {
+                layer.close(this.layerIndex);
+            }
+        });
+    }
+    $(document).ready(function () {
+        //加载更多
+        layui.use(['laypage', 'layer'], function () {
+            loadList(size, page);
+            layer = layui.layer;
+            laypage = layui.laypage;
+            laypage({
+                cont: 'comPage'
+                , pages: comList.count
+                , skin: '#337ab7'
+                , skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        loadList(size, page);
+                    }
+                }
+            });
+        });
+        //点击库存列表填充模态框
+        $("#comList").on("click", "tr", function (ev) {
+            var tdData = $(this).find("td");
+            $("#comModalLabel").html("伙伴编号: " + tdData[0].innerHTML);
+            $("#c_id").attr("value", tdData[0].innerHTML);
+            $("#c_name").attr("value", tdData[1].innerHTML);
+            $("#c_addr").attr("value", tdData[2].innerHTML);
+            $("#c_phone").attr("value", tdData[3].innerHTML);
+            $("#c_man1").attr("value", tdData[4].innerHTML);
+            $("#c_manphone1").attr("value", tdData[5].innerHTML);
+            $("#c_man2").attr("value", tdData[6].innerHTML);
+            $("#c_manphone2").attr("value", tdData[7].innerHTML);
+            $("#c_remark").attr("value", tdData[8].innerHTML);
+        });
+        //响应保存提交事件
+        $("#saveChange").on("click", function (ev) {
+            //提交事件
+            var Form = $("#comForm");
+            $.ajax({
+                url: "{:U('Company/doChangeInfo')}",
+                data: Form.serialize(),
+                dataType: "json",
+                type: "POST",
+                success: function (data) {
+                    console.log(data);
+                    if (data['code'] == 200) {
+                        $("#comModal").modal('toggle');
+                        loadList(size, page);
+                        Form[0].reset();
+                        layer.msg("修改成功!", {icon: 1});
+                    } else {
+                        layer.msg("原因:" + data['msg'], {icon: 2});
+                    }
+                },
+                error: function () {
+                    layer.msg("提交过程中发生问题! 请联系管理员", {icon: 0});
+                },
+                beforeSend: function () {
+                    this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                },
+                complete: function () {
+                    layer.close(this.layerIndex);
+                }
+            })
+        });
+        //响应删除用户
+        $("#delUserBtn").on("click", function () {
+            layer.confirm('确定要删除该小伙伴？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                var Form = $("#comForm");
+                $.ajax({
+                    url: "{:U('Company/delCom')}",
+                    data: "do=delCom&" + Form.serialize(),
+                    dataType: "json",
+                    type: "POST",
+                    success: function (data) {
+                        console.log(data);
+                        if (data['code'] == 200) {
+                            $("#comModal").modal('toggle');
+                            loadList(size, page);
+                            Form[0].reset();
+                            layer.msg("成功！", {icon: 1});
+                        } else {
+                            layer.msg(data['msg'], {icon: 2});
+                        }
+                    },
+                    error: function () {
+                        layer.msg("提交过程中发生问题! 请联系管理员", {icon: 0});
+                    }
+                })
+            }, function () {
+            });
+        });
+        //新增用户
+        $("#doAdd").on("click", function () {
+            var Form = $("#addForm");
+            $.ajax({
+                url: "{:U('Company/addCom')}",
+                data: "do=addCom&" + Form.serialize(),
+                dataType: "json",
+                type: "POST",
+                success: function (data) {
+                    console.log(data);
+                    if (data['code'] == 200) {
+                        loadList(size, page);
+                        Form[0].reset();
+                        layer.msg("新增成功！", {icon: 1});
+                    } else {
+                        layer.msg(data['msg'], {icon: 2});
+                    }
+                },
+                error: function () {
+                    layer.msg("提交过程中发生问题! 请联系管理员", {icon: 0});
+                }
+            })
+        });
+    });
+</script>
+</body>
+</html>

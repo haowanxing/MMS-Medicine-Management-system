@@ -86,4 +86,8 @@ class StoreController extends Controller{
         $User->adminCheck();
         $this->display();
     }
+
+    public function com(){
+        $this->display();
+    }
 }

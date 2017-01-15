@@ -282,6 +282,11 @@
             location: "{:U('Drug/nameTips')}",
             dataType: 'json'
         });
+        //公司自动提示
+        $("#inputFactory").Kcomplete({
+            location: "{:U('Company/nameTips')}",
+            dataType: 'json'
+        });
         //拼音码事件
         $("#inputPinyin").bind("keyup change", function () {
             if ($(this).val() == '') return;
