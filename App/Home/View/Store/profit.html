@@ -23,11 +23,11 @@
         <tr><th></th><th>数据</th></tr>
         </thead>
         <tbody id="profitData">
-        <tr><td>进货支出</td><td class="info">-{$profitData.storage}</td></tr>
-        <tr><td>销售收入</td><td class="success">+{$profitData.sell}</td></tr>
-        <tr><td>退货支出</td><td class="info">-{$profitData.return}</td></tr>
-        <tr><td>报损支出</td><td class="info">-{$profitData.breakage}</td></tr>
-        <tr><td>合计</td><td class="warning">{$profitData.heji}</td></tr>
+        <tr><td>进货支出</td><td class="info">-{$profitData.storage|default=0}</td></tr>
+        <tr><td>销售收入</td><td class="success">+{$profitData.sell|default=0}</td></tr>
+        <tr><td>退货支出</td><td class="info">-{$profitData.return|default=0}</td></tr>
+        <tr><td>报损支出</td><td class="info">-{$profitData.breakage|default=0}</td></tr>
+        <tr><td>合计</td><td class="warning">{$profitData.heji|default=0}</td></tr>
         </tbody>
       </table>
     </div>

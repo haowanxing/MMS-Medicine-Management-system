@@ -163,7 +163,7 @@
     function loadList(size, page) {
         $.ajax({
             type: 'POST',
-            url: "{:U('user/getUserList')}",
+            url: "{:U('Business/getUserList')}",
             data: {"size": size, "page": page},
             dataType: 'json',
             async: false,
@@ -218,7 +218,7 @@
             //提交事件
             var Form = $("#userForm");
             $.ajax({
-                url: "{:U('User/doChangeInfo')}",
+                url: "{:U('Business/doChangeInfo')}",
                 data: Form.serialize(),
                 dataType: "json",
                 type: "POST",
@@ -251,7 +251,7 @@
             }, function () {
                 var Form = $("#userForm");
                 $.ajax({
-                    url: "{:U('User/delUser')}",
+                    url: "{:U('Business/delUser')}",
                     data: "do=delUser&" + Form.serialize(),
                     dataType: "json",
                     type: "POST",
@@ -277,7 +277,7 @@
         $("#doAdd").on("click", function () {
             var Form = $("#addForm");
             $.ajax({
-                url: "{:U('User/addUser')}",
+                url: "{:U('Business/addUser')}",
                 data: "do=addUser&" + Form.serialize(),
                 dataType: "json",
                 type: "POST",

@@ -17,9 +17,13 @@ class ReturnModel extends Model{
         $this->join("LEFT JOIN __SELL__ ON __SELL__.sell_id = __RETURN__.sell_id");
         $this->join("LEFT JOIN __STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id");
         $this->join("LEFT JOIN __DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
-        $this->join("LEFT JOIN __USERS__ ON __USERS__.id = __RETURN__.return_by");
+        $this->join("LEFT JOIN __BUSINESS__ ON __BUSINESS__.id = __RETURN__.return_by");
         if($size) $this->page($page, $size);
-        if(!empty($condition)) $this->where($condition);
+        if(!empty($condition)){
+            $where=array();
+            array_walk($condition,function($v,$k) use (&$where){$where[$this->getTableName().'.'.$k] = $v;});
+            $this->where($where);
+        }
         $this->order("ret_id desc");
         $rs = $this->select();
         array_walk($rs,function(&$i){
@@ -29,6 +33,7 @@ class ReturnModel extends Model{
     }
 
     public function doReturn($data){
+        $shop_id = $data['shop_id'];
         $sell_id = $data['sell_id'];
         $ret_amount = $data['ret_amount'];
         $ret_price = $data['totalprice'];
@@ -36,7 +41,7 @@ class ReturnModel extends Model{
             $this->startTrans();
             $dbSell = M("Sell");
             $dbStock = M("Stock");
-            $sellData = array("sell_id"=>$sell_id);
+            $sellData = array("sell_id"=>$sell_id,'shop_id'=>$shop_id);
             $findRes = $dbSell->where($sellData)->find();
             if($findRes){
                 if($findRes['sell_status'] == 0 && $findRes['sell_amount'] >= $data['ret_amount']){

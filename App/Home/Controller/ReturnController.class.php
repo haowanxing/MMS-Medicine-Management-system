@@ -5,9 +5,11 @@ use Think\Controller;
 
 class ReturnController extends Controller
 {
+    private $shopData = array();
     public function _initialize()
     {
-        A("User")->loginCheck();
+        A("Business")->loginCheck();
+        $this->shopData = ['shop_id'=>session("business.shop_id")];
     }
     public function index()
     {
@@ -15,6 +17,7 @@ class ReturnController extends Controller
     }
     public function getRetList(){
         $data = array();
+        $data = array_merge($data,$this->shopData);
         $page = I("post.page",1);
         $size = I("post.size",15);
         $Return = D("Return");
@@ -25,7 +28,8 @@ class ReturnController extends Controller
     }
     public function doAdd(){
         $data = I("post.");
-        $data['return_by'] = I("session.userId");
+        $data['return_by'] = session('business.bid');
+        $data = array_merge($data,$this->shopData);
         $rs = D("Return")->doReturn($data);
         if($rs){
             $retMsg = result(200,'ok',$rs);

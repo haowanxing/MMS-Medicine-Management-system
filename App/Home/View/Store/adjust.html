@@ -87,7 +87,7 @@
     function loadList(size, page) {
         $.ajax({
             type: 'POST',
-            url: "{:U('Index/getAdjustList')}",
+            url: "{:U('Adjust/getAdjustList')}",
             data: {"size": size, "page": page},
             dataType: 'json',
             async: false,

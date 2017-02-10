@@ -253,7 +253,7 @@
     function loadList(size, page) {
         $.ajax({
             type: 'POST',
-            url: "{:U('Index/getSellList')}",
+            url: "{:U('Sell/getSellList')}",
             data: {"do": "loadmore", "size": size, "page": page},
             dataType: 'json',
             async:false,

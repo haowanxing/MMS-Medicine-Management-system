@@ -5,9 +5,11 @@ use Think\Controller;
 
 class StockController extends Controller
 {
+    private $shopData = array();
     public function _initialize()
     {
-        A("User")->loginCheck();
+        A("Business")->loginCheck();
+        $this->shopData = ['shop_id'=>session("business.shop_id")];
     }
     public function index()
     {
@@ -21,10 +23,11 @@ class StockController extends Controller
      */
     public function getStockList(){
         $data = array();
+        $data = array_merge($data,$this->shopData);
         $page = I("post.page",1);
         $size = I("post.size",15);
         $rs = D("Stock")->get_list($data,$size,$page);
-        $count = D("Stock")->count();
+        $count = D("Stock")->where($this->shopData)->count();
         $ret = result(200,'ok',array("list"=>$rs,"count"=>intval($count)));
         $this->ajaxReturn($ret,'json');
     }
@@ -48,7 +51,9 @@ class StockController extends Controller
     public function doChangePrice(){
         $stock_id = I("post.stock_id");
         $newPrice = I("post.newprice");
-        $rs = D("Stock")->changePrice($stock_id,$newPrice,I("session.user.Id"));
+        $where['stock_id'] = $stock_id;
+        $where = array_merge($where,$this->shopData);
+        $rs = D("Stock")->changePrice($where,$newPrice,session("business.bid"));
         if($rs){
             $retMsg = result(200,'ok',$rs);
         }else{

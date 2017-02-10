@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./Public/Tpl/head.html" title="登录系统" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<include file="./Public/Tpl/nav.html"/>
+<div class="container">
+  <div class="row">
+    <div class="col-md-offset-4 col-md-4">
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 style="text-align: center">登录系统</h3></div>
+        <div class="panel-body">
+          <form method="POST" action="{$actionUrl}">
+            <input type="hidden" name="shop_id" value="{$shop_id}">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="shopList">商户:</label>
+                <select name="shop_id" id="shopList" class="form-control">
+                  <option value="0">请选择...</option>
+                  <option v-for="info in shops" v-bind:value="info.shop_id">
+                    {{info.storename}}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="user">用户名:</label>
+                <input name="username" id="user" class="form-control" type="text" placeholder="请输入您的用户名"/><br>
+              </div>
+              <div class="form-group">
+                <label for="pwd">密码:</label>
+                <input name="password" id="pwd" class="form-control" type="password" placeholder="请输入您的密码"/>
+              </div>
+            </div>
+            <div class="col-md-offset-8 col-md-4">
+              <button type="submit" class="btn btn-success">提交</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<include file="./Public/Tpl/footer.html"/>
+<script>
+    var shopList = {shops: {:json_encode($shops)},selected:0};
+    var app = new Vue({
+        el: '#shopList',
+        data: shopList
+    });
+    var shop_history = {$shop_id?$shop_id:0};
+    $(document).ready(function(){
+        if(shop_history!=0){
+            $("#shopList").find("option[value="+shop_history+"]").attr("selected",true);
+        }
+    });
+</script>
+</body>
+</html>

@@ -47,19 +47,19 @@
           <div class="col-sm-12">
             <h4 class="text-primary">销售相关:</h4>
             <div class="col-sm-3 text-success">
-              销售额: {$sell.sell_money}元
+              销售额: {$sell.sell_money|default=0}元
             </div>
             <div class="col-sm-3 text-info">
-              总销售: {$sell.total}件
+              总销售: {$sell.total|default=0}件
             </div>
             <div class="col-sm-3 text-warning">
-              退货: {$sell.return}件
+              退货: {$sell.return|default=0}件
             </div>
             <div class="col-sm-3 text-danger">
-              总退款: {$sell.ret_money}元
+              总退款: {$sell.ret_money|default=0}元
             </div>
             <div class="col-sm-3 text-warning">
-              实际销售额: {$sell.real_money}元
+              实际销售额: {$sell.real_money|default=0}元
             </div>
           </div>
         </div>

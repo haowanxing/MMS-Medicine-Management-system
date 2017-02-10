@@ -241,7 +241,6 @@
                         console.log(data);
                         if (data['code'] == 200) {
                             $("#drugModal").modal('toggle');
-                            loadMore("#drugList", "{:U('Index/getDrugList')}", NOW_PAGE);
                             Form[0].reset();
                             layer.msg("修改成功!",{icon: 1});
                         } else {
@@ -274,14 +273,10 @@
                     data: Form.serialize(),
                     datatype: "json",
                     type: "POST",
-                    beforeSend: function () {
-
-                    },
                     success: function (data) {
                         console.log(data);
                         if (data['code'] == 200) {
                             $("#addModal").modal('toggle');
-                            loadMore("#drugList", "{:U('Index/getDrugList')}", NOW_PAGE);
                             Form[0].reset();
                             layer.msg("添加成功!",{icon: 1});
                         } else {
@@ -290,11 +285,18 @@
                     },
                     error: function () {
                         layer.msg("提交过程中发生问题! 请联系管理员",{icon: 3});
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(0, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                        loadList(size,page);
                     }
                 })
             }
         });
-        //响应删除用户
+        //响应删除
         $("#delDrugBtn").on("click", function () {
             layer.confirm('确定要删除该药品？', {
                 btn: ['确认','取消'] //按钮
@@ -309,16 +311,21 @@
                         console.log(data);
                         if (data['code'] == 200) {
                             $("#drugModal").modal('toggle');
-                            loadMore("#drugList", "{:U('Index/getDrugList')}", NOW_PAGE);
                             Form[0].reset();
                             layer.msg("删除了!",{icon: 1});
-                            loadList(size,page);
                         } else {
                             layer.msg("处理失败了!原因:" + data['msg'],{icon: 2});
                         }
                     },
                     error: function () {
                         layer.msg("提交过程中发生问题! 请联系管理员",{icon: 3});
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(0, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                        loadList(size,page);
                     }
                 })
             }, function(){});

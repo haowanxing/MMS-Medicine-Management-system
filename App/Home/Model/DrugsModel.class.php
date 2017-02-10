@@ -29,8 +29,7 @@ class DrugsModel extends Model{
     public function edit($drug_id,$data){
         $data['pinyinma'] = strtoupper($data['pinyinma']);
         if(!empty($drug_id) && $drug_id != 0){
-            $data['drug_id'] = $drug_id;
-            $saveRes = $this->data($data)->save();
+            $saveRes = $this->where(['drug_id'=>$drug_id])->data($data)->save();
             if($saveRes){
                 return $saveRes;
             }else{

@@ -5,9 +5,11 @@ use Think\Controller;
 
 class CompanyController extends Controller{
 
-    private $s_id;
+    private $shopData;
 
     public function _initialize(){
+        A("Business")->loginCheck();
+        $this->shopData = ['shop_id'=>session("business.shop_id")];
         $this->s_id = I("session.userId");
     }
 
@@ -33,11 +35,11 @@ class CompanyController extends Controller{
     }
 
     public function getComList(){
-        $data = array('s_id'=>$this->s_id);
+        $data = array();
         $page = I("post.page",1);
         $size = I("post.size",15);
-        $list = D("Company")->get_list($data,$size,$page);
-        $count = D("Company")->count();
+        $list = D("Company")->where($this->shopData)->get_list($data,$size,$page);
+        $count = D("Company")->where($this->shopData)->count();
         $ret = result(200,'ok',array('list'=>$list,'count'=>intval($count)));
         $this->ajaxReturn($ret,'json');
     }
@@ -45,7 +47,7 @@ class CompanyController extends Controller{
     public function addCom(){
         if (I("post.do") == "addCom") {
             $info = I("post.");
-            $info['s_id'] = $this->s_id;
+            $info = array_merge($info,$this->shopData);
             $rs = D("Company")->doAdd($info);
             if($rs){
                 $retMsg = result(200,'ok',$rs);
@@ -61,7 +63,7 @@ class CompanyController extends Controller{
     public function delCom(){
         if (I("post.do") == "delCom") {
             $data['id'] = I("post.id");
-            $data['s_id'] = $this->s_id;
+            $data = array_merge($data,$this->shopData);
             $rs = D("Company")->doDel($data);
             if($rs){
                 $retMsg = result(200,'ok',$rs);
@@ -76,9 +78,10 @@ class CompanyController extends Controller{
 
     public function doChangeInfo(){
         $data = I("post.");
-        $data['s_id'] = $this->s_id;
-        $id = $data['id'];
-        $rs = D("Company")->edit($id,$data);
+        $data = array_merge($data,$this->shopData);
+        $where['id'] = $data['id'];
+        $where = array_merge($where,$this->shopData);
+        $rs = D("Company")->edit($where,$data);
         if($rs){
             $retMsg = result(200,'ok',$rs);
         }else{

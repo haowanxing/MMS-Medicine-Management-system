@@ -16,7 +16,11 @@ class StockModel extends Model{
     public function get_list(array $condition=array(),$size=null,$page=1){
         $this->join("LEFT JOIN __DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
         if($size) $this->page($page, $size);
-        if(!empty($condition)) $this->where($condition);
+        if(!empty($condition)){
+            $where=array();
+            array_walk($condition,function($v,$k) use (&$where){$where[$this->getTableName().'.'.$k] = $v;});
+            $this->where($where);
+        }
         $this->order("stock_id desc");
         $rs = $this->select();
         array_walk($rs,function(&$i){
@@ -27,13 +31,15 @@ class StockModel extends Model{
         return $rs;
     }
 
-    public function changePrice($stock_id,$newPrice,$operator=1){
+    public function changePrice($where=array(),$newPrice,$operator=1){
+        $stock_id = $where['stock_id'];
+        $shop_id = $where['shop_id'];
         if(!empty($newPrice) && $stock_id > 0){
-            $newData['stock_id'] = $stock_id;
-            $findRes = $this->where($newData)->find();
+            $findRes = $this->where($where)->find();
             if($findRes){
                 $this->startTrans();
                 $newData['sellprice'] = $newPrice;
+                $newData = array_merge($newData,$where);
                 $saveRes = $this->data($newData)->save();
                 if($saveRes){
                     $dbAdjust = M("Adjust");
@@ -42,6 +48,7 @@ class StockModel extends Model{
                     $adjustData['newprice'] = $newPrice;
                     $adjustData['time'] = time();
                     $adjustData['adjust_by'] = $operator;
+                    $adjustData['shop_id'] = $shop_id;
                     $addRes = $dbAdjust->data($adjustData)->add();
                     if($addRes){
                         $this->commit();

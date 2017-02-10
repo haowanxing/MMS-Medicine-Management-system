@@ -8,9 +8,13 @@ class SellModel extends Model
         $this->join("LEFT JOIN __ORDER__ ON __ORDER__.orderno = __SELL__.orderno");
         $this->join("LEFT JOIN __STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id");
         $this->join("LEFT JOIN __DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
-        $this->join("LEFT JOIN __USERS__ ON __USERS__.id = __ORDER__.sell_by");
+        $this->join("LEFT JOIN __BUSINESS__ ON __BUSINESS__.id = __ORDER__.sell_by");
         if($size) $this->page($page, $size);
-        if(!empty($condition)) $this->where($condition);
+        if(!empty($condition)){
+            $where=array();
+            array_walk($condition,function($v,$k) use (&$where){$where[$this->getTableName().'.'.$k] = $v;});
+            $this->where($where);
+        }
         $this->order("sell_id DESC");
         $rs = $this->select();
         array_walk($rs,function(&$i){
@@ -24,23 +28,37 @@ class SellModel extends Model
         $this->join("LEFT JOIN __ORDER__ ON __ORDER__.orderno = __SELL__.orderno");
         $this->join("__STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id");
         $this->join("__DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
-        $this->join("__USERS__ ON __USERS__.id = __ORDER__.sell_by");
+        $this->join("__BUSINESS__ ON __BUSINESS__.id = __ORDER__.sell_by");
         $this->where($data);
+        $rs = $this->find();
+        return $rs;
+    }
+    public function getInfo($condition=array()){
+        $this->join("LEFT JOIN __ORDER__ ON __ORDER__.orderno = __SELL__.orderno");
+        $this->join("LEFT JOIN __STOCK__ ON __STOCK__.stock_id = __SELL__.stock_id");
+        $this->join("LEFT JOIN __DRUGS__ ON __DRUGS__.drug_id = __STOCK__.drug_id");
+        $this->join("LEFT JOIN __BUSINESS__ ON __BUSINESS__.id = __ORDER__.sell_by");
+        if(!empty($condition)){
+            $where=array();
+            array_walk($condition,function($v,$k) use (&$where){$where[$this->getTableName().'.'.$k] = $v;});
+            $this->where($where);
+        }
         $rs = $this->find();
         return $rs;
     }
 
     public function sell($data = array()){
+        $shop_id = $data['shop_id'];
         $Stock = M('Stock');
         $orderNo = createOrderNo();
-        $seller = I("session.userId");
+        $seller = session('business.bid');
         $totalPrice = 0;
         $data_all = array();
         $this->startTrans();
         foreach($data['stock_id'] as $k => $v){
             if(empty($v))
                 continue;
-            if($stock = $Stock->where('stock_id='.$v)->find()){
+            if($stock = $Stock->where(array('stock_id'=>$v,'shop_id'=>$data['shop_id']))->find()){
                 if($data['sell_amount'][$k] < 1){
                     $this->error = "输入的'{$data['name'][$k]}'的数量有误";
                     return false;
@@ -57,6 +75,7 @@ class SellModel extends Model
                                 'sell_amount'=>$data['sell_amount'][$k],
                                 'subtotal'=>$stock['sellprice']*intval($data['sell_amount'][$k]),
                                 'orderno'=>$orderNo,
+                                'shop_id'=>$shop_id,
                                 );
                         array_push($data_all,$sData);
                         $totalPrice += $sData['subtotal'];
@@ -79,6 +98,7 @@ class SellModel extends Model
                 'time'=>time(),
                 'total'=>$totalPrice,
                 'sell_by'=>$seller,
+                'shop_id'=>$shop_id,
             );
             if(M('Order')->data($oData)->add()){
                 $this->commit();

@@ -5,8 +5,11 @@ use Think\Controller;
 
 class StorageController extends Controller{
 
-    public function _initialize(){
-        A("User")->loginCheck();
+    private $shopData = array();
+    public function _initialize()
+    {
+        A("Business")->loginCheck();
+        $this->shopData = ['shop_id'=>session("business.shop_id")];
     }
 
     public function index(){
@@ -16,11 +19,12 @@ class StorageController extends Controller{
 
     public function getStorageRecord(){
         $data = array();
+        $data = array_merge($data,$this->shopData);
         $page = I("post.page",1);
         $size = I("post.size",15);
         $Storage = D("Storage");
         $list = $Storage->get_list($data,$size,$page);
-        $count = $Storage->count();
+        $count = $Storage->where($this->shopData)->count();
         $retMsg = result(200,'ok',array('list'=>$list,'count'=>intval($count)));
         $this->ajaxReturn($retMsg,'json');
     }
@@ -31,7 +35,8 @@ class StorageController extends Controller{
         $data['in_time'] = strtotime($data['in_time']);
         $data['producedate'] = strtotime($data['producedate']);
         $data['usefuldate'] = strtotime($data['usefuldate']);
-        $data['in_by'] = I("session.userId");
+        $data['in_by'] = session('business.bid');
+        $data = array_merge($data,$this->shopData);
         $rs = D("Storage")->storage($piYin,$data);
         if($rs){
             $retMsg = result(200,'ok',$rs);

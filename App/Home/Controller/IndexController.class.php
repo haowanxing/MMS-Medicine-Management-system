@@ -7,14 +7,14 @@ class IndexController extends Controller
 {
     public function index()
     {
-        $User = A('User');
+        $User = A("Business");
         if(!$User->checkLogin()){
-            $this->redirect("User/login");
+            $this->redirect("Business/login");
         }else{
             $this->redirect("Store/index");
         }
     }
-    public function getSellList(){
+    /*public function getSellList(){
         $data = array();
         $page = I("post.page",1);
         $size = I("post.size",15);
@@ -23,8 +23,8 @@ class IndexController extends Controller
         $count = $Sell->count();
         $ret = result(200,'ok',array("list"=>$rs,"count"=>intval($count)));
         $this->ajaxReturn($ret,'json');
-    }
-    public function getAdjustList(){
+    }*/
+    /*public function getAdjustList(){
         $data = array();
         $page = I("post.page",1);
         $size = I("post.size",15);
@@ -33,6 +33,6 @@ class IndexController extends Controller
         $count = $Adjust->count();
         $ret = result(200,'ok',array('list'=>$list,'count'=>intval($count)));
         $this->ajaxReturn($ret,'json');
-    }
+    }*/
 
 }

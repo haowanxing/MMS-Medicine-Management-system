@@ -5,10 +5,11 @@ use Think\Controller;
 
 class DrugController extends Controller
 {
-
+    private $shopData = array();
     public function _initialize()
     {
-        A("User")->loginCheck();
+        A("Business")->loginCheck();
+        $this->shopData = ['shop_id'=>session("business.shop_id")];
     }
     public function index()
     {
@@ -18,8 +19,8 @@ class DrugController extends Controller
         $data = array();
         $page = I("post.page",1);
         $size = I("post.size",15);
-        $list = D("Drugs")->get_list($data,$size,$page);
-        $count = D("Drugs")->count();
+        $list = D("Drugs")->where($this->shopData)->get_list($data,$size,$page);
+        $count = D("Drugs")->where($this->shopData)->count();
         $ret = result(200,'ok',array('list'=>$list,'count'=>intval($count)));
         $this->ajaxReturn($ret,'json');
     }
@@ -47,6 +48,7 @@ class DrugController extends Controller
             $data['spec'] = I("post.spec");
             $data['unit'] = I("post.unit");
             $data['lowwarning'] = I("post.lowwarning");
+            $data['shop_id'] = $this->shopData['shop_id'];
             $rs = D("Drugs")->doAdd($data);
             if($rs){
                 $retMsg = result(200,'ok',$rs);
@@ -60,7 +62,7 @@ class DrugController extends Controller
     }
     public function delDrug()
     {
-        if (A("User")->checkAdmin() === true) {
+        if (A("User")->checkAdmin() === true || A("Business")->checkAdmin() === true) {
             if (I("post.do") == "delDrug") {
                 $drug_id = I("post.drug_id");
                 $rs = D("Drugs")->doDel($drug_id);
@@ -80,7 +82,7 @@ class DrugController extends Controller
     public function getInfo(){
         if(!empty(I("get.pinyinma"))){
             $pinyin = I("get.pinyinma");
-            $rs = D("Drugs")->getByPinYin($pinyin);
+            $rs = D("Drugs")->where($this->shopData)->getByPinYin($pinyin);
             if($rs){
                 $retMsg = result(200,'ok',$rs);
             }else{
@@ -94,7 +96,7 @@ class DrugController extends Controller
     public function nameTips(){
         if(!empty(I("get.input"))){
             $data['pinyinma'] = array("like","%".I("get.input")."%");
-            $result = M("Drugs")->where($data)->select();
+            $result = D("Drugs")->where($this->shopData)->where($data)->select();
             $ret = array();
             if($result){
                 foreach($result as $k=>$v){

@@ -13,9 +13,12 @@ class StorageModel extends Model{
 
     public function get_list($condition=array(),$size=null,$page=1){
         $this->join("LEFT JOIN __DRUGS__ ON __DRUGS__.drug_id = __STORAGE__.drug_id");
-        $this->join("LEFT JOIN __USERS__ ON __USERS__.id = __STORAGE__.in_by");
+        $this->join("LEFT JOIN __BUSINESS__ ON __BUSINESS__.id = __STORAGE__.in_by");
         if($size) $this->page($page, $size);
-        if(!empty($condition)) $this->where($condition);
+        if(!empty($condition)){
+            array_walk($condition,function($v,$k) use (&$condition){$condition[$this->trueTableName.'.'.$k] = $v;unset($condition[$k]);});
+            $this->where($condition);
+        }
         $this->order("storage_id desc");
         $rs = $this->select();
         array_walk($rs,function(&$i){
@@ -30,7 +33,7 @@ class StorageModel extends Model{
         $piYin = $pinyin;
         $dbDrugs = M("Drugs");
         $this->startTrans();
-        $drug = $dbDrugs->where(array("pinyinma" => $piYin))->find();
+        $drug = $dbDrugs->where(array("pinyinma" => $piYin,"shop_id"=>$data['shop_id']))->find();
         if ($drug){
             //写入库记录单
             $storage_data = $data;
@@ -40,7 +43,7 @@ class StorageModel extends Model{
                 //写库存 首先找是否存在已经入库的,否则新增
 
                 $Stock = M("Stock");
-                if ($stock = $Stock->where('drug_id='.$drug['drug_id'])->find()){
+                if ($stock = $Stock->where(array('drug_id'=>$drug['drug_id'],'shop_id'=>$data['shop_id']))->find()){
                     $stockRes = $Stock->where($stock)->setInc('stock_amount', $data['storage_amount']);
                 }else{
                     $stock_Data = array('drug_id'      => $drug['drug_id'],
@@ -52,6 +55,7 @@ class StorageModel extends Model{
                                         'in_time'    => $data['in_time'],
                                         'producedate'    => $data["producedate"],
                                         'usefuldate'    => $data['usefuldate'],
+                                        'shop_id'       => $data['shop_id'],
                     );
                     $stockRes = M('Stock')->add($stock_Data);
 //                    $stockRes = $Stock->setDrugId($drug['drug_id'])->setFactory($this->factory)->setAmount($this->amount)->setPizhunwenhao($this->pizhunwenhao)->setPihao($this->pihao)->setSellprice($this->inprice)->setInTime($this->in_time)->setProducedate($this->producedate)->setUsefuldate($this->usefuldate)->add();

@@ -1,0 +1,15 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+.gitignore
+.idea/
+.phpstorm.meta.php
+App/Runtime/
+ThinkPHP/Library/Think/Verify/zhttfs/
+/App/Common/Conf/config.php

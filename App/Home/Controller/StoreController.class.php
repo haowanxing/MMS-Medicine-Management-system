@@ -5,27 +5,30 @@ use Think\Controller;
 
 class StoreController extends Controller{
 
+    private $shopData = array();
     public function _initialize()
     {
-        A("User")->loginCheck();
+        A("Business")->loginCheck();
+        $this->shopData = ['shop_id'=>session("business.shop_id")];
     }
 
     public function index()
     {
         $Model = new \Think\Model();
         //药店相关
-        $dbUser = M("Users");
-        $User['total'] = $dbUser->count();
-        $User['admin'] = $dbUser->where("admin=1")->count();
-        $User['recent'] = $dbUser->where("lasttime>=".(time()-3600))->count();
+        $dbUser = M("Business");
+        $User['total'] = $dbUser->where($this->shopData)->count();
+        $User['admin'] = $dbUser->where($this->shopData)->where(['admin'=>1])->count();
+        $User['recent'] = $dbUser->where($this->shopData)->where("lasttime>=".(time()-3600))->count();
         $this->assign("user",$User);
         //药品相关
         $dbDrug = M("Drugs");
         $dbStock = M("Stock");
-        $Drug['total'] = $dbDrug->count();//药品种类数量
-        $Drug['stock'] = $dbStock->count("DISTINCT drug_id");//库存中药品种类数量
-        $Drug['out_stock'] = $Model->query("SELECT * FROM __DRUGS__ WHERE drug_id NOT IN (SELECT DISTINCT drug_id FROM __STOCK__)");
-        $Drug['warning'] = $dbDrug->alias("drug")->join("RIGHT JOIN __STOCK__ stock ON stock.drug_id = drug.drug_id")->group("stock.drug_id")->field("sum(stock.stock_amount) sum_amount,stock.*,drug.*")->select();
+        $Drug['total'] = $dbDrug->where($this->shopData)->count();//药品种类数量
+        $Drug['stock'] = $dbStock->where($this->shopData)->count("DISTINCT drug_id");//库存中药品种类数量
+        $subSql = $dbStock->field("DISTINCT drug_id")->where($this->shopData)->buildSql();
+        $Drug['out_stock'] = $dbDrug->where("drug_id not in {$subSql}")->where($this->shopData)->select();
+        $Drug['warning'] = $dbDrug->alias("drug")->join("RIGHT JOIN __STOCK__ stock ON stock.drug_id = drug.drug_id AND stock.shop_id = drug.shop_id")->group("stock.drug_id")->field("sum(stock.stock_amount) sum_amount,stock.*,drug.*")->where(array('drug.shop_id'=>$this->shopData['shop_id']))->select();
         foreach($Drug['warning'] as $key=>$value){
             if($value['sum_amount'] > $value['lowwarning']){
                 unset($Drug['warning'][$key]);
@@ -35,10 +38,10 @@ class StoreController extends Controller{
         //销售相关
         $dbSell = M("Sell");
         $dbRet = M("Return");
-        $Sell['total'] = $dbSell->sum("sell_amount");//销售数量
-        $Sell['return'] = $dbRet->sum("ret_amount");//退货数量
-        $Sell['sell_money'] = $dbSell->sum("subtotal");
-        $Sell['ret_money'] = $dbRet->sum("totalprice");
+        $Sell['total'] = $dbSell->where($this->shopData)->sum("sell_amount");//销售数量
+        $Sell['return'] = $dbRet->where($this->shopData)->sum("ret_amount");//退货数量
+        $Sell['sell_money'] = $dbSell->where($this->shopData)->sum("subtotal");
+        $Sell['ret_money'] = $dbRet->where($this->shopData)->sum("totalprice");
         $Sell['real_money'] = $Sell['sell_money']-$Sell['ret_money'];
         $this->assign("sell",$Sell);
         $this->display();
@@ -68,21 +71,21 @@ class StoreController extends Controller{
         $this->display();
     }
     public function profit(){
-        $profitData['storage'] = M("Storage")->sum("allprice");
-        $profitData['sell'] = M("Sell")->sum("subtotal");
-        $profitData['return'] = M("Return")->sum("totalprice");
-        $profitData['breakage'] = M("Breakage")->sum("allprice");
+        $profitData['storage'] = M("Storage")->where($this->shopData)->sum("allprice");
+        $profitData['sell'] = M("Sell")->where($this->shopData)->sum("subtotal");
+        $profitData['return'] = M("Return")->where($this->shopData)->sum("totalprice");
+        $profitData['breakage'] = M("Breakage")->where($this->shopData)->sum("allprice");
         $profitData['heji'] = number_format(($profitData['sell']-$profitData['storage']-$profitData['return']-$profitData['breakage']),2);
         $this->assign("profitData",$profitData);
         $this->display();
     }
     public function base(){
-        A("User")->adminCheck();
-        $this->assign("store",M("Store")->find());
+        A("Business")->adminCheck();
+        $this->assign("store",D("Shop")->find());
         $this->display();
     }
     public function people(){
-        $User = A("User");
+        $User = A("Business");
         $User->adminCheck();
         $this->display();
     }
