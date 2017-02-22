@@ -108,4 +108,34 @@ class DrugController extends Controller
 //            $this->ajaxReturn(array('value'=>"1","data"=>"one"));
         }
     }
+
+    public function getDicInfo(){
+        if(!empty(I("get.input_code"))){
+            $pinyin = I("get.input_code");
+            $rs = D("DrugDic")->getByPinYin($pinyin);
+            if($rs){
+                $retMsg = result(200,'ok',$rs);
+            }else{
+                $retMsg = result(400,'信息库无'.$pinyin,$rs);
+            }
+        }else{
+            $retMsg = result(300,'缺少pinyinma');
+        }
+        $this->ajaxReturn($retMsg,'json');
+    }
+    public function dicNameTips(){
+        if(!empty(I("get.input"))){
+            $data['input_code'] = array("like","%".I("get.input")."%");
+            $result = D("DrugDic")->where($data)->select();
+            $ret = array();
+            if($result){
+                foreach($result as $k=>$v){
+                    $ret[] = array("id"=>$k,"value"=>$v["input_code"]);
+                }
+            }
+            $this->ajaxReturn($ret,'json');
+        }else{
+//            $this->ajaxReturn(array('value'=>"1","data"=>"one"));
+        }
+    }
 }

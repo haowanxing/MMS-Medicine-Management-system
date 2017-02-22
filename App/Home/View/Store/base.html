@@ -141,17 +141,17 @@
             <form id="addForm" class="form-horizontal">
               <input name="do" type="hidden" value="doAdd"/>
               <div class="form-group">
-                <label for="addName" class="col-sm-2 control-label">名称</label>
-                <div class="col-sm-10">
-                  <input name="name" type="text" class="form-control" id="addName" autocomplete="off"
-                         data-toggle="tooltip" data-placement="top" title="请输入药品通用名称">
-                </div>
-              </div>
-              <div class="form-group">
                 <label for="addPinYinMa" class="col-sm-2 control-label">拼音码</label>
                 <div class="col-sm-10">
                   <input name="pinyinma" type="text" class="form-control" id="addPinYinMa" autocomplete="off"
                          data-toggle="tooltip" data-placement="top" title="大写的药品拼音缩写">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="addName" class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-10">
+                  <input name="name" type="text" class="form-control" id="addName" autocomplete="off"
+                         data-toggle="tooltip" data-placement="top" title="请输入药品通用名称">
                 </div>
               </div>
               <div class="form-group">
@@ -187,6 +187,7 @@
   </div>
 </div>
 <include file="./Public/Tpl/footer.html"/>
+<js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
 <script>
     var size = 10;
     var page = 1;
@@ -213,6 +214,38 @@
                     }
                 }
             });
+        });
+        //拼音码自动提示
+        $("#addPinYinMa").Kcomplete({
+            location: "{:U('Drug/dicNameTips')}",
+            dataType: 'json'
+        });
+        //拼音码事件
+        $("#addPinYinMa").bind("keyup change", function () {
+            if ($(this).val() == '') return;
+            $.ajax({
+                url: "{:U('Drug/getDicInfo')}",
+                data: "input_code=" + $("#addPinYinMa").val(),
+                dataType: "json",
+                type: "get",
+                success: function (rs) {
+                    console.log(rs.code+ " " + rs.msg);
+                    if (rs.code == 200) {
+                        var tempName = rs.data.drug_name;
+                        var tempSpec = rs.data.drug_spec;
+                        var tempUnit = rs.data.drug_unit;
+                    } else {
+                        var tempName = rs.msg;
+                        var tempSpec = rs.msg;
+                        var tempUnit = rs.msg;
+                    }
+                    $("#addName").attr("value", tempName);
+                    $("#addSpec").attr("value", tempSpec);
+                    $("#addUnit").attr("value", tempUnit);
+                },
+                error: function () {
+                },
+            })
         });
         //点击库存列表填充模态框
         $("#drugList").on("click", "tr", function (ev) {
