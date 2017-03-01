@@ -12,7 +12,5 @@ gen
 .phpstorm.meta.php
 App/Runtime/
 ThinkPHP/Library/Think/Verify/zhttfs/
-/App/Common/Conf/config.php
 .DS_Store
-App/.DS_Store
-App/Common/.DS_Store
+/App/Common/Conf/config.php
