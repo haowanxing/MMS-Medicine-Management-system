@@ -4,7 +4,7 @@ if(ENV_FLAG == "mopaas"){
     return array(
         //'配置项'=>'配置值'
         'URL_HTML_SUFFIX'=>'',
-//        'URL_CASE_INSENSITIVE' =>true,
+        'URL_CASE_INSENSITIVE' =>true,
         //数据库配置信息
         'DB_TYPE'   => 'mysql', // 数据库类型
         'DB_HOST'   => '192.168.1.89', // 服务器地址
