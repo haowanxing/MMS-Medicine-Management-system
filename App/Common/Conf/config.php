@@ -1,5 +1,6 @@
 <?php
-if(defined('ENV_FLAG') && ENV_FLAG == "mopaas"){
+defined('ENV_FLAG') or define('ENV_FLAG','mopaas');
+if(ENV_FLAG == "mopaas"){
     return array(
         //'配置项'=>'配置值'
         'URL_HTML_SUFFIX'=>'',
