@@ -7,10 +7,8 @@
 *.iml
 out
 gen
-.gitignore
 .idea/
 .phpstorm.meta.php
 App/Runtime/
 ThinkPHP/Library/Think/Verify/zhttfs/
 .DS_Store
-/App/Common/Conf/config.php
