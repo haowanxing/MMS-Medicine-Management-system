@@ -111,7 +111,7 @@ class BusinessController extends Controller{
             session("business.realname",$result['realname']);
             session("business.admin",$result['admin']);
             session("business.freshTime",time());
-            $this->redirect("/Store/Index");
+            $this->redirect("/Store/index");
         } else {
             $this->error("用户名或者密码不正确");
         }
