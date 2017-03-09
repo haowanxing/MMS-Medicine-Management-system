@@ -11,7 +11,7 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">药品报损</button>
-        <button type="button" class="list-group-item list-menu" data-to="1" onclick="loadList(size,page)">报损列表</button>
+        <button type="button" class="list-group-item list-menu" data-to="1" onclick="loadList()">报损列表</button>
       </div>
     </div>
   </div>
@@ -168,24 +168,28 @@
 <include file="./Public/Tpl/footer.html"/>
 <js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
 <script>
-    var size = 10;
-    var page = 1;
-    var breakageList = {list: [], count: 10};
+    var apiData = {
+        size:10,
+        page:1,
+    };
+    var breakageList = {list: [], count: 0};
     var app = new Vue({
         el: '#breakageList',
         data: breakageList
     });
-    function loadList(size, page) {
+    function loadList(_param) {
+        var defaultSetting=apiData;
+        $.extend(defaultSetting,_param);
         $.ajax({
             type: 'POST',
             url: "{:U('Breakage/getBreakageList')}",
-            data: {"size": size, "page": page},
+            data: defaultSetting,
             dataType: 'json',
             async:false,
             success: function (rs) {
                 if (rs.code == 200) {
                     breakageList.list = rs.data.list;
-                    breakageList.count = Math.ceil(rs.data.count / size);
+                    breakageList.count = Math.ceil(rs.data.count / apiData.size);
                 }
             },
             beforeSend: function () {
@@ -199,7 +203,7 @@
     $(document).ready(function () {
         //加载更多
         layui.use(['laypage', 'layer'], function () {
-            loadList(size,page);
+            loadList();
             layer = layui.layer;
             laypage = layui.laypage;
             laypage({
@@ -209,8 +213,8 @@
                 , skip: true,
                 jump: function (obj, first) {
                     if (!first) {
-                        page = obj.curr;
-                        loadList(size, page);
+                        apiData['page'] = obj.curr;
+                        loadList();
                     }
                 }
             });

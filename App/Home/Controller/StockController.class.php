@@ -23,6 +23,7 @@ class StockController extends Controller
      */
     public function getStockList(){
         $data = array();
+        I("post.pinyinma")==''?:$data['pinyinma'] = I("post.pinyinma");
         $data = array_merge($data,$this->shopData);
         $page = I("post.page",1);
         $size = I("post.size",15);

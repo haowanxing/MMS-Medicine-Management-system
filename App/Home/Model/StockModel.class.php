@@ -18,7 +18,13 @@ class StockModel extends Model{
         if($size) $this->page($page, $size);
         if(!empty($condition)){
             $where=array();
-            array_walk($condition,function($v,$k) use (&$where){$where[$this->getTableName().'.'.$k] = $v;});
+            array_walk($condition,function($v,$k) use (&$where){
+                if($k=='pinyinma'){
+                    $where['medic_drugs'.'.'.$k] = array('LIKE','%'.$v.'%');
+                }else{
+                    $where[$this->getTableName().'.'.$k] = $v;
+                }
+            });
             $this->where($where);
         }
         $this->order("stock_id desc");

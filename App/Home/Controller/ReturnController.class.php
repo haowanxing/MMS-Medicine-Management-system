@@ -22,7 +22,8 @@ class ReturnController extends Controller
         $size = I("post.size",15);
         $Return = D("Return");
         $rs = $Return->get_list($data,$size,$page);
-        $count = $Return->count();
+        $count = $Return->where($this->shopData)->count();
+
         $ret = result(200,'ok',array("list"=>$rs,"count"=>intval($count)));
         $this->ajaxReturn($ret,'json');
     }

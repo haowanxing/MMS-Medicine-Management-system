@@ -11,7 +11,7 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">药店信息</button>
-        <button type="button" class="list-group-item list-menu" data-to="1" onclick="loadList(size,page)">药品基础信息</button>
+        <button type="button" class="list-group-item list-menu" data-to="1" onclick="loadList()">药品基础信息</button>
       </div>
     </div>
   </div>
@@ -189,9 +189,11 @@
 <include file="./Public/Tpl/footer.html"/>
 <js href="__PUBLIC__/js/jquery.Kcomplete-1.1.min.js"/>
 <script>
-    var size = 10;
-    var page = 1;
-    var drugList = {list: [], count: 10};
+    var apiData = {
+        size:10,
+        page:1,
+    };
+    var drugList = {list: [], count: 0};
     var app = new Vue({
         el: '#drugList',
         data: drugList
@@ -199,7 +201,7 @@
     $(document).ready(function () {
         //加载更多
         layui.use(['laypage', 'layer'], function () {
-            loadList(size,page);
+            loadList();
             layer = layui.layer;
             laypage = layui.laypage;
             laypage({
@@ -209,8 +211,8 @@
                 , skip: true,
                 jump: function (obj, first) {
                     if (!first) {
-                        page = obj.curr;
-                        loadList(size, page);
+                        apiData['page'] = obj.curr;
+                        loadList();
                     }
                 }
             });
@@ -288,7 +290,7 @@
                     },
                     complete: function () {
                         layer.close(this.layerIndex);
-                        loadList(size,page);
+                        loadList();
                     }
                 })
             }
@@ -324,7 +326,7 @@
                     },
                     complete: function () {
                         layer.close(this.layerIndex);
-                        loadList(size,page);
+                        loadList();
                     }
                 })
             }
@@ -358,24 +360,26 @@
                     },
                     complete: function () {
                         layer.close(this.layerIndex);
-                        loadList(size,page);
+                        loadList();
                     }
                 })
             }, function(){});
         });
 
     });
-    function loadList(size, page) {
+    function loadList(_param) {
+        var defaultSetting=apiData;
+        $.extend(defaultSetting,_param);
         $.ajax({
             type: 'POST',
             url: "{:U('Drug/getDrugList')}",
-            data: {"size": size, "page": page},
+            data: defaultSetting,
             dataType: 'json',
             async:  false,
             success: function (rs) {
                 if (rs.code == 200) {
                     drugList.list = rs.data.list;
-                    drugList.count = Math.ceil(rs.data.count / size);
+                    drugList.count = Math.ceil(rs.data.count / apiData.size);
                 }
             },
             beforeSend: function () {

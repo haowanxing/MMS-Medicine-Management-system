@@ -11,7 +11,7 @@
       <div class="panel-heading">功能</div>
       <div class="list-group list-menu">
         <button type="button" class="list-group-item list-menu active" data-to="0">药品退货</button>
-        <button type="button" class="list-group-item list-menu" data-to="1" onclick="loadList(size,page)">退货记录</button>
+        <button type="button" class="list-group-item list-menu" data-to="1" onclick="loadList()">退货记录</button>
       </div>
     </div>
   </div>
@@ -166,24 +166,28 @@
 </div>
 <include file="./Public/Tpl/footer.html"/>
 <script>
-    var size = 10;
-    var page = 1;
+    var apiData = {
+        size:10,
+        page:1,
+    };
     var returnList = {list: [], count: 10};
     var app = new Vue({
         el: '#returnList',
         data: returnList
     });
-    function loadList(size, page) {
+    function loadList(_param) {
+        var defaultSetting=apiData;
+        $.extend(defaultSetting,_param);
         $.ajax({
             type: 'POST',
             url: "{:U('Return/getRetList')}",
-            data: {"size": size, "page": page},
+            data: defaultSetting,
             dataType: 'json',
             async:false,
             success: function (rs) {
                 if (rs.code == 200) {
                     returnList.list = rs.data.list;
-                    returnList.count = Math.ceil(rs.data.count / size);
+                    returnList.count = Math.ceil(rs.data.count / apiData.size);
                 }
             },
             beforeSend: function () {
@@ -197,7 +201,7 @@
     $(document).ready(function () {
         //加载更多
         layui.use(['laypage', 'layer'], function () {
-            loadList(size,page);
+            loadList();
             layer = layui.layer;
             laypage = layui.laypage;
             laypage({
@@ -207,8 +211,8 @@
                 , skip: true,
                 jump: function (obj, first) {
                     if (!first) {
-                        page = obj.curr;
-                        loadList(size, page);
+                        apiData['page'] = obj.curr;
+                        loadList();
                     }
                 }
             });

@@ -58,16 +58,18 @@
 </div>
 <include file="./Public/Tpl/footer.html"/>
 <script>
-    var size = 10;
-    var page = 1;
-    var adjustList = {list: [], count: 10};
+    var apiData = {
+        size:10,
+        page:1,
+    };
+    var adjustList = {list: [], count: 0};
     var app = new Vue({
         el: '#adjustList',
         data: adjustList
     });
     $(document).ready(function () {
         layui.use(['laypage', 'layer'], function () {
-            loadList(size, page);
+            loadList();
             layer = layui.layer;
             laypage = layui.laypage;
             laypage({
@@ -77,24 +79,26 @@
                 , skip: true,
                 jump: function (obj, first) {
                     if (!first) {
-                        page = obj.curr;
-                        loadList(size, page);
+                        apiData['page'] = obj.curr;
+                        loadList();
                     }
                 }
             });
         });
     });
-    function loadList(size, page) {
+    function loadList(_param) {
+        var defaultSetting=apiData;
+        $.extend(defaultSetting,_param);
         $.ajax({
             type: 'POST',
             url: "{:U('Adjust/getAdjustList')}",
-            data: {"size": size, "page": page},
+            data: defaultSetting,
             dataType: 'json',
             async: false,
             success: function (rs) {
                 if (rs.code == 200) {
                     adjustList.list = rs.data.list;
-                    adjustList.count = Math.ceil(rs.data.count / size);
+                    adjustList.count = Math.ceil(rs.data.count / apiData.size);
                 }
             },
             beforeSend: function () {

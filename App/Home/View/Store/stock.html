@@ -11,7 +11,7 @@
       <div class="panel panel-default">
         <div class="panel-heading">功能</div>
         <div class="list-group list-menu">
-          <button type="button" class="list-group-item list-menu active" data-to="0" onclick="loadList(size,page)">库存列表</button>
+          <button type="button" class="list-group-item list-menu active" data-to="0" onclick="loadList()">库存列表</button>
           <!--<button type="button" class="list-group-item list-menu" data-to="1">库存功能</button>-->
         </div>
       </div>
@@ -140,24 +140,29 @@
 </div>
 <include file="./Public/Tpl/footer.html"/>
 <script>
-    var size = 10;
-    var page = 1;
-    var stockList = {list: [], count: 10};
+    var apiData = {
+        size:10,
+        page:1,
+        pinyinma:'',
+    };
+    var stockList = {list: [], count: 0};
     var app = new Vue({
         el: '#stockList',
         data: stockList
     });
-    function loadList(size, page) {
+    function loadList(_param) {
+        var defaultSetting=apiData;
+        $.extend(defaultSetting,_param);
         $.ajax({
             type: 'POST',
             url: "{:U('Stock/getStockList')}",
-            data: {"size": size, "page": page},
+            data: defaultSetting,
             dataType: 'json',
             async:false,
             success: function (rs) {
                 if (rs.code == 200) {
                     stockList.list = rs.data.list;
-                    stockList.count = Math.ceil(rs.data.count/size);
+                    stockList.count = Math.ceil(rs.data.count/apiData.size);
                 }
             },
             beforeSend:function(){
@@ -171,7 +176,7 @@
     $(document).ready(function () {
         //加载更多
         layui.use(['laypage', 'layer'], function () {
-            loadList(size,page);
+            loadList();
             layer = layui.layer;
             laypage = layui.laypage;
             laypage({
@@ -181,8 +186,8 @@
                 , skip: true,
                 jump: function (obj, first) {
                     if (!first) {
-                        page = obj.curr;
-                        loadList(size, page);
+                        apiData['page'] = obj.curr;
+                        loadList();
                     }
                 }
             });
@@ -217,7 +222,7 @@
                     success: function (data) {
                         if (data['code'] == 200) {
                             $("#stockModal").modal('toggle');
-                            loadList(size,page);
+                            loadList();
                             Form[0].reset();
                             layer.msg("改价成功!",{icon:1});
                         } else {
