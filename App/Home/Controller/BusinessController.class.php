@@ -113,7 +113,7 @@ class BusinessController extends Controller{
             session("business.freshTime",time());
             $this->success('欢迎登录！',U("Store/index"));
         } else {
-            $this->error("用户名或者密码不正确");
+            $this->error("用户名或者密码不正确!");
         }
     }
 

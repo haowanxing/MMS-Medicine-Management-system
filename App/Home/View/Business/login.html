@@ -5,7 +5,7 @@
 </head>
 <body>
 <include file="./Public/Tpl/nav.html"/>
-<div class="container">
+<div class="container" id="shopList">
   <div class="row">
     <div class="col-md-offset-4 col-md-4">
       <div class="panel panel-info">
@@ -16,7 +16,7 @@
             <div class="col-md-12">
               <div class="form-group">
                 <label for="shopList">商户:</label>
-                <select name="shop_id" id="shopList" class="form-control">
+                <select name="shop_id" v-model="form.shop_id" class="form-control">
                   <option value="0">请选择...</option>
                   <option v-for="info in shops" v-bind:value="info.shop_id">
                     {{info.storename}}
@@ -25,15 +25,15 @@
               </div>
               <div class="form-group">
                 <label for="user">用户名:</label>
-                <input name="username" id="user" class="form-control" type="text" placeholder="请输入您的用户名"/><br>
+                <input name="username" id="user" v-model="form.username" class="form-control" type="text" placeholder="请输入您的用户名"/><br>
               </div>
               <div class="form-group">
                 <label for="pwd">密码:</label>
-                <input name="password" id="pwd" class="form-control" type="password" placeholder="请输入您的密码"/>
+                <input name="password" id="pwd" v-model="form.password" class="form-control" type="password" placeholder="请输入您的密码"/>
               </div>
             </div>
-            <div class="col-md-offset-8 col-md-4">
-              <button type="submit" class="btn btn-success">提交</button>
+            <div class="col-md-12">
+              <button @click="login" type="button" class="btn btn-primary" style="float: right">提交</button>
             </div>
           </form>
         </div>
@@ -43,10 +43,35 @@
 </div>
 <include file="./Public/Tpl/footer.html"/>
 <script>
-    var shopList = {shops: {:json_encode($shops)},selected:0};
+    var shopList = {
+        form:{username:"",password:"",shop_id:1},
+        selected:0,
+        shops: {:json_encode($shops)},
+    };
     var app = new Vue({
         el: '#shopList',
-        data: shopList
+        data: shopList,
+        methods:{
+            login:function (e) {
+                var btn = $(e.target);
+                btn.addClass('btn-info').prop('disabled',true).html("正在登录...");
+                $.ajax({
+                    url:"{$actionUrl}",
+                    method:"POST",
+                    data:this.form,
+                    dataType:'json',
+                    success:function(rs){
+                        if(rs.status==1){
+                            btn.addClass("btn-success").prop('disabled',false).html(rs.info);
+                            setTimeout(function(){window.location=rs.url},1000);
+                        }else{
+                            btn.addClass("btn-danger").prop('disabled',false).html(rs.info);
+                        }
+                    }
+
+                })
+            }
+        }
     });
     var shop_history = {$shop_id?$shop_id:0};
     $(document).ready(function(){
