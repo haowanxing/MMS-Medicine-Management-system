@@ -16,14 +16,14 @@
     </div>
   </div>
   <div class="col-sm-10">
-    <div class="panel panel-default func">
+    <div id="sell_app" class="panel panel-default func">
       <div class="panel-heading" style="text-align: center">销售</div>
       <div class="panel-body text-info">
         <form id="sellForm" class="form-horizontal">
           <div class="form-group">
             <label for="buyyer" class="col-sm-2 control-label">购方单位:</label>
             <div class="col-sm-10" data-toggle="tooltip" data-placement="top" title="发票抬头">
-              <input name="buyyer" type="text" class="form-control" id="buyyer" placeholder="">
+              <input :value="buyyer" v-model="buyyer" name="buyyer" type="text" class="form-control" id="buyyer" placeholder="">
             </div>
           </div>
           <table class="table table-bordered">
@@ -65,122 +65,38 @@
                 <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
               </td>
             </tr>
-            <tr>
+            <tr v-for="(item,index) in list" :data-index="index">
               <td>
                 <div class="" data-toggle="tooltip" data-placement="top">
-                  <input name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
-                  <input name="stock_id[]" type="hidden" class="form-control">
+                  <input @keyup="pinyin" :obj-index="'list.'+index+'.pinyinma'" name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
+                  <input :value="item.stock_id" v-model="item.stock_id" :obj-index="'list.'+index+'.stock_id'" name="stock_id[]" type="hidden" class="form-control">
                 </div>
               </td>
               <td>
                 <div class="">
-                  <input name="name[]" type="text" class="form-control" readonly placeholder="药品名称" tabindex="-1">
+                  <input :value="item.name" :obj-index="'list.'+index+'.name'" name="name[]" type="text" class="form-control" readonly placeholder="药品名称" tabindex="-1">
                 </div>
               </td>
               <td>
-                <input name="spec[]" type="text" class="form-control" readonly placeholder="规格" tabindex="-1">
+                <input :value="item.spec" :obj-index="'list.'+index+'.spec'" name="spec[]" type="text" class="form-control" readonly placeholder="规格" tabindex="-1">
               </td>
               <td>
-                <input name="unit[]" type="text" class="form-control" readonly placeholder="单位" tabindex="-1">
+                <input :value="item.unit" :obj-index="'list.'+index+'.unit'" name="unit[]" type="text" class="form-control" readonly placeholder="单位" tabindex="-1">
               </td>
               <td>
-                <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
+                <input :value="item.price" :obj-index="'list.'+index+'.price'" name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
               </td>
               <td>
-                <input name="amount[]" type="number" class="form-control" placeholder="0">
+                <input :value="item.amount" v-model="item.amount" :obj-index="'list.'+index+'.amount'" @keyup="calcu" name="amount[]" type="number" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="" data-toggle="tooltip" data-placement="top">
-                  <input name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
-                  <input name="stock_id[]" type="hidden" class="form-control">
-                </div>
-              </td>
-              <td>
-                <div class="">
-                  <input name="name[]" type="text" class="form-control" readonly placeholder="药品名称" tabindex="-1">
-                </div>
-              </td>
-              <td>
-                <input name="spec[]" type="text" class="form-control" readonly placeholder="规格" tabindex="-1">
-              </td>
-              <td>
-                <input name="unit[]" type="text" class="form-control" readonly placeholder="单位" tabindex="-1">
-              </td>
-              <td>
-                <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
-              </td>
-              <td>
-                <input name="amount[]" type="number" class="form-control" placeholder="0">
-              </td>
-              <td>
-                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="" data-toggle="tooltip" data-placement="top">
-                  <input name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
-                  <input name="stock_id[]" type="hidden" class="form-control">
-                </div>
-              </td>
-              <td>
-                <div class="">
-                  <input name="name[]" type="text" class="form-control" readonly placeholder="药品名称" tabindex="-1">
-                </div>
-              </td>
-              <td>
-                <input name="spec[]" type="text" class="form-control" readonly placeholder="规格" tabindex="-1">
-              </td>
-              <td>
-                <input name="unit[]" type="text" class="form-control" readonly placeholder="单位" tabindex="-1">
-              </td>
-              <td>
-                <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
-              </td>
-              <td>
-                <input name="amount[]" type="number" class="form-control" placeholder="0">
-              </td>
-              <td>
-                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="" data-toggle="tooltip" data-placement="top">
-                  <input name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
-                  <input name="stock_id[]" type="hidden" class="form-control">
-                </div>
-              </td>
-              <td>
-                <div class="">
-                  <input name="name[]" type="text" class="form-control" readonly placeholder="药品名称" tabindex="-1">
-                </div>
-              </td>
-              <td>
-                <input name="spec[]" type="text" class="form-control" readonly placeholder="规格" tabindex="-1">
-              </td>
-              <td>
-                <input name="unit[]" type="text" class="form-control" readonly placeholder="单位" tabindex="-1">
-              </td>
-              <td>
-                <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
-              </td>
-              <td>
-                <input name="amount[]" type="number" class="form-control" placeholder="0">
-              </td>
-              <td>
-                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
+                <input :value="item.subtotal" :obj-index="'list.'+index+'.subtotal'" name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
               </td>
             </tr>
             </tbody>
           </table>
           <div class="col-sm-10">
-            总计:<span id="totalPrice">0.0</span>元
+            总计:<span id="totalPrice">{{totalPrice}}</span>元
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
@@ -249,9 +165,70 @@
         do:'loadmore',
     };
     var sellList = {list: [], count: 10};
-    var app = new Vue({
+    var sell_record = new Vue({
         el: '#sellList',
         data: sellList
+    });
+    var sell_obj = {pinyinma:"",stock_id:"",name:"",spec:"",unit:"",price:"",amount:"",subtotal:""};
+    var sellData = {list:[sell_obj],buyyer:"",totalPrice:0.0};
+    var sell_app = new Vue({
+        el: '#sell_app',
+        data: sellData,
+        methods:{
+            calcu:function(e){
+                var index = $(e.target).parents('tr').attr('data-index');
+                var Price = this.list[index].price;
+                var num = this.list[index].amount;
+                if (num !== "" && Price.value != "") {
+                    var subTotal = (num * Price).toFixed(2);
+                    this.list[index].subtotal = subTotal;
+                }
+                var add = 0
+                for (var i = 0; i < sell_app.list.length; i++) {
+                    add += parseFloat(sell_app.list[i].subtotal);
+                }
+                sell_app.totalPrice = add;console.log(add);
+            },
+            pinyin:function(e){
+                var index = $(e.target).parents('tr').attr('data-index');
+                if (e.target.value == "") {
+                    return;
+                }
+                sell_app.list[index].subtotal = "";
+                sell_app.list[index].pinyinma = e.target.value;
+                setTimeout(function(){
+                    $.ajax({
+                        url: "{:U('Stock/getInfo')}",
+                        data: "pinyinma=" + e.target.value,
+                        datatype: "json",
+                        type: "POST",
+                        success: function (data) {
+                            console.log(data,e.target.value);
+                            if (data['code'] == 200) {
+                                var tempStockId = data.data.stock_id;
+                                var tempName = data.data.name;
+                                var tempSpec = data.data.spec;
+                                var tempUnit = data.data.unit;
+                                var tempSellprice = data.data.sellprice;
+                            } else {
+                                var tempName = data.msg;
+                                var tempSpec = data.msg;
+                                var tempUnit = data.msg;
+                                var tempSellprice = data.msg;
+                            }
+                            sell_app.list[index].stock_id = tempStockId;
+                            sell_app.list[index].name = tempName;
+                            sell_app.list[index].spec = tempSpec;
+                            sell_app.list[index].unit = tempUnit;
+                            sell_app.list[index].price = tempSellprice;
+
+                        },
+                        error: function () {
+                        },
+                    });
+                },1);
+            }
+        },
     });
     function loadList(_param) {
         var defaultSetting=apiData;
@@ -277,7 +254,27 @@
         });
     }
 
+    var pinyinbind = function(){
+        pinyinunbind();
+        //拼音码自动提示
+        $("input[name='pinyinma[]']").each(function () {
+            $(this).Kcomplete({
+                location: "{:U('Drug/nameTips')}",
+                dataType: 'json'
+            });
+        });
+    };
+    var pinyinunbind = function(){
+        $("input[name='pinyinma[]']").each(function () {
+            $(this).unbind('keyup');
+        });
+    }
     $(document).ready(function () {
+        pinyinbind();
+        sell_app.$watch('list',function(newValue,oldValue){
+            pinyinbind();
+            console.log(newValue);
+        });
         //加载更多
         layui.use(['laypage', 'layer'], function () {
             loadList();
@@ -294,13 +291,6 @@
                         loadList();
                     }
                 }
-            });
-        });
-        //拼音码自动提示
-        $("input[name='pinyinma[]']").each(function () {
-            $(this).Kcomplete({
-                location: "{:U('Drug/nameTips')}",
-                dataType: 'json'
             });
         });
         //提交事件
@@ -341,7 +331,7 @@
             })
         });
         //自动算价
-        $("input[name='amount[]']").on("keyup", function () {
+        /*$("input[name='amount[]']").on("keyup", function () {
             $Price = $(this).parents('tr').find("[name='price[]']");
             $allPrice = $(this).parents('tr').find("[name='subtotal[]']");
             if (this.value !== "" && $Price.val() != "") {
@@ -355,14 +345,20 @@
                 if (add)
                     $("#totalPrice").html((oldPrice + add).toFixed(2));
             }
-        });
+        });*/
         //拼音码事件
-        $("input[name='pinyinma[]']").bind("keyup change", function () {
+        /*$("input[name='pinyinma[]']").bind("keyup change", function () {
             if (this.value == "") {
                 return;
             }
             $pTr = $(this).parents('tr');
-            $pTr.find("[name='subtotal[]']").attr("value", "");
+            var index_sub_total = $pTr.find("[name='subtotal[]']").attr("obj-index");
+            var index_stock_id = $pTr.find("[name='stock_id[]']").attr("obj-index");
+            var index_name = $pTr.find("[name='name[]']").attr("obj-index");
+            var index_spec = $pTr.find("[name='spec[]']").attr("obj-index");
+            var index_unit = $pTr.find("[name='unit[]']").attr("obj-index");
+            var index_price = $pTr.find("[name='price[]']").attr("obj-index");
+            set_data(sell_app,index_sub_total,"");
             $.ajax({
                 url: "{:U('Stock/getInfo')}",
                 data: "pinyinma=" + $(this).val(),
@@ -382,18 +378,27 @@
                         var tempUnit = data.msg;
                         var tempSellprice = data.msg;
                     }
-                    $pTr.find("[name='stock_id[]']").attr("value", tempStockId);
-                    $pTr.find("[name='name[]']").attr("value", tempName);
-                    $pTr.find("[name='spec[]']").attr("value", tempSpec);
-                    $pTr.find("[name='unit[]']").attr("value", tempUnit);
-                    $pTr.find("[name='price[]']").attr("value", tempSellprice);
+                    set_data(sell_app,index_stock_id,tempStockId);
+                    set_data(sell_app,index_name,tempName);
+                    set_data(sell_app,index_spec,tempSpec);
+                    set_data(sell_app,index_unit,tempUnit);
+                    set_data(sell_app,index_price,tempSellprice);
                 },
                 error: function () {
                 },
             })
-        });
+        });*/
 
     });
+
+    /*var set_data = function(appobj, target, value){
+        var obj_index_arr = target.split('.');
+        var obj_target = appobj;
+        for(var i=0;i<obj_index_arr.length-1;i++){
+            obj_target = obj_target[obj_index_arr[i]];
+        }
+        obj_target[obj_index_arr.pop()] = value;
+    }*/
 </script>
 </body>
 </html>
