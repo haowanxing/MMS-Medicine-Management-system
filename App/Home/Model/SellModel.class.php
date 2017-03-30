@@ -49,34 +49,36 @@ class SellModel extends Model
 
     public function sell($data = array()){
         $shop_id = $data['shop_id'];
+        $data_list = $data['list'];
+        $data_buyyer = $data['buyyer'];
         $Stock = M('Stock');
         $orderNo = createOrderNo();
         $seller = session('business.bid');
         $totalPrice = 0;
         $data_all = array();
         $this->startTrans();
-        foreach($data['stock_id'] as $k => $v){
-            if(empty($v))
+        foreach ($data_list as $key=>$item){
+            if(empty($item['stock_id']))
                 continue;
-            if($stock = $Stock->where(array('stock_id'=>$v,'shop_id'=>$data['shop_id']))->find()){
-                if($data['sell_amount'][$k] < 1){
-                    $this->error = "输入的'{$data['name'][$k]}'的数量有误";
+            if($stock = $Stock->where(array('stock_id'=>$item['stock_id'],'shop_id'=>$shop_id))->find()){
+                if(intval($item['amount']) < 1){
+                    $this->error = "输入的'{$item['name']}'的数量有误";
                     return false;
                 }
-                if($data['sell_amount'][$k] > $stock['stock_amount']){
-                    $this->error = "'{$data['name'][$k]}'库存不足,剩余:".$stock['stock_amount'];
+                if($item['amount'] > $stock['stock_amount']){
+                    $this->error = "'{$item['name']}'库存不足,剩余:".$stock['stock_amount'];
                     return false;
                 }else{
-                    $stockRes = $Stock->where($stock)->setDec('stock_amount',intval($data['sell_amount'][$k]));
+                    $stockRes = $Stock->where($stock)->setDec('stock_amount',intval($item['amount']));
                     if($stockRes){
                         $sData = array(
-                                'stock_id'=>$data['stock_id'][$k],
-                                'price'=>$data['price'][$k],
-                                'sell_amount'=>$data['sell_amount'][$k],
-                                'subtotal'=>$stock['sellprice']*intval($data['sell_amount'][$k]),
-                                'orderno'=>$orderNo,
-                                'shop_id'=>$shop_id,
-                                );
+                            'stock_id'=>$item['stock_id'],
+                            'price'=>$item['price'],
+                            'sell_amount'=>$item['amount'],
+                            'subtotal'=>$stock['sellprice']*intval($item['amount']),
+                            'orderno'=>$orderNo,
+                            'shop_id'=>$shop_id,
+                        );
                         array_push($data_all,$sData);
                         $totalPrice += $sData['subtotal'];
                     }else{
@@ -86,7 +88,7 @@ class SellModel extends Model
                     }
                 }
             }else{
-                $this->error = "库存中没有找到".$data['name'][$k];
+                $this->error = "库存中没有找到".$item['name'];
                 return false;
             }
         }
@@ -94,7 +96,7 @@ class SellModel extends Model
         if($addRes = $this->addAll($data_all)){ //销售记录成功
             $oData = array(
                 'orderno'=>$orderNo,
-                'buyyer'=>$data['buyyer'],
+                'buyyer'=>$data_buyyer,
                 'time'=>time(),
                 'total'=>$totalPrice,
                 'sell_by'=>$seller,

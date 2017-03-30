@@ -31,66 +31,78 @@
             <th style="width: 15%;">拼音码</th>
             <th style="width: 22%;">名称</th>
             <th style="width: 15%">规格大小</th>
-            <th style="width: 8%;">计量单位</th>
+            <th style="width: 8%;">单位</th>
             <th style="width: 10%;">单价</th>
             <th style="width: 10%;">数量</th>
             <th style="width: 10%;">小计</th>
+            <th style="width: 10%;">操作</th>
             </thead>
             <tbody>
             <tr>
               <td>
                 <div class="" data-toggle="tooltip" data-placement="top">
-                  <input name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
-                  <input name="stock_id[]" type="hidden" class="form-control">
+                  <input @keyup="pinyin" name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
+                  <input v-model="input_data.stock_id" name="stock_id[]" type="hidden" class="form-control">
                 </div>
               </td>
               <td>
                 <div class="">
-                  <input name="name[]" type="text" class="form-control" readonly placeholder="药品名称" tabindex="-1">
+                  <input v-model="input_data.name" name="name[]" type="text" class="form-control" readonly placeholder="药品名称" tabindex="-1">
                 </div>
               </td>
               <td>
-                <input name="spec[]" type="text" class="form-control" readonly placeholder="规格" tabindex="-1">
+                <input v-model="input_data.spec" name="spec[]" type="text" class="form-control" readonly placeholder="规格" tabindex="-1">
               </td>
               <td>
-                <input name="unit[]" type="text" class="form-control" readonly placeholder="单位" tabindex="-1">
+                <input v-model="input_data.unit" name="unit[]" type="text" class="form-control" readonly placeholder="单位" tabindex="-1">
               </td>
               <td>
-                <input name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
+                <input v-model="input_data.price" name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
               </td>
               <td>
-                <input name="amount[]" type="number" class="form-control" placeholder="0">
+                <input v-model="input_data.amount" @keyup="calcu" name="amount[]" type="number" class="form-control" placeholder="0">
               </td>
               <td>
-                <input name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
+                <input v-model="input_data.subtotal" name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
+              </td>
+              <td style="text-align: center;line-height: 34px;">
+                <span @click="add" style="cursor: pointer">新增</span>
               </td>
             </tr>
+            </tbody>
+          </table>
+          <table class="table table-striped">
+            <thead>
+            <th>名称</th>
+            <th>规格</th>
+            <th>单位</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>小计</th>
+            </thead>
+            <tbody>
             <tr v-for="(item,index) in list" :data-index="index">
               <td>
-                <div class="" data-toggle="tooltip" data-placement="top">
-                  <input @keyup="pinyin" :obj-index="'list.'+index+'.pinyinma'" name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
-                  <input :value="item.stock_id" v-model="item.stock_id" :obj-index="'list.'+index+'.stock_id'" name="stock_id[]" type="hidden" class="form-control">
-                </div>
+                <span>{{item.name}}</span>
               </td>
               <td>
-                <div class="">
-                  <input :value="item.name" :obj-index="'list.'+index+'.name'" name="name[]" type="text" class="form-control" readonly placeholder="药品名称" tabindex="-1">
-                </div>
+                <span>{{item.spec}}</span>
               </td>
               <td>
-                <input :value="item.spec" :obj-index="'list.'+index+'.spec'" name="spec[]" type="text" class="form-control" readonly placeholder="规格" tabindex="-1">
+                <span>{{item.unit}}</span>
               </td>
               <td>
-                <input :value="item.unit" :obj-index="'list.'+index+'.unit'" name="unit[]" type="text" class="form-control" readonly placeholder="单位" tabindex="-1">
+                <span>{{item.price}}</span>
               </td>
               <td>
-                <input :value="item.price" :obj-index="'list.'+index+'.price'" name="price[]" type="text" class="form-control" readonly placeholder="0.00" tabindex="-1">
+                <span>{{item.amount}}</span>
               </td>
               <td>
-                <input :value="item.amount" v-model="item.amount" :obj-index="'list.'+index+'.amount'" @keyup="calcu" name="amount[]" type="number" class="form-control" placeholder="0">
+                <span>{{item.subtotal}}</span>
               </td>
-              <td>
-                <input :value="item.subtotal" :obj-index="'list.'+index+'.subtotal'" name="subtotal[]" type="number" class="form-control" readonly placeholder="自动计算..." tabindex="-1">
+              <td style="text-align: center;line-height: 34px;">
+                <span @click="remove(index)" style="cursor: pointer;color: #e34a17">移除</span>
+                <!--<span @click="add(index)" style="cursor: pointer">新增</span>-->
               </td>
             </tr>
             </tbody>
@@ -100,8 +112,8 @@
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button id="doSell" type="button" class="btn btn-success submit">确认销售</button>
-              <button type="reset" class="btn btn-warning">清空输入</button>
+              <button @click="doSell" id="doSell" type="button" class="btn btn-success submit">确认销售</button>
+              <button @click="reset" type="button" class="btn btn-warning">清空输入</button>
             </div>
           </div>
         </form>
@@ -170,40 +182,55 @@
         data: sellList
     });
     var sell_obj = {pinyinma:"",stock_id:"",name:"",spec:"",unit:"",price:"",amount:"",subtotal:""};
-    var sellData = {list:[sell_obj],buyyer:"",totalPrice:0.0};
+    var sellData = {list:[],buyyer:"",totalPrice:0.0,input_data:sell_obj};
     var sell_app = new Vue({
         el: '#sell_app',
         data: sellData,
         methods:{
-            calcu:function(e){
-                var index = $(e.target).parents('tr').attr('data-index');
-                var Price = this.list[index].price;
-                var num = this.list[index].amount;
+            add:function(){
+                var d = $.extend({},sell_app.input_data);console.log(d);
+                this.list.push(d);
+            },
+            remove:function(index){
+                sell_app.list.splice(index,1);
+            },
+            reset:function(e){
+                layer.confirm('确定要清空本次销售列表？', {
+                    btn: ['确认', '取消'] //按钮
+                },function(lay){
+                        sell_app.list = [];
+                        layer.close(lay);
+                    }
+                )
+            },
+            calcu:function(index){
+                var index = index;
+                var Price = this.input_data.price;
+                var num = this.input_data.amount;
                 if (num !== "" && Price.value != "") {
                     var subTotal = (num * Price).toFixed(2);
-                    this.list[index].subtotal = subTotal;
+                    this.input_data.subtotal = subTotal;
                 }
-                var add = 0
+                /*var add = 0
                 for (var i = 0; i < sell_app.list.length; i++) {
                     add += parseFloat(sell_app.list[i].subtotal);
                 }
-                sell_app.totalPrice = add;console.log(add);
+                sell_app.totalPrice = add;*/
             },
             pinyin:function(e){
-                var index = $(e.target).parents('tr').attr('data-index');
+                console.log(e.target.value);
                 if (e.target.value == "") {
                     return;
                 }
-                sell_app.list[index].subtotal = "";
-                sell_app.list[index].pinyinma = e.target.value;
                 setTimeout(function(){
+                    sell_app.input_data.subtotal = "";
+                    sell_app.input_data.pinyinma = e.target.value;
                     $.ajax({
                         url: "{:U('Stock/getInfo')}",
                         data: "pinyinma=" + e.target.value,
-                        datatype: "json",
+                        dataType: "json",
                         type: "POST",
                         success: function (data) {
-                            console.log(data,e.target.value);
                             if (data['code'] == 200) {
                                 var tempStockId = data.data.stock_id;
                                 var tempName = data.data.name;
@@ -212,21 +239,54 @@
                                 var tempSellprice = data.data.sellprice;
                             } else {
                                 var tempName = data.msg;
-                                var tempSpec = data.msg;
-                                var tempUnit = data.msg;
-                                var tempSellprice = data.msg;
                             }
-                            sell_app.list[index].stock_id = tempStockId;
-                            sell_app.list[index].name = tempName;
-                            sell_app.list[index].spec = tempSpec;
-                            sell_app.list[index].unit = tempUnit;
-                            sell_app.list[index].price = tempSellprice;
+                            sell_app.input_data.stock_id = tempStockId;
+                            sell_app.input_data.name = tempName;
+                            sell_app.input_data.spec = tempSpec;
+                            sell_app.input_data.unit = tempUnit;
+                            sell_app.input_data.price = tempSellprice;
 
                         },
                         error: function () {
                         },
                     });
                 },1);
+            },
+            doSell:function(){
+                $.ajax({
+                    url: "{:U('Sell/doAdd')}",
+                    data: sellData,
+                    dataType: "json",
+                    type: "POST",
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1,{ shade: [0.1, '#393D49'] });
+                    },
+                    success: function (data) {
+//                    console.log(data);
+                        if (data['code'] == 200) {
+                            layer.msg("销售成功!",{icon:1});
+                          /*layer.open({
+                           type: 2,
+                           title: '打印订单',
+                           shadeClose: true,
+                           shade: 0.8,
+                           area: ['380px', '90%'],
+                           content: data.data
+                           });*/
+                            $("#ifm").attr('src', data.data);
+                            $("#sellForm")[0].reset();
+//                        window.location.reload();
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+                    },
+                    error: function () {
+                        layer.msg("提交过程中发生问题! 请联系管理员",{icon:0});
+                    },
+                    complete:function(){
+                        layer.close(this.layerIndex);
+                    }
+                })
             }
         },
     });
@@ -254,26 +314,31 @@
         });
     }
 
-    var pinyinbind = function(){
-        pinyinunbind();
+    var pinyinbind = function(obj){
         //拼音码自动提示
-        $("input[name='pinyinma[]']").each(function () {
-            $(this).Kcomplete({
+        var t = $(obj);
+        if(t.length>1)
+          $(obj).each(function () {
+              $(this).Kcomplete({
+                  location: "{:U('Drug/nameTips')}",
+                  dataType: 'json'
+              });
+          });
+        else
+            $(obj).Kcomplete({
                 location: "{:U('Drug/nameTips')}",
                 dataType: 'json'
             });
-        });
     };
-    var pinyinunbind = function(){
-        $("input[name='pinyinma[]']").each(function () {
-            $(this).unbind('keyup');
-        });
-    }
     $(document).ready(function () {
-        pinyinbind();
+        pinyinbind("input[name='pinyinma[]']");
         sell_app.$watch('list',function(newValue,oldValue){
-            pinyinbind();
-            console.log(newValue);
+            var add = 0
+            for (var i = 0; i < sell_app.list.length; i++) {
+                sell_app.list[i].subtotal = (sell_app.list[i].price*sell_app.list[i].amount).toFixed(2);
+                add += parseFloat(sell_app.list[i].subtotal);
+            }
+            sell_app.totalPrice = add;
         });
         //加载更多
         layui.use(['laypage', 'layer'], function () {
@@ -294,6 +359,7 @@
             });
         });
         //提交事件
+/*
         $("#doSell").on("click", function () {
             $.ajax({
                 url: "{:U('Sell/doAdd')}",
@@ -304,17 +370,17 @@
                     this.layerIndex = layer.load(1,{ shade: [0.1, '#393D49'] });
                 },
                 success: function (data) {
-                    console.log(data);
+//                    console.log(data);
                     if (data['code'] == 200) {
                         layer.msg("销售成功!",{icon:1});
-                        /*layer.open({
+                        /!*layer.open({
                             type: 2,
                             title: '打印订单',
                             shadeClose: true,
                             shade: 0.8,
                             area: ['380px', '90%'],
                             content: data.data
-                        });*/
+                        });*!/
                         $("#ifm").attr('src', data.data);
                         $("#sellForm")[0].reset();
 //                        window.location.reload();
@@ -330,6 +396,7 @@
                 }
             })
         });
+*/
         //自动算价
         /*$("input[name='amount[]']").on("keyup", function () {
             $Price = $(this).parents('tr').find("[name='price[]']");

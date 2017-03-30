@@ -28,15 +28,14 @@ class SellController extends Controller{
     }
     public function doAdd(){
         $data = I("post.");
-        $data["sell_amount"] = I("post.amount");
         $data = array_merge($data,$this->shopData);
-        $sellRes = D('Sell')->sell($data);
+        /*$sellRes = D('Sell')->sell($data);
         if ($sellRes){
             $retMsg = result(200,'ok',U('Print/sales_slip',array('order'=>$sellRes)));
         }else{
             $retMsg = result(400,D('Sell')->getError());
-        }
-        $this->ajaxReturn($retMsg, 'json');
+        }*/
+        $this->ajaxReturn($data, 'json');
     }
 
     public function getInfo(){
