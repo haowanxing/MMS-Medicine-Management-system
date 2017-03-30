@@ -192,8 +192,8 @@
                 var price = this.input_data.price;
                 var amount = this.input_data.amount;
                 var subtotal = this.input_data.subtotal;
+                this.input_data.pinyinma = "";
                 if(stock_id!= "" && price != "" && amount != "" && amount > 0){
-                    this.input_data = $.extend({},sell_obj);
                     for(var i=0;i<this.list.length;i++){
                         var item = this.list[i];
                         if(item.stock_id == stock_id){
