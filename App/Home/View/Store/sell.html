@@ -41,7 +41,7 @@
             <tr>
               <td>
                 <div class="" data-toggle="tooltip" data-placement="top">
-                  <input @keyup="pinyin" name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
+                  <input @keyup="pinyin" @change="pinyin" name="pinyinma[]" type="text" class="form-control" placeholder="拼音码" autocomplete="off">
                   <input v-model="input_data.stock_id" name="stock_id[]" type="hidden" class="form-control">
                 </div>
               </td>
@@ -188,8 +188,26 @@
         data: sellData,
         methods:{
             add:function(){
-                var d = $.extend({},sell_app.input_data);console.log(d);
-                this.list.push(d);
+                var stock_id = this.input_data.stock_id;
+                var price = this.input_data.price;
+                var amount = this.input_data.amount;
+                var subtotal = this.input_data.subtotal;
+                if(stock_id!= "" && price != "" && amount != "" && amount > 0){
+                    this.input_data = $.extend({},sell_obj);
+                    for(var i=0;i<this.list.length;i++){
+                        var item = this.list[i];
+                        if(item.stock_id == stock_id){
+                            item.amount += amount;
+                            item.subtotal = (parseFloat(item.subtotal)+parseFloat(subtotal)).toFixed(2);
+                            layer.msg("合并到"+item.name);
+                            return true;
+                        }
+                    }
+                    var d = $.extend({},sell_app.input_data);console.log(d);
+                    this.list.push(d);
+                }else{
+                    layer.msg("键入信息不完整或有误",{icon:2});
+                }
             },
             remove:function(index){
                 sell_app.list.splice(index,1);
@@ -204,7 +222,6 @@
                 )
             },
             calcu:function(index){
-                var index = index;
                 var Price = this.input_data.price;
                 var num = this.input_data.amount;
                 if (num !== "" && Price.value != "") {
@@ -245,12 +262,13 @@
                             sell_app.input_data.spec = tempSpec;
                             sell_app.input_data.unit = tempUnit;
                             sell_app.input_data.price = tempSellprice;
+                            sell_app.input_data.amount = '';
 
                         },
                         error: function () {
                         },
                     });
-                },1);
+                },100);
             },
             doSell:function(){
                 $.ajax({
