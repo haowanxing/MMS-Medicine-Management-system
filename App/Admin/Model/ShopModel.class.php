@@ -11,25 +11,21 @@ namespace Admin\Model;
 
 use Think\Model;
 
-class UserModel extends Model{
-    protected $tableName = 'users';
+class ShopModel extends Model{
 
     public function get_list(array $condition=array(),$size=null,$page=1){
         if($size) $this->page($page, $size);
         if(!empty($condition)) $this->where($condition);
-        $this->order("id DESC");
-        $rs = $this->field("id,username,realname,lasttime,admin")->select();
-        array_walk($rs,function(&$i){
-            $i['lasttime'] = $i['lasttime']==0?"从未登录过本系统":date("Y-m-d H:i:s",$i['lasttime']);
-        });
+        $this->order("shop_id DESC");
+        $rs = $this->select();
         return $rs;
     }
 
-    public function edit($user_id,$data){
-        if (!empty($user_id) && $user_id > 0) {
-            $findRes = $this->where(array('id'=>$user_id))->find();
+    public function edit($shop_id,$data){
+        if (!empty($shop_id) && $shop_id > 0) {
+            $findRes = $this->where(array('id'=>$shop_id))->find();
             if ($findRes) {
-                $data['id'] = $user_id;
+                $data['shop_id'] = $shop_id;
                 $saveRes = $this->data($data)->save();
                 if ($saveRes) {
                     return $saveRes;
@@ -38,7 +34,7 @@ class UserModel extends Model{
                     return false;
                 }
             } else {
-                $this->error = "用户不存在!";
+                $this->error = "店铺不存在!";
                 return false;
             }
         } else {
@@ -48,25 +44,25 @@ class UserModel extends Model{
     }
 
     public function doAdd($data){
-        $username = $data['username'];
-        $password = $data['password'];
-        $realname = $data['realname'];
-        $admin = $data['admin'];
-        if($username == "" || $password == "" || $realname ==""){
+        $storename = $data['storename'];
+        $telephone = $data['telephone'];
+        $mobile = $data['mobile'];
+        $address = $data['address'];
+        if($storename == "" || $telephone == "" || $mobile =="" || $address ==""){
             $this->error = "表单必须填写完整,不得出现空项!";
             return false;
         }
-        $info['username'] = $username;
-        $info['password'] = md5($password);
-        $info['realname'] = $realname;
-        $info['admin'] = $admin;
+        $info['storename'] = $storename;
+        $info['telephone'] = $telephone;
+        $info['mobile'] = $mobile;
+        $info['address'] = $address;
         foreach ($info as $k => $v) {
             if (empty($v) && $v < 0) {
                 $this->error($k . "为必填项");
             }
         }
-        if ($this->where(array("username" => $info['username']))->find()) {
-            $this->error = "登录名重复!";
+        if ($this->where(array("storename" => $info['storename']))->find()) {
+            $this->error = "店铺名重复!";
             return false;
         }
         $res = $this->data($info)->add();
@@ -78,19 +74,14 @@ class UserModel extends Model{
         }
     }
 
-    public function del($user_id){
-        $info['id'] = $user_id;
+    public function del($shop_id){
+        $info['shop_id'] = $shop_id;
         $user = $this->where($info)->find();
         if ($user) {
-            if ($user['admin'] == 0) {
-                $res = $this->where($user)->delete();
-                return $res;
-            } else {
-                $this->error = "不能删除管理员!";
-                return false;
-            }
+            $res = $this->where($user)->delete();
+            return $res;
         } else {
-            $this->error = "用户不存在!";
+            $this->error = "店铺不存在!";
             return false;
         }
     }

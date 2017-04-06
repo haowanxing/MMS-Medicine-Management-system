@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./App/Admin/View/Tpl/head.html" title="字典库管理" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<include file="./App/Admin/View/Tpl/nav.html"/>
+<div class="container" id="business">
+  <div class="col-lg-12">
+    <ul class="nav nav-tabs">
+      <li role="presentation" class="list-menu active" data-to="0"><a href="#">字典库</a></li>
+    </ul>
+    <div class="row func">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-2">
+            <div class="input-group">
+              <button class="btn btn-success" type="button" data-toggle="modal" data-target="#add_drugModal">收录新品</button>
+            </div>
+          </div>
+          <div class="col-lg-offset-6 col-lg-4">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Search for..." v-model="filter.input_code">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button" @click="search">搜索</button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <table class="table table-hover table-pointer">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>名称</th>
+                <th>拼音码</th>
+                <th>规格</th>
+                <th>单位</th>
+                <th>规格/单位</th>
+                <th>计量单位</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(info,index) in list" data-toggle="modal" data-target="#drugModal" @click="up_drug(index)">
+                <td>{{ info.id }}</td>
+                <td>{{ info.drug_name }}</td>
+                <td>{{ info.input_code }}</td>
+                <td>{{ info.drug_spec }}</td>
+                <td>{{ info.drug_unit }}</td>
+                <td>{{ info.dose_per_unit }}</td>
+                <td>{{ info.dose_units }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div id="Page" class="center">
+              <nav>
+                <ul class="pagination">
+                  <li v-for="i in count">
+                    <a href="javascript:" :data-to="i">{{ i }}</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="drugModal" tabindex="-1" role="dialog" aria-labelledby="drugModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="shopModalLabel">药品信息</h4>
+            </div>
+            <div class="modal-body">
+              <form id="userForm" class="form-horizontal">
+                <div class="form-group">
+                  <label for="inputDrugName" class="col-sm-2 control-label">名称</label>
+                  <div class="col-sm-10">
+                    <input name="drug_name" type="text" class="form-control" id="inputDrugName" placeholder=""
+                           autocomplete="off" v-model="drugModel.drug_name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputDrugSpec" class="col-sm-2 control-label">规格</label>
+                  <div class="col-sm-10">
+                    <input name="drug_spec" type="text" class="form-control" id="inputDrugSpec" placeholder=""
+                           autocomplete="off" v-model="drugModel.drug_spec">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputDrugUnit" class="col-sm-2 control-label">单位</label>
+                  <div class="col-sm-10" data-toggle="tooltip" data-placement="top">
+                    <input name="drug_unit" type="text" class="form-control" id="inputDrugUnit" placeholder=""
+                           autocomplete="off"  v-model="drugModel.drug_unit">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputDoseperUnit" class="col-sm-2 control-label">规格/单位</label>
+                  <div class="col-sm-10">
+                    <input name="dose_per_unit" type="text" class="form-control" id="inputDoseperUnit"  v-model="drugModel.dose_per_unit">
+                    </input>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputDoseunits" class="col-sm-2 control-label">计量单位</label>
+                  <div class="col-sm-10">
+                    <input name="dose_units" type="text" class="form-control" id="inputDoseunits"  v-model="drugModel.dose_units">
+                    </input>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputCode" class="col-sm-2 control-label">拼音码</label>
+                  <div class="col-sm-10">
+                    <input name="input_code" type="text" class="form-control" id="inputCode"  v-model="drugModel.input_code">
+                    </input>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button id="delUserBtn" type="button" class="btn btn-danger btn-sm" style="float: left"
+                      data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该记录" @click="model_delete">删除
+              </button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" @click="model_update">修改</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="add_drugModal" tabindex="-1" role="dialog" aria-labelledby="add_drugModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="add_drugModalLabel">添加新品</h4>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label for="inputDrugName2" class="col-sm-2 control-label">名称</label>
+                  <div class="col-sm-10">
+                    <input name="drug_name" type="text" class="form-control" id="inputDrugName2" placeholder=""
+                           autocomplete="off" v-model="add_drugModel.drug_name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputDrugSpec2" class="col-sm-2 control-label">规格</label>
+                  <div class="col-sm-10">
+                    <input name="drug_spec" type="text" class="form-control" id="inputDrugSpec2" placeholder=""
+                           autocomplete="off" v-model="add_drugModel.drug_spec">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputDrugUnit2" class="col-sm-2 control-label">单位</label>
+                  <div class="col-sm-10" data-toggle="tooltip" data-placement="top">
+                    <input name="drug_unit" type="text" class="form-control" id="inputDrugUnit2" placeholder=""
+                           autocomplete="off"  v-model="add_drugModel.drug_unit">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputDoseperUnit2" class="col-sm-2 control-label">规格/单位</label>
+                  <div class="col-sm-10">
+                    <input name="dose_per_unit" type="text" class="form-control" id="inputDoseperUnit2"  v-model="add_drugModel.dose_per_unit">
+                    </input>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputDoseunits2" class="col-sm-2 control-label">计量单位</label>
+                  <div class="col-sm-10">
+                    <input name="dose_units" type="text" class="form-control" id="inputDoseunits2"  v-model="add_drugModel.dose_units">
+                    </input>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputCode2" class="col-sm-2 control-label">拼音码</label>
+                  <div class="col-sm-10">
+                    <input name="input_code" type="text" class="form-control" id="inputCode2"  v-model="add_drugModel.input_code">
+                    </input>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" @click="model_add">提交</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row func">
+    </div>
+    <div class="row func">
+    </div>
+  </div>
+</div>
+<include file="./App/Admin/View/Tpl/footer.html"/>
+<script>
+    var apiData = {
+        size:10,
+        page:1,
+        input_code:'',
+    };
+    var drug_info = {id:0,drug_name:'',drug_spec:'',drug_unit:'',dose_per_unit:'',dose_units:'',input_code:''};
+    var appdata = {list: [], count: 10,filter:apiData,drugModel:$.extend({},drug_info),add_drugModel:$.extend({},drug_info)};
+    var app = new Vue({
+        el: '#business',
+        data: appdata,
+        mounted:function(){
+            this.loadList();
+            layui.use(['laypage', 'layer'], function () {
+                layer = layui.layer;
+                laypage = layui.laypage;
+                laypage({
+                    cont: 'Page'
+                    , pages: appdata.count
+                    , skin: '#337ab7'
+                    , skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                            apiData['page'] = obj.curr;
+                            app.loadList();
+                        }
+                    }
+                });
+            });
+        },
+        methods:{
+            up_page:function(){
+                layui.laypage({
+                    cont: 'Page'
+                    , pages: appdata.count
+                    , skin: '#337ab7'
+                    , skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                            apiData['page'] = obj.curr;
+                            app.loadList();
+                        }
+                    }
+                });
+            },
+            up_drug:function(index){
+                this.drugModel = $.extend(this.drugModel,this.list[index]);
+                this.drugModel.password = "";
+            },
+            model_add:function(e){
+                var data = this.add_drugModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Dictionary/addDrug')}",
+                    data: $.extend({do:'addDrug'},data),
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#add_drugModal").modal('toggle');
+                            layer.msg("添加成功!", {icon: 1});
+                            app.loadList();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            model_update:function(e){
+                var data = this.drugModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Dictionary/updateDrug')}",
+                    data: data,
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#drugModal").modal('toggle');
+                            layer.msg("修改成功!", {icon: 1});
+                            app.loadList();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            model_delete:function(){
+                var data = this.drugModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Dictionary/delDrug')}",
+                    data: $.extend({do:'delDrug'},data),
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#drugModal").modal('toggle');
+                            layer.msg("删除成功!", {icon: 1});
+                            app.loadList();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            loadList:function(e){
+                var ret = {};
+                var defaultSetting=apiData;
+                if(typeof e !== "undefined") $.extend(defaultSetting,e);
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Dictionary/getDrugList')}",
+                    data: defaultSetting,
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            appdata.list = rs.data.list;
+                            appdata.count = Math.ceil(rs.data.count / apiData.size);
+                        }
+                        ret = rs;
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+                return ret;
+            },
+            search:function(e){
+                this.loadList({input_code:appdata.filter.input_code});
+                this.up_page();
+            },
+        }
+    });
+</script>
+<script>
+
+</script>
+</body>
+</html>

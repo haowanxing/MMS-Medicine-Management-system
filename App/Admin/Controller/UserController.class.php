@@ -1,5 +1,5 @@
 <?php
-namespace Home\Controller;
+namespace Admin\Controller;
 
 use Think\Controller;
 
@@ -18,6 +18,7 @@ class UserController extends Controller
         $data = array();
         $page = I("post.page",1);
         $size = I("post.size",15);
+        I("post.username") != "" && $data['username'] = array('like','%'.I("post.username").'%');
         $list = D("User")->get_list($data,$size,$page);
         $count = D("User")->count();
         $ret = result(200,'ok',array('list'=>$list,'count'=>intval($count)));
@@ -46,19 +47,19 @@ class UserController extends Controller
 
     public function checkLogin()
     {
-        if (empty(I("session.username"))) {
+        if (empty(session("user.username"))) {
             return false;
         } else {
-            $freshTime = I("session.freshTime");
-            if (time() > ($freshTime + 30 * 60)) {    //空闲时间超过30分钟,自动退出登录
+            $freshTime = session("user.freshTime");
+            /*if (time() > ($freshTime + 30 * 60)) {    //空闲时间超过30分钟,自动退出登录
                 $this->logout();
                 return false;
-            }
+            }*/
             if (time() > ($freshTime + 5 * 60)) {    //登录时间超过5分钟,需要更新一下session
-                $info = M("Users")->where("id=" . I("session.userId"))->find();
-                $_SESSION['username'] = $info['username'];
-                $_SESSION['admin'] = $info['admin'];
-                $_SESSION['freshTime'] = time();
+                $info = M("Users")->where("id=" . session("user.user_id"))->find();
+                session("user.username",$info['username']);
+                session("user.admin",$info['admin']);
+                session("user.freshTime",time());
             }
             return true;
         }
@@ -66,7 +67,7 @@ class UserController extends Controller
 
     public function checkAdmin()
     {
-        if (empty(I("session.admin")) || !$this->checkLogin()) {
+        if (empty(session("user.admin")) || !$this->checkLogin()) {
             return false;
         } else {
             return true;
@@ -89,12 +90,13 @@ class UserController extends Controller
         $result = M("Users")->where($user)->find();
         if ($result) {
             M("Users")->where($result)->data(array("lasttime" => time()))->save();
-            $_SESSION['userId'] = $result['id'];
-            $_SESSION['username'] = $result['username'];
-            $_SESSION['realname'] = $result['realname'];
-            $_SESSION['admin'] = $result['admin'];
-            $_SESSION['freshTime'] = time();
-            $this->redirect("/Store/Index");
+            session("user.user_id",$result['id']);
+            session("user.shop_id",$result['shop_id']);
+            session("user.username",$result['username']);
+            session("user.realname",$result['realname']);
+            session("user.admin",$result['admin']);
+            session("user.freshTime",time());
+            $this->redirect("/Index/config");
         } else {
             $this->error("用户名或者密码不正确");
         }
@@ -102,11 +104,7 @@ class UserController extends Controller
 
     public function logout()
     {
-        unset($_SESSION['username']);
-        unset($_SESSION['realname']);
-        unset($_SESSION['admin']);
-        unset($_SESSION['userId']);
-        unset($_SESSION['freshTime']);
+        session(null);
         return $this;
     }
 
@@ -121,7 +119,7 @@ class UserController extends Controller
 
     public function doChangeInfo(){
         $data = I("post.");
-        $user_id = $data['user_id'];unset($data['user_id']);
+        $user_id = $data['id'];unset($data['id']);
         if($data['password'] == "") unset($data['password']);
         else $data['password'] = md5($data['password']);
         $rs = D("User")->edit($user_id,$data);
@@ -135,17 +133,17 @@ class UserController extends Controller
 
     public function chPass(){
         $this->loginCheck();
-        if(I("post.do") == "chpassword"){
-            if(I("post.new") == I("post.old") || I("post.new") == ""){
+        if (I("post.do") == "chpassword"){
+            if (I("post.new") == I("post.old") || I("post.new") == ""){
                 $this->error("新旧密码不能相同或为空!");
             }else{
-                $user_id = I("session.userId");
+                $user_id = session("user.user_id");
                 $old_password = md5(I("post.old"));
                 $new_password = md5(I("post.new"));
-                $findRes = M("Users")->where(array("id"=>$user_id,"password"=>$old_password))->find();
-                if($findRes){
-                    $saveRes = D("User")->edit($user_id,array("password"=>$new_password));
-                    if($saveRes){
+                $findRes = M("Users")->where(array("id" => $user_id, "password" => $old_password))->find();
+                if ($findRes){
+                    $saveRes = D("User")->edit($user_id, array("password" => $new_password));
+                    if ($saveRes){
                         $this->logout()->success("修改成功!请使用新密码重新登录");
                     }else{
                         $this->error(D("User")->getError());
@@ -186,7 +184,7 @@ class UserController extends Controller
     {
         if ($this->checkAdmin() === true) {
             if (I("post.do") == "delUser") {
-                $user_id = I("post.user_id");
+                $user_id = I("post.id");
                 $rs = D("User")->del($user_id);
                 if($rs){
                     $retMsg = result(200,'ok',$rs);

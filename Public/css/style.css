@@ -8,9 +8,13 @@
 }
 .func{
   display: none;
+  padding-top: 20px;
 }
 .center{
   text-align: center;
+}
+.table-pointer td{
+  cursor: pointer;
 }
 
 footer{
@@ -18,4 +22,6 @@ footer{
   height: 150px;
   background-color: whitesmoke;
   padding: 65px 0px;
+  border: 1px solid #ccc;
+  border-radius: 20px 20px 20px 20px;
 }

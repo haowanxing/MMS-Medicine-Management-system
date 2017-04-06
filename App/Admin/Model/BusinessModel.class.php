@@ -11,14 +11,13 @@ namespace Admin\Model;
 
 use Think\Model;
 
-class UserModel extends Model{
-    protected $tableName = 'users';
+class BusinessModel extends Model{
 
     public function get_list(array $condition=array(),$size=null,$page=1){
         if($size) $this->page($page, $size);
         if(!empty($condition)) $this->where($condition);
         $this->order("id DESC");
-        $rs = $this->field("id,username,realname,lasttime,admin")->select();
+        $rs = $this->field("id,shop_id,username,realname,lasttime,admin")->select();
         array_walk($rs,function(&$i){
             $i['lasttime'] = $i['lasttime']==0?"从未登录过本系统":date("Y-m-d H:i:s",$i['lasttime']);
         });

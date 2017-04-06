@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <include file="./App/Admin/View/Tpl/head.html" title="商户管理" description="药品管理系统." keywords="中南民族大学,药品管理系统"/>
+</head>
+<body>
+<include file="./App/Admin/View/Tpl/nav.html"/>
+<div class="container" id="business">
+  <div class="col-lg-12">
+    <ul class="nav nav-tabs">
+      <li role="presentation" class="list-menu active" data-to="0"><a href="#">商户列表</a></li>
+      <li role="presentation" class="list-menu" data-to="1"><a href="#">用户管理</a></li>
+    </ul>
+    <div class="row func">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-2">
+            <div class="input-group">
+              <button class="btn btn-success" type="button" data-toggle="modal" data-target="#add_shopModal">添加商户</button>
+            </div>
+          </div>
+          <div class="col-lg-offset-6 col-lg-4">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Search for..." v-model="filter.storename">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button" @click="search">搜索</button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <table class="table table-hover table-pointer">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>店铺名</th>
+                <th>固定电话</th>
+                <th>手机号</th>
+                <th>联系地址</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(info,index) in list" data-toggle="modal" data-target="#shopModal" @click="up_shop(index)">
+                <td>{{ info.shop_id }}</td>
+                <td>{{ info.storename }}</td>
+                <td>{{ info.telephone }}</td>
+                <td>{{ info.mobile }}</td>
+                <td>{{ info.address }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div id="Page" class="center">
+              <nav>
+                <ul class="pagination">
+                  <li v-for="i in count">
+                    <a href="javascript:" :data-to="i">{{ i }}</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="shopModal" tabindex="-1" role="dialog" aria-labelledby="shopModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="shopModalLabel">商户信息</h4>
+            </div>
+            <div class="modal-body">
+              <form id="userForm" class="form-horizontal">
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">名称</label>
+                  <div class="col-sm-10">
+                    <input name="realname" type="text" class="form-control" id="inputName" placeholder="老王府井"
+                           autocomplete="off" v-model="shopModel.storename">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputUserName" class="col-sm-2 control-label">固定电话</label>
+                  <div class="col-sm-10">
+                    <input name="username" type="text" class="form-control" id="inputUserName" placeholder="Wong.Lao"
+                           autocomplete="off" v-model="shopModel.telephone">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputPassword" class="col-sm-2 control-label">手机号</label>
+                  <div class="col-sm-10" data-toggle="tooltip" data-placement="top">
+                    <input name="password" type="mobile" class="form-control" id="inputPassword" placeholder="***"
+                           autocomplete="off"  v-model="shopModel.mobile">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputAdmin" class="col-sm-2 control-label">联系地址</label>
+                  <div class="col-sm-10">
+                    <input name="admin" type="text" class="form-control" id="inputAdmin"  v-model="shopModel.address">
+                    </input>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button id="delUserBtn" type="button" class="btn btn-danger btn-sm" style="float: left"
+                      data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该用户" @click="model_delete">删除
+              </button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" @click="model_update">修改</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="add_shopModal" tabindex="-1" role="dialog" aria-labelledby="add_shopModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="add_shopModalLabel">添加商户</h4>
+            </div>
+            <div class="modal-body">
+              <form id="add_userForm" class="form-horizontal">
+                <div class="form-group">
+                  <label for="add_inputName" class="col-sm-2 control-label">名称</label>
+                  <div class="col-sm-10">
+                    <input name="realname" type="text" class="form-control" id="add_inputName" placeholder="老王府井"
+                           autocomplete="off" v-model="add_shopModel.storename">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="add_inputUserName" class="col-sm-2 control-label">固定电话</label>
+                  <div class="col-sm-10">
+                    <input name="username" type="text" class="form-control" id="add_inputUserName" placeholder="Wong.Lao"
+                           autocomplete="off" v-model="add_shopModel.telephone">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="add_inputPassword" class="col-sm-2 control-label">手机号</label>
+                  <div class="col-sm-10" data-toggle="tooltip" data-placement="top">
+                    <input name="password" type="mobile" class="form-control" id="add_inputPassword" placeholder="***"
+                           autocomplete="off"  v-model="add_shopModel.mobile">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="add_inputAdmin" class="col-sm-2 control-label">联系地址</label>
+                  <div class="col-sm-10">
+                    <input name="admin" type="text" class="form-control" id="add_inputAdmin"  v-model="add_shopModel.address">
+                    </input>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" @click="model_add">提交</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row func">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-2">
+            <div class="input-group">
+              <button class="btn btn-success" type="button" data-toggle="modal" data-target="#add_userModal">新增用户</button>
+            </div>
+          </div>
+          <div class="col-lg-offset-6 col-lg-4">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Search for..." v-model="user.filter.username">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button" @click="search_user">搜索</button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <table class="table table-hover table-pointer">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>店铺ID</th>
+                <th>用户名</th>
+                <th>姓名</th>
+                <th>权限</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(info,index) in user.list" data-toggle="modal" data-target="#userModal" @click="up_user(index)">
+                <td>{{ info.id }}</td>
+                <td>{{ info.shop_id }}</td>
+                <td>{{ info.username }}</td>
+                <td>{{ info.realname }}</td>
+                <td v-if="info.admin == 0">普通</td>
+                <td v-else>超管</td>
+              </tr>
+              </tbody>
+            </table>
+            <div id="Page2" class="center">
+              <nav>
+                <ul class="pagination">
+                  <li v-for="i in count">
+                    <a href="javascript:" :data-to="i">{{ i }}</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="userModalLabel">用户信息</h4>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label for="usershop" class="col-sm-2 control-label">店铺ID</label>
+                  <div class="col-sm-10">
+                    <input name="realname" type="text" class="form-control" id="usershop" placeholder=""
+                           autocomplete="off" v-model="user.userModel.shop_id">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="userrealname" class="col-sm-2 control-label">姓名</label>
+                  <div class="col-sm-10">
+                    <input name="realname" type="text" class="form-control" id="userrealname" placeholder="读取错误"
+                           autocomplete="off" v-model="user.userModel.realname">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="username" class="col-sm-2 control-label">登录名</label>
+                  <div class="col-sm-10">
+                    <input name="username" type="text" class="form-control" id="username" placeholder="读取错误"
+                           autocomplete="off" v-model="user.userModel.username">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="passowrd" class="col-sm-2 control-label">密码</label>
+                  <div class="col-sm-10" data-toggle="tooltip" data-placement="top" title="不修改请留空">
+                    <input name="password" type="password" class="form-control" id="passowrd" placeholder="不修改请留空"
+                           autocomplete="off"  v-model="user.userModel.password">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="userAdmin" class="col-sm-2 control-label">身份权限</label>
+                  <div class="col-sm-10">
+                    <select name="admin" class="form-control" id="userAdmin"  v-model="user.userModel.admin">
+                      <option value="0" text="普通">普通</option>
+                      <option value="1" text="管理员">管理员</option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger btn-sm" style="float: left"
+                      data-toggle="tooltip" data-placement="right" title="慎重!这将会删除该用户" @click="model_delete_user">删除
+              </button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" @click="model_update_user">修改</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="add_userModal" tabindex="-1" role="dialog" aria-labelledby="add_userModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="add_userModalLabel">添加用户</h4>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label for="addusershop" class="col-sm-2 control-label">店铺ID</label>
+                  <div class="col-sm-10">
+                    <input name="realname" type="text" class="form-control" id="addusershop" placeholder=""
+                           autocomplete="off" v-model="user.add_userModel.shop_id">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="adduserrealname" class="col-sm-2 control-label">姓名</label>
+                  <div class="col-sm-10">
+                    <input name="realname" type="text" class="form-control" id="adduserrealname" placeholder=""
+                           autocomplete="off" v-model="user.add_userModel.realname">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="addusername" class="col-sm-2 control-label">登录名</label>
+                  <div class="col-sm-10">
+                    <input name="username" type="text" class="form-control" id="addusername" placeholder=""
+                           autocomplete="off" v-model="user.add_userModel.username">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="addpassowrd" class="col-sm-2 control-label">密码</label>
+                  <div class="col-sm-10" data-toggle="tooltip" data-placement="top">
+                    <input name="password" type="password" class="form-control" id="addpassowrd" placeholder=""
+                           autocomplete="off"  v-model="user.add_userModel.password">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="adduserAdmin" class="col-sm-2 control-label">身份权限</label>
+                  <div class="col-sm-10">
+                    <select name="admin" class="form-control" id="adduserAdmin"  v-model="user.add_userModel.admin">
+                      <option value="0" text="普通">普通</option>
+                      <option value="1" text="管理员">管理员</option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" @click="model_add_user">提交</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row func">
+    </div>
+  </div>
+</div>
+<include file="./App/Admin/View/Tpl/footer.html"/>
+<script>
+    var apiData = {
+        size:10,
+        page:1,
+        storename:'',
+    };
+    var apiData2 = {
+        size:10,
+        page:1,
+        shop_id:'',
+        username:'',
+    };
+    var shop_info = {shop_id:0,storename:'',telephone:'',mobile:'',address:''};
+    var user_info = {id:0,shop_id:'',username:'',password:'',realname:'',lasttime:'',admin:''};
+    var appdata = {list: [], count: 10,filter:apiData,shopModel:$.extend({},shop_info),add_shopModel:$.extend({},shop_info),
+    user:{list:[],count:10,filter:apiData2,userModel:$.extend({},user_info),add_userModel:$.extend({},user_info)}};
+    var app = new Vue({
+        el: '#business',
+        data: appdata,
+        mounted:function(){
+            this.loadList();
+            this.loadList_user();
+            layui.use(['laypage', 'layer'], function () {
+                layer = layui.layer;
+                laypage = layui.laypage;
+                laypage({
+                    cont: 'Page'
+                    , pages: appdata.count
+                    , skin: '#337ab7'
+                    , skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                            apiData['page'] = obj.curr;
+                            app.loadList();
+                        }
+                    }
+                });
+            });
+            this.up_page_user();
+        },
+        methods:{
+            up_page:function(){
+                layui.laypage({
+                    cont: 'Page'
+                    , pages: appdata.count
+                    , skin: '#337ab7'
+                    , skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                            apiData['page'] = obj.curr;
+                            app.loadList();
+                        }
+                    }
+                });
+            },
+            up_shop:function(index){
+                this.shopModel = $.extend(this.shopModel,this.list[index]);
+                this.shopModel.password = "";
+            },
+            model_add:function(e){
+                var data = this.add_shopModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Business/addShop')}",
+                    data: $.extend({do:'addUser'},data),
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#add_shopModal").modal('toggle');
+                            layer.msg("添加成功!", {icon: 1});
+                            app.loadList();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            model_update:function(e){
+                var data = this.shopModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Business/updateShop')}",
+                    data: data,
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#shopModal").modal('toggle');
+                            layer.msg("修改成功!", {icon: 1});
+                            app.loadList();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            model_delete:function(){
+                var data = this.shopModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Business/delShop')}",
+                    data: $.extend({do:'delShop'},data),
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#shopModal").modal('toggle');
+                            layer.msg("删除成功!", {icon: 1});
+                            app.loadList();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            loadList:function(e){
+                var ret = {};
+                var defaultSetting=apiData;
+                if(typeof e !== "undefined") $.extend(defaultSetting,e);
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Business/getShopList')}",
+                    data: defaultSetting,
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            appdata.list = rs.data.list;
+                            appdata.count = Math.ceil(rs.data.count / apiData.size);
+                        }
+                        ret = rs;
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+                return ret;
+            },
+            up_page_user:function(){
+                layui.laypage({
+                    cont: 'Page2'
+                    , pages: appdata.user.count
+                    , skin: '#337ab7'
+                    , skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                            apiData2['page'] = obj.curr;
+                            app.loadList_user();
+                        }
+                    }
+                });
+            },
+            up_user:function(index){
+                this.user.userModel = $.extend(this.user.userModel,this.user.list[index]);
+                this.user.userModel.password = "";
+            },
+            model_add_user:function(e){
+                var data = this.user.add_userModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Business/addUser')}",
+                    data: $.extend({do:'addUser'},data),
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#add_userModal").modal('toggle');
+                            layer.msg("添加成功!", {icon: 1});
+                            app.loadList_user();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            model_update_user:function(e){
+                var data = this.user.userModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Business/updateUser')}",
+                    data: data,
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#userModal").modal('toggle');
+                            layer.msg("修改成功!", {icon: 1});
+                            app.loadList_user();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            model_delete_user:function(){
+                var data = this.user.userModel;
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Business/delUser')}",
+                    data: $.extend({do:'delUser'},data),
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            $("#userModal").modal('toggle');
+                            layer.msg("删除成功!", {icon: 1});
+                            app.loadList_user();
+                        } else {
+                            layer.msg("原因:" + rs.msg, {icon: 2});
+                        }
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+            },
+            loadList_user:function(e){
+                var ret = {};
+                var defaultSetting=apiData2;
+                if(typeof e !== "undefined") $.extend(defaultSetting,e);
+                $.ajax({
+                    type: 'POST',
+                    url: "{:U('Business/getUserList')}",
+                    data: defaultSetting,
+                    dataType: 'json',
+                    async: false,
+                    success: function (rs) {
+                        if (rs.code == 200) {
+                            appdata.user.list = rs.data.list;
+                            appdata.user.count = Math.ceil(rs.data.count / apiData2.size);
+                        }
+                        ret = rs;
+                    },
+                    beforeSend: function () {
+                        this.layerIndex = layer.load(1, {shade: [0.1, '#393D49']});
+                    },
+                    complete: function () {
+                        layer.close(this.layerIndex);
+                    }
+                });
+                return ret;
+            },
+            search:function(e){
+                this.loadList({storename:appdata.filter.storename});
+                this.up_page();
+            },
+            search_user:function(e){
+                this.loadList_user({username:appdata.user.filter.username});
+                this.up_page();
+            },
+        }
+    });
+</script>
+<script>
+
+</script>
+</body>
+</html>
