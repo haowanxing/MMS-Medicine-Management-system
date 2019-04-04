@@ -1,34 +1,17 @@
 <?php
-defined('ENV_FLAG') or define('ENV_FLAG','mopaas');
-if(ENV_FLAG == "mopaas"){
-    return array(
-        //'配置项'=>'配置值'
-        'URL_HTML_SUFFIX'=>'',
-        'URL_CASE_INSENSITIVE' =>true,
-        //数据库配置信息
-        'DB_TYPE'   => 'mysql', // 数据库类型
-        'DB_HOST'   => '192.168.1.89', // 服务器地址
-        'DB_NAME'   => '1ba9967d1c3c4', // 数据库名
-        'DB_USER'   => 'e155d8febfab4', // 用户名
-        'DB_PWD'    => 'c19c526131a34', // 密码
-        'DB_PORT'   => 30147, // 端口
-        'DB_PREFIX' => 'medic_', // 数据库表前缀
-        'DB_CHARSET'=> 'utf8', // 字符集
-        'DB_DEBUG'  =>  TRUE, // 数据库调试模式 开启后可以记录SQL日志 3.2.3新增
-    );
-}
 return array(
-	//'配置项'=>'配置值'
-        'URL_HTML_SUFFIX'=>'',
-        'URL_CASE_INSENSITIVE' =>true,
+    //'配置项'=>'配置值'
+    'URL_MODEL' => 2,
+    'URL_HTML_SUFFIX' => '',
+    'URL_CASE_INSENSITIVE' => true,
     //数据库配置信息
-        'DB_TYPE'   => 'mysql', // 数据库类型
-        'DB_HOST'   => 'localhost', // 服务器地址
-        'DB_NAME'   => 'medicine', // 数据库名
-        'DB_USER'   => 'root', // 用户名
-        'DB_PWD'    => '1234', // 密码
-        'DB_PORT'   => 3306, // 端口
-        'DB_PREFIX' => 'medic_', // 数据库表前缀
-        'DB_CHARSET'=> 'utf8', // 字符集
-        'DB_DEBUG'  =>  TRUE, // 数据库调试模式 开启后可以记录SQL日志 3.2.3新增
+    'DB_TYPE' => 'mysql', // 数据库类型
+    'DB_HOST' => 'localhost', // 服务器地址
+    'DB_NAME' => 'mms', // 数据库名
+    'DB_USER' => 'root', // 用户名
+    'DB_PWD' => '1234', // 密码
+    'DB_PORT' => 3306, // 端口
+    'DB_PREFIX' => 'medic_', // 数据库表前缀
+    'DB_CHARSET' => 'utf8', // 字符集
+    'DB_DEBUG' => true, // 数据库调试模式 开启后可以记录SQL日志 3.2.3新增
 );

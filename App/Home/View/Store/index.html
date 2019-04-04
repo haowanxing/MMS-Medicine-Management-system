@@ -116,7 +116,7 @@
             <volist name="drug.warning" id="data">
               <li class="list-group-item">
                 <span class="badge">{$data.lowwarning}</span>
-                {$data.name} (库存: {$data.sum_amount} 件)
+                {$data.name} (库存: {$data['sum_amount']?$data['sum_amount']:0} 件)
               </li>
             </volist>
           </ul>

@@ -28,7 +28,18 @@ class StoreController extends Controller{
         $Drug['stock'] = $dbStock->where($this->shopData)->count("DISTINCT drug_id");//库存中药品种类数量
         $subSql = $dbStock->field("DISTINCT drug_id")->where($this->shopData)->buildSql();
         $Drug['out_stock'] = $dbDrug->where("drug_id not in {$subSql}")->where($this->shopData)->select();
-        $Drug['warning'] = $dbDrug->alias("drug")->join("RIGHT JOIN __STOCK__ stock ON stock.drug_id = drug.drug_id AND stock.shop_id = drug.shop_id")->group("stock.drug_id")->field("sum(stock.stock_amount) sum_amount,stock.*,drug.*")->where(array('drug.shop_id'=>$this->shopData['shop_id']))->select();
+        $subQuery = $Model->field('sum(stock_amount) sum_amount,drug_id')->table('__STOCK__')->where(['shop_id' => $this->shopData['shop_id']])->group('drug_id')->buildSql();
+        $Drug['warning'] = $dbDrug->alias("drug")
+            ->join("LEFT JOIN {$subQuery} stock ON stock.drug_id = drug.drug_id")
+            ->field("sum_amount, drug.*")
+            ->where(array('drug.shop_id' => $this->shopData['shop_id']))
+            ->select();
+//        $Drug['warning'] = $dbDrug->alias("drug")
+//            ->join("RIGHT JOIN __STOCK__ stock ON stock.drug_id = drug.drug_id AND stock.shop_id = drug.shop_id")
+//            ->group("stock.drug_id")
+//            ->field("sum(stock.stock_amount) sum_amount,stock.*,drug.*")
+//            ->where(array('drug.shop_id'=>$this->shopData['shop_id']))
+//            ->select();
         foreach($Drug['warning'] as $key=>$value){
             if($value['sum_amount'] > $value['lowwarning']){
                 unset($Drug['warning'][$key]);
